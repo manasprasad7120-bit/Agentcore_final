@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden}
+body{font-family:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;background:#0b1220;color:#f0efec;position:relative;-webkit-font-smoothing:antialiased}
+.bg{position:absolute;inset:0;background:
+  radial-gradient(1300px 760px at 88% -12%, rgba(57,135,229,.22), transparent 62%),
+  radial-gradient(1000px 640px at -8% 112%, rgba(144,133,233,.16), transparent 62%),
+  #0b1220}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:80px 80px;-webkit-mask-image:radial-gradient(ellipse at 50% 45%, #000 35%, transparent 85%)}
+.slide{position:absolute;inset:0}
+.head{position:absolute;left:96px;right:96px;top:64px}
+.eyebrow{font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:#6da7ec;font-weight:600;margin-bottom:14px}
+h1.title{font-size:56px;font-weight:600;line-height:1.1;letter-spacing:-.012em}
+.sub{font-size:26px;color:#c3c2b7;margin-top:14px;max-width:1500px;line-height:1.35}
+.body{position:absolute;left:96px;right:96px;top:288px;bottom:104px}
+.footer{position:absolute;left:96px;right:96px;bottom:38px;display:flex;justify-content:space-between;align-items:center;color:#8b8f98;font-size:18px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:600;color:#c3c2b7;font-size:20px;letter-spacing:.01em}
+.card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:22px;padding:28px}
+.ic{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;flex:none}
+ul.dots{list-style:none}
+ul.dots li{position:relative;padding-left:26px;font-size:22px;color:#c3c2b7;line-height:1.35;margin-top:10px}
+ul.dots li::before{content:"";position:absolute;left:4px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--c,#3987e5)}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);font-size:21px;color:#f0efec;white-space:nowrap}
+.chip svg{flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-size:18px;font-weight:600;letter-spacing:.02em}
+.muted{color:#8b8f98}
+.t2{color:#c3c2b7}
+ul.dots li{font-size:25px;margin-top:14px}</style></head><body>
+<div class="bg"></div><div class="grid"></div>
+<div class="slide">
+  <div class="head"><div class="eyebrow">What AgentCore is</div><h1 class="title">One platform from first prototype to governed production</h1><p class="sub">AgentCore brings the full agent lifecycle under one login, one catalogue and one audit trail.</p></div>
+  <div class="body"><div style="display:flex;gap:28px;height:560px"><div class="card" style="flex:1;padding:36px 32px;--c:#3987e5;border-top:4px solid #3987e5">
+      <div style="display:flex;align-items:center;gap:18px"><span class="ic" style="width:64px;height:64px;border-radius:14px;background:#3987e522;border:1px solid #3987e566;color:#3987e5"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg></span><div style="font-size:38px;font-weight:700">Build</div></div>
+      <ul class="dots" style="margin-top:22px"><li>Visual agent studio</li><li>Curated component library</li><li>Playground for testing</li><li>Multi-agent patterns</li><li>Templates and starter projects</li></ul></div><div class="card" style="flex:1;padding:36px 32px;--c:#199e70;border-top:4px solid #199e70">
+      <div style="display:flex;align-items:center;gap:18px"><span class="ic" style="width:64px;height:64px;border-radius:14px;background:#199e7022;border:1px solid #199e7066;color:#199e70"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span><div style="font-size:38px;font-weight:700">Connect</div></div>
+      <ul class="dots" style="margin-top:22px"><li>Any LLM provider through one gateway</li><li>Microsoft 365 and databases</li><li>Knowledge bases, vectors and graphs</li><li>MCP tool servers</li><li>Scheduled and event-driven triggers</li></ul></div><div class="card" style="flex:1;padding:36px 32px;--c:#9085e9;border-top:4px solid #9085e9">
+      <div style="display:flex;align-items:center;gap:18px"><span class="ic" style="width:64px;height:64px;border-radius:14px;background:#9085e922;border:1px solid #9085e966;color:#9085e9"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><div style="font-size:38px;font-weight:700">Govern</div></div>
+      <ul class="dots" style="margin-top:22px"><li>Roles and workspaces</li><li>Approval workflows</li><li>Guardrails and human review</li><li>Audit trails</li><li>Cost limits and timeouts</li></ul></div><div class="card" style="flex:1;padding:36px 32px;--c:#d95926;border-top:4px solid #d95926">
+      <div style="display:flex;align-items:center;gap:18px"><span class="ic" style="width:64px;height:64px;border-radius:14px;background:#d9592622;border:1px solid #d9592666;color:#d95926"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span><div style="font-size:38px;font-weight:700">Run</div></div>
+      <ul class="dots" style="margin-top:22px"><li>Releases across DEV, UAT and PROD</li><li>APIs, chat widget and Teams</li><li>Monitoring and tracing</li><li>Evaluation datasets</li><li>Multi-region deployment</li></ul></div></div>
+<div style="display:flex;justify-content:center;gap:18px;margin-top:40px">
+  <span class="chip"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6da7ec" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>One login</span>
+  <span class="chip"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6da7ec" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>One catalogue of agents, models, tools and guardrails</span>
+  <span class="chip"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6da7ec" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>One audit trail</span></div></div>
+  <div class="footer"><div class="brand"><svg width="30" height="30" viewBox="0 0 48 48" fill="none">
+  <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3987e5"/><stop offset="1" stop-color="#9085e9"/></linearGradient></defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#lg)"/>
+  <path d="M15 16h8M23 16l10 8M33 24l-10 8M15 32h8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="14" cy="16" r="4" fill="#fff"/><circle cx="14" cy="32" r="4" fill="#fff"/>
+  <circle cx="34" cy="24" r="4.5" fill="#0b1220" stroke="#fff" stroke-width="2.4"/>
+</svg><span>AgentCore</span></div><div>Enterprise AI agent platform&nbsp;&nbsp;·&nbsp;&nbsp;03</div></div>
+</div></body></html>

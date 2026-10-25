@@ -1,0 +1,52 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden}
+body{font-family:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;background:#0b1220;color:#f0efec;position:relative;-webkit-font-smoothing:antialiased}
+.bg{position:absolute;inset:0;background:
+  radial-gradient(1300px 760px at 88% -12%, rgba(57,135,229,.22), transparent 62%),
+  radial-gradient(1000px 640px at -8% 112%, rgba(144,133,233,.16), transparent 62%),
+  #0b1220}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:80px 80px;-webkit-mask-image:radial-gradient(ellipse at 50% 45%, #000 35%, transparent 85%)}
+.slide{position:absolute;inset:0}
+.head{position:absolute;left:96px;right:96px;top:64px}
+.eyebrow{font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:#6da7ec;font-weight:600;margin-bottom:14px}
+h1.title{font-size:56px;font-weight:600;line-height:1.1;letter-spacing:-.012em}
+.sub{font-size:26px;color:#c3c2b7;margin-top:14px;max-width:1500px;line-height:1.35}
+.body{position:absolute;left:96px;right:96px;top:288px;bottom:104px}
+.footer{position:absolute;left:96px;right:96px;bottom:38px;display:flex;justify-content:space-between;align-items:center;color:#8b8f98;font-size:18px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:600;color:#c3c2b7;font-size:20px;letter-spacing:.01em}
+.card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:22px;padding:28px}
+.ic{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;flex:none}
+ul.dots{list-style:none}
+ul.dots li{position:relative;padding-left:26px;font-size:22px;color:#c3c2b7;line-height:1.35;margin-top:10px}
+ul.dots li::before{content:"";position:absolute;left:4px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--c,#3987e5)}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);font-size:21px;color:#f0efec;white-space:nowrap}
+.chip svg{flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-size:18px;font-weight:600;letter-spacing:.02em}
+.muted{color:#8b8f98}
+.t2{color:#c3c2b7}
+</style></head><body>
+<div class="bg"></div><div class="grid"></div>
+<div style="position:absolute;right:-40px;top:60px"><svg width="1200" height="830" viewBox="0 0 1300 900" style="opacity:0.55"><line x1="120" y1="160" x2="340" y2="90" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="340" y1="90" x2="520" y2="240" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="520" y1="240" x2="760" y2="120" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="760" y1="120" x2="930" y2="300" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="930" y1="300" x2="1120" y2="160" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="120" y1="160" x2="250" y2="420" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="250" y1="420" x2="480" y2="520" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="520" y1="240" x2="480" y2="520" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="480" y1="520" x2="700" y2="420" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="700" y1="420" x2="930" y2="300" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="700" y1="420" x2="960" y2="560" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="960" y1="560" x2="1180" y2="420" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="1120" y1="160" x2="1180" y2="420" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="250" y1="420" x2="380" y2="700" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="380" y1="700" x2="640" y2="760" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="480" y1="520" x2="640" y2="760" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="640" y1="760" x2="880" y2="700" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="880" y1="700" x2="960" y2="560" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="880" y1="700" x2="1100" y2="820" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><line x1="1180" y1="420" x2="1100" y2="820" stroke="#6da7ec" stroke-opacity=".35" stroke-width="1.5"/><circle cx="120" cy="160" r="9" fill="#9085e9" fill-opacity=".9"/><circle cx="340" cy="90" r="6" fill="#3987e5" fill-opacity=".9"/><circle cx="520" cy="240" r="6" fill="#3987e5" fill-opacity=".9"/><circle cx="760" cy="120" r="9" fill="#3987e5" fill-opacity=".9"/><circle cx="930" cy="300" r="6" fill="#9085e9" fill-opacity=".9"/><circle cx="1120" cy="160" r="6" fill="#3987e5" fill-opacity=".9"/><circle cx="250" cy="420" r="9" fill="#3987e5" fill-opacity=".9"/><circle cx="480" cy="520" r="6" fill="#3987e5" fill-opacity=".9"/><circle cx="700" cy="420" r="6" fill="#9085e9" fill-opacity=".9"/><circle cx="960" cy="560" r="9" fill="#3987e5" fill-opacity=".9"/><circle cx="1180" cy="420" r="6" fill="#3987e5" fill-opacity=".9"/><circle cx="380" cy="700" r="6" fill="#3987e5" fill-opacity=".9"/><circle cx="640" cy="760" r="9" fill="#9085e9" fill-opacity=".9"/><circle cx="880" cy="700" r="6" fill="#3987e5" fill-opacity=".9"/><circle cx="1100" cy="820" r="6" fill="#3987e5" fill-opacity=".9"/></svg></div>
+<div style="position:absolute;left:120px;top:150px;display:flex;align-items:center;gap:26px">
+  <svg width="96" height="96" viewBox="0 0 48 48" fill="none">
+  <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3987e5"/><stop offset="1" stop-color="#9085e9"/></linearGradient></defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#lg)"/>
+  <path d="M15 16h8M23 16l10 8M33 24l-10 8M15 32h8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="14" cy="16" r="4" fill="#fff"/><circle cx="14" cy="32" r="4" fill="#fff"/>
+  <circle cx="34" cy="24" r="4.5" fill="#0b1220" stroke="#fff" stroke-width="2.4"/>
+</svg><span style="font-size:72px;font-weight:700;letter-spacing:-.02em">AgentCore</span>
+</div>
+<div style="position:absolute;left:120px;top:330px;max-width:1150px">
+  <div style="font-size:92px;font-weight:700;line-height:1.04;letter-spacing:-.02em">Build, govern and run<br/>AI agents at enterprise scale</div>
+  <div style="font-size:32px;color:#c3c2b7;margin-top:36px;line-height:1.4;max-width:980px">One platform for the visual design of agents, their connection to enterprise systems, governance and production operations.</div>
+</div>
+<div style="position:absolute;left:120px;bottom:96px;display:flex;gap:16px">
+  <span class="chip"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6da7ec" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg>Build</span>
+  <span class="chip"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6da7ec" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>Connect</span>
+  <span class="chip"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6da7ec" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>Govern</span>
+  <span class="chip"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6da7ec" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>Run</span>
+</div>
+<div style="position:absolute;right:120px;bottom:96px;color:#8b8f98;font-size:22px;text-align:right">Client briefing<br/>October 2026</div>
+</body></html>

@@ -1,0 +1,74 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden}
+body{font-family:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;background:#0b1220;color:#f0efec;position:relative;-webkit-font-smoothing:antialiased}
+.bg{position:absolute;inset:0;background:
+  radial-gradient(1300px 760px at 88% -12%, rgba(57,135,229,.22), transparent 62%),
+  radial-gradient(1000px 640px at -8% 112%, rgba(144,133,233,.16), transparent 62%),
+  #0b1220}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:80px 80px;-webkit-mask-image:radial-gradient(ellipse at 50% 45%, #000 35%, transparent 85%)}
+.slide{position:absolute;inset:0}
+.head{position:absolute;left:96px;right:96px;top:64px}
+.eyebrow{font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:#6da7ec;font-weight:600;margin-bottom:14px}
+h1.title{font-size:56px;font-weight:600;line-height:1.1;letter-spacing:-.012em}
+.sub{font-size:26px;color:#c3c2b7;margin-top:14px;max-width:1500px;line-height:1.35}
+.body{position:absolute;left:96px;right:96px;top:288px;bottom:104px}
+.footer{position:absolute;left:96px;right:96px;bottom:38px;display:flex;justify-content:space-between;align-items:center;color:#8b8f98;font-size:18px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:600;color:#c3c2b7;font-size:20px;letter-spacing:.01em}
+.card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:22px;padding:28px}
+.ic{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;flex:none}
+ul.dots{list-style:none}
+ul.dots li{position:relative;padding-left:26px;font-size:22px;color:#c3c2b7;line-height:1.35;margin-top:10px}
+ul.dots li::before{content:"";position:absolute;left:4px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--c,#3987e5)}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);font-size:21px;color:#f0efec;white-space:nowrap}
+.chip svg{flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-size:18px;font-weight:600;letter-spacing:.02em}
+.muted{color:#8b8f98}
+.t2{color:#c3c2b7}
+</style></head><body>
+<div class="bg"></div><div class="grid"></div>
+<div class="slide">
+  <div class="head"><div class="eyebrow">Why now</div><h1 class="title">Agents are easy to prototype and hard to run in production</h1><p class="sub">Most initiatives stall between the pilot and the production stage. The reasons are rarely about the model.</p></div>
+  <div class="body"><div style="display:flex;flex-direction:column;height:100%"><div style="display:flex;align-items:flex-start;padding:0 60px;margin-top:4px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:300px">
+      <div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#3987e522;border:2px solid #3987e5;color:#3987e5">
+        <svg class="" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3987e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <div style="font-size:26px;font-weight:600;color:#f0efec">Idea</div>
+    </div><div style="flex:1;height:0;border-top:3px solid #3987e5;margin-top:31px;opacity:.8"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:300px">
+      <div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#3987e522;border:2px solid #3987e5;color:#3987e5">
+        <svg class="" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3987e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <div style="font-size:26px;font-weight:600;color:#f0efec">Prototype</div>
+    </div><div style="flex:1;height:0;border-top:3px solid #3987e5;margin-top:31px;opacity:.8"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:300px">
+      <div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#3987e522;border:2px solid #3987e5;color:#3987e5">
+        <svg class="" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3987e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <div style="font-size:26px;font-weight:600;color:#f0efec">Pilot</div>
+    </div><div style="flex:1;height:0;border-top:3px dashed #d03b3b;margin-top:31px;opacity:.8"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:300px">
+      <div style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#d03b3b22;border:2px solid #d03b3b;color:#d03b3b">
+        <svg class="" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d03b3b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+      <div style="font-size:26px;font-weight:600;color:#ec835a">Production</div>
+    </div></div>
+<div style="display:flex;gap:28px;margin-top:56px;flex:1"><div class="card" style="flex:1;display:flex;flex-direction:column;gap:18px;padding:32px">
+      <span class="ic" style="width:64px;height:64px;border-radius:14px;background:#3987e522;border:1px solid #3987e566;color:#3987e5"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/><path d="m7 16.5-4.74-2.85"/><path d="m7 16.5 5-3"/><path d="M7 16.5v5.17"/><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/><path d="m17 16.5-5-3"/><path d="m17 16.5 4.74-2.85"/><path d="M17 16.5v5.17"/><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/><path d="M12 8 7.26 5.15"/><path d="m12 8 4.74-2.85"/><path d="M12 13.5V8"/></svg></span>
+      <div style="font-size:32px;font-weight:600">Fragmented tooling</div>
+      <div style="font-size:24px;color:#c3c2b7;line-height:1.45">Every team picks its own models, vector stores and prompts. Nothing is reusable or comparable.</div></div><div class="card" style="flex:1;display:flex;flex-direction:column;gap:18px;padding:32px">
+      <span class="ic" style="width:64px;height:64px;border-radius:14px;background:#d9592622;border:1px solid #d9592666;color:#d95926"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
+      <div style="font-size:32px;font-weight:600">No governance</div>
+      <div style="font-size:24px;color:#c3c2b7;line-height:1.45">Nobody can say which model was approved, who may send mail on the company's behalf, or what changed.</div></div><div class="card" style="flex:1;display:flex;flex-direction:column;gap:18px;padding:32px">
+      <span class="ic" style="width:64px;height:64px;border-radius:14px;background:#199e7022;border:1px solid #199e7066;color:#199e70"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"/><path d="m2 22 3-3"/><path d="M7.5 13.5 10 11"/><path d="M10.5 16.5 13 14"/><path d="m18 3-4 4h6l-4 4"/></svg></span>
+      <div style="font-size:32px;font-weight:600">Integration gaps</div>
+      <div style="font-size:24px;color:#c3c2b7;line-height:1.45">Mailboxes, SharePoint, databases and legacy systems stay out of reach of the agent.</div></div><div class="card" style="flex:1;display:flex;flex-direction:column;gap:18px;padding:32px">
+      <span class="ic" style="width:64px;height:64px;border-radius:14px;background:#9085e922;border:1px solid #9085e966;color:#9085e9"><svg class="" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg></span>
+      <div style="font-size:32px;font-weight:600">No visibility</div>
+      <div style="font-size:24px;color:#c3c2b7;line-height:1.45">Cost, latency and failures are discovered after the fact, if at all.</div></div></div></div></div>
+  <div class="footer"><div class="brand"><svg width="30" height="30" viewBox="0 0 48 48" fill="none">
+  <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3987e5"/><stop offset="1" stop-color="#9085e9"/></linearGradient></defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#lg)"/>
+  <path d="M15 16h8M23 16l10 8M33 24l-10 8M15 32h8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="14" cy="16" r="4" fill="#fff"/><circle cx="14" cy="32" r="4" fill="#fff"/>
+  <circle cx="34" cy="24" r="4.5" fill="#0b1220" stroke="#fff" stroke-width="2.4"/>
+</svg><span>AgentCore</span></div><div>Enterprise AI agent platform&nbsp;&nbsp;·&nbsp;&nbsp;02</div></div>
+</div></body></html>
