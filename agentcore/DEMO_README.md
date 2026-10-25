@@ -8,9 +8,18 @@ Key Vault, Entra ID SSO, Azure Managed Redis and Blob storage.
 
 ```powershell
 cd <repo>\agentcore
-.\start-demo.ps1        # starts PostgreSQL, Redis, backend, frontend and opens the browser
+.\start-demo.ps1        # first run installs dependencies, then starts everything and opens the browser
 .\stop-demo.ps1         # stops everything
 ```
+
+Prerequisites on a new machine: PostgreSQL installed (any recent version; the
+script runs its own cluster on port 5433), Python 3.10–3.12 on PATH (uv
+downloads 3.12 automatically if needed), Node.js 18+ with npm. Redis is
+optional; without it the backend uses its in-memory cache. On the first run
+the script installs uv, creates the backend and model-service virtualenvs from
+the lockfiles (plus any declared package the lockfiles miss) and runs
+`npm install`; expect 10–15 minutes. `.\start-demo.ps1 -SetupOnly` does only
+the installation.
 
 | Component  | URL / location                                  |
 |------------|-------------------------------------------------|

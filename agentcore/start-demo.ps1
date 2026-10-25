@@ -3,23 +3,31 @@
   Starts the AgentCore local demo stack WITHOUT Azure.
 
 .DESCRIPTION
-  Starts, in this order:
+  First run: installs what is missing (uv, backend and model-service Python environments
+  from the lockfiles, frontend node_modules). Then starts, in this order:
     1. project-local PostgreSQL  (127.0.0.1:5433, data in .\.local\pgdata)
     2. local Redis               (127.0.0.1:6379)  - optional, in-memory fallback if missing
-    3. backend API               (http://127.0.0.1:7860)
-    4. frontend (Vite)           (http://localhost:3000)
-  Backend and frontend each open in their own PowerShell window so logs stay visible.
+    3. model-service             (http://127.0.0.1:8001)
+    4. backend API               (http://127.0.0.1:7860)
+    5. frontend (Vite)           (http://localhost:3000)
+  Each server opens in its own PowerShell window so logs stay visible.
   Run .\stop-demo.ps1 to stop everything.
+
+  Prerequisites: PostgreSQL (binaries under C:\Program Files\PostgreSQL\<ver>\bin or AGENTCORE_PG_BIN),
+  Python 3.10-3.12 on PATH (uv downloads 3.12 if needed), Node.js 18+ with npm. Redis is optional.
 
 .PARAMETER NoBrowser
   Do not open the browser when the stack is ready.
 .PARAMETER SkipFrontend
-  Start only PostgreSQL, Redis and the backend.
+  Start only PostgreSQL, Redis, model-service and the backend.
+.PARAMETER SetupOnly
+  Only install dependencies; do not start anything.
 #>
 [CmdletBinding()]
 param(
     [switch]$NoBrowser,
-    [switch]$SkipFrontend
+    [switch]$SkipFrontend,
+    [switch]$SetupOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,10 +36,14 @@ $LocalDir     = Join-Path $Root ".local"
 $PgData       = Join-Path $LocalDir "pgdata"
 $PgPort       = 5433
 $RedisPort    = 6379
-$BackendPort  = 7860
 $ModelSvcPort = 8001
+$BackendPort  = 7860
 $FrontendPort = 3000
+$BackendDir   = Join-Path $Root "src\backend"
+$ModelSvcDir  = Join-Path $Root "src\services\model-service"
+$FrontendDir  = Join-Path $Root "src\frontend"
 
+# ------------------------------------------------------------------ helpers
 function Test-PortListening([int]$Port) {
     $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
     return ($null -ne $conn)
@@ -70,16 +82,89 @@ function Find-RedisExe {
     return $null
 }
 
+function Resolve-SystemPython {
+    # Returns a usable python.exe. The Microsoft Store placeholder alias (…\WindowsApps\python.exe) is skipped.
+    $ErrorActionPreference = "Continue"
+    foreach ($name in @("python", "python3")) {
+        $cmd = Get-Command $name -ErrorAction SilentlyContinue
+        if ($cmd -and $cmd.Source -and ($cmd.Source -notmatch "\\WindowsApps\\") -and (Test-Path $cmd.Source)) {
+            return $cmd.Source
+        }
+    }
+    $launcher = Get-Command py -ErrorAction SilentlyContinue
+    if ($launcher) {
+        $out = [string[]](& $launcher.Source -3 -c "import sys; print(sys.executable)" 2>$null)
+        if ($out -and $out.Count -gt 0 -and $out[0] -and (Test-Path $out[0].Trim())) { return $out[0].Trim() }
+    }
+    $guesses = Get-ChildItem -Path @(
+        "$env:LOCALAPPDATA\Programs\Python\Python3*\python.exe",
+        "$env:ProgramFiles\Python3*\python.exe",
+        "C:\Python3*\python.exe"
+    ) -ErrorAction SilentlyContinue | Sort-Object FullName -Descending
+    if ($guesses) { return $guesses[0].FullName }
+    throw "Python not found. Install Python 3.12 from https://www.python.org/downloads/ (tick 'Add to PATH') and retry."
+}
+
+function Ensure-Uv([string]$PyExe) {
+    & $PyExe -m uv --version *> $null
+    if ($LASTEXITCODE -eq 0) { return }
+    Write-Host "Installing uv (Python package manager) ..."
+    & $PyExe -m pip install --quiet --disable-pip-version-check uv
+    if ($LASTEXITCODE -ne 0) { throw "Could not install uv with $PyExe. Check your internet connection / proxy and retry." }
+}
+
+function Ensure-PythonProject([string]$Dir, [string]$Label) {
+    $venvPy = Join-Path $Dir ".venv\Scripts\python.exe"
+    $sysPy = Resolve-SystemPython
+    if (-not (Test-Path $venvPy)) {
+        Ensure-Uv $sysPy
+        Write-Host "First run: creating the $Label environment and installing its packages (this can take several minutes) ..."
+        Push-Location $Dir
+        try {
+            & $sysPy -m uv sync --frozen --no-dev --python 3.12
+            if ($LASTEXITCODE -ne 0) { throw "uv sync failed for $Label (see output above)." }
+        } finally { Pop-Location }
+    }
+    # The lockfiles can lag behind pyproject.toml: install anything declared but still missing.
+    $missing = @(& $venvPy (Join-Path $Root "scripts\demo_missing_deps.py") (Join-Path $Dir "pyproject.toml") 2>$null |
+        Where-Object { $_ -and $_.Trim() -ne "" })
+    if ($missing.Count -gt 0) {
+        Ensure-Uv $sysPy
+        Write-Host "Installing $($missing.Count) missing $Label package(s): $($missing -join ', ')"
+        & $sysPy -m uv pip install --python $venvPy @missing
+        if ($LASTEXITCODE -ne 0) { Write-Warning "Some $Label packages could not be installed; the service may fail to start." }
+    }
+    return $venvPy
+}
+
+function Ensure-FrontendDeps {
+    if (Test-Path (Join-Path $FrontendDir "node_modules\.package-lock.json")) { return }
+    if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+        throw "npm not found. Install Node.js 18+ from https://nodejs.org and retry."
+    }
+    Write-Host "First run: installing frontend packages with npm (this can take several minutes) ..."
+    Push-Location $FrontendDir
+    try {
+        & npm install --no-audit --no-fund
+        if ($LASTEXITCODE -ne 0) { throw "npm install failed (see output above)." }
+    } finally { Pop-Location }
+}
+
 New-Item -ItemType Directory -Force $LocalDir | Out-Null
 
-# ---------------------------------------------------------------- 1. .env
+# ---------------------------------------------------------------- 0. .env + first-run setup
 $EnvFile = Join-Path $Root ".env"
 if (-not (Test-Path $EnvFile)) {
     Copy-Item (Join-Path $Root ".env.demo") $EnvFile
     Write-Host "Created .env from .env.demo"
 }
 
-# ---------------------------------------------------------------- 2. PostgreSQL
+$Py   = Ensure-PythonProject $BackendDir "backend"
+$PyMs = Ensure-PythonProject $ModelSvcDir "model-service"
+if (-not $SkipFrontend) { Ensure-FrontendDeps }
+if ($SetupOnly) { Write-Host "Setup complete."; return }
+
+# ---------------------------------------------------------------- 1. PostgreSQL
 $PgBin = Find-PgBin
 if (-not (Test-PortListening $PgPort)) {
     if (-not (Test-Path (Join-Path $PgData "PG_VERSION"))) {
@@ -104,7 +189,7 @@ if ("$dbExists".Trim() -ne "1") {
     Write-Host "Created database 'agentcore'"
 }
 
-# ---------------------------------------------------------------- 3. Redis
+# ---------------------------------------------------------------- 2. Redis (optional)
 if (-not (Test-PortListening $RedisPort)) {
     $RedisExe = Find-RedisExe
     if ($RedisExe) {
@@ -116,18 +201,13 @@ if (-not (Test-PortListening $RedisPort)) {
         )
         Wait-ForPort $RedisPort "Redis" 20 | Out-Null
     } else {
-        Write-Warning "redis-server.exe not found; the backend will fall back to its in-memory cache."
+        Write-Warning "redis-server.exe not found; the backend will fall back to its in-memory cache (fine for the demo). Set AGENTCORE_REDIS_EXE to use a local Redis."
     }
 } else {
     Write-Host "Redis already listening on $RedisPort"
 }
 
-# ---------------------------------------------------------------- 3b. Model service
-$ModelSvcDir = Join-Path $Root "src\services\model-service"
-$PyMs = Join-Path $ModelSvcDir ".venv\Scripts\python.exe"
-if (-not (Test-Path $PyMs)) {
-    throw "Model-service virtualenv missing. Run:  cd src\services\model-service ; python -m uv sync --frozen --no-dev"
-}
+# ---------------------------------------------------------------- 3. Model service
 if (-not (Test-PortListening $ModelSvcPort)) {
     Write-Host "Starting model-service on http://127.0.0.1:$ModelSvcPort ..."
     # Run from the repo root so the service reads the shared .env; --app-dir makes `app` importable.
@@ -138,11 +218,6 @@ if (-not (Test-PortListening $ModelSvcPort)) {
 }
 
 # ---------------------------------------------------------------- 4. Backend
-$BackendDir = Join-Path $Root "src\backend"
-$Py = Join-Path $BackendDir ".venv\Scripts\python.exe"
-if (-not (Test-Path $Py)) {
-    throw "Backend virtualenv missing. Run:  cd src\backend ; python -m pip install uv ; python -m uv sync --frozen --no-dev"
-}
 if (-not (Test-PortListening $BackendPort)) {
     Write-Host "Starting backend on http://127.0.0.1:$BackendPort ..."
     $backendCmd = "Set-Location '$BackendDir'; `$Host.UI.RawUI.WindowTitle = 'AgentCore backend'; & '$Py' -m uvicorn agentcore.main:create_app --factory --host 127.0.0.1 --port $BackendPort --loop asyncio:SelectorEventLoop"
@@ -153,10 +228,6 @@ if (-not (Test-PortListening $BackendPort)) {
 
 # ---------------------------------------------------------------- 5. Frontend
 if (-not $SkipFrontend) {
-    $FrontendDir = Join-Path $Root "src\frontend"
-    if (-not (Test-Path (Join-Path $FrontendDir "node_modules"))) {
-        throw "Frontend dependencies missing. Run:  cd src\frontend ; npm install"
-    }
     if (-not (Test-PortListening $FrontendPort)) {
         Write-Host "Starting frontend on http://localhost:$FrontendPort ..."
         $frontendCmd = "Set-Location '$FrontendDir'; `$Host.UI.RawUI.WindowTitle = 'AgentCore frontend'; npm start"
@@ -167,7 +238,7 @@ if (-not $SkipFrontend) {
 }
 
 # ---------------------------------------------------------------- 6. Readiness
-Write-Host "Waiting for the backend to finish startup (first boot runs DB migrations; can take 1-3 minutes) ..."
+Write-Host "Waiting for the backend to finish startup (first boot creates the schema; can take 1-3 minutes) ..."
 $deadline = (Get-Date).AddSeconds(420)
 $ready = $false
 while ((Get-Date) -lt $deadline) {
