@@ -19,7 +19,12 @@ from loguru import logger
 from pydantic import BaseModel
 from sqlalchemy.orm.attributes import flag_modified
 
-from agentcore.services.cache.redis_client import get_redis_client
+from agentcore.services.cache.redis_client import (
+    get_redis_client,
+    mark_redis_down,
+    redis_circuit_open,
+    redis_configured,
+)
 from agentcore.services.deps import get_settings_service
 
 from agentcore.api.connector_catalogue import (
@@ -58,23 +63,53 @@ MAIL_SCOPES = "https://graph.microsoft.com/.default offline_access"
 _STATE_TTL_SECONDS = 600  # 10 minutes
 
 
-async def _store_oauth_state(state: str, data: dict) -> None:
-    """Store OAuth state in Redis with TTL."""
+# In-process fallback used when Redis is not configured or unreachable (single-instance
+# deployments such as the local demo). Entries: state -> (expires_at_epoch, data).
+_LOCAL_OAUTH_STATES: dict[str, tuple[float, dict]] = {}
+
+
+def _redis_usable() -> bool:
     settings_service = get_settings_service()
-    redis = get_redis_client(settings_service)
-    await redis.setex(f"outlook_oauth:{state}", _STATE_TTL_SECONDS, json.dumps(data))
+    return redis_configured(settings_service) and not redis_circuit_open()
+
+
+async def _store_oauth_state(state: str, data: dict) -> None:
+    """Store OAuth state (Redis with TTL when available, otherwise in-process with TTL)."""
+    if _redis_usable():
+        try:
+            redis = get_redis_client(get_settings_service())
+            await redis.setex(f"outlook_oauth:{state}", _STATE_TTL_SECONDS, json.dumps(data))
+            return
+        except Exception as exc:  # noqa: BLE001
+            mark_redis_down(str(exc))
+            logger.warning("Redis unavailable for Outlook OAuth state ({}); using in-process store", exc)
+    now = time.time()
+    for key, (expires_at, _) in list(_LOCAL_OAUTH_STATES.items()):
+        if expires_at < now:
+            _LOCAL_OAUTH_STATES.pop(key, None)
+    _LOCAL_OAUTH_STATES[state] = (now + _STATE_TTL_SECONDS, data)
 
 
 async def _pop_oauth_state(state: str) -> dict | None:
-    """Retrieve and delete OAuth state from Redis. Returns None if expired/missing."""
-    settings_service = get_settings_service()
-    redis = get_redis_client(settings_service)
-    key = f"outlook_oauth:{state}"
-    raw = await redis.get(key)
-    if not raw:
+    """Retrieve and delete OAuth state. Returns None if expired/missing."""
+    entry = _LOCAL_OAUTH_STATES.pop(state, None)
+    if entry is not None:
+        expires_at, data = entry
+        return data if expires_at >= time.time() else None
+    if not _redis_usable():
         return None
-    await redis.delete(key)
-    return json.loads(raw)
+    try:
+        redis = get_redis_client(get_settings_service())
+        key = f"outlook_oauth:{state}"
+        raw = await redis.get(key)
+        if not raw:
+            return None
+        await redis.delete(key)
+        return json.loads(raw)
+    except Exception as exc:  # noqa: BLE001
+        mark_redis_down(str(exc))
+        logger.warning("Redis unavailable while reading Outlook OAuth state ({})", exc)
+        return None
 
 
 # ── Pydantic models ─────────────────────────────────────────────

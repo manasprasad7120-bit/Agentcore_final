@@ -62,16 +62,46 @@ def _build_secret_name(prefix: str, connector_id: UUID, provider: str, key: str)
     return f"{prefix}-connector-{provider_tag}-{connector_id}-{key}"
 
 
-def _store_secret_value(name: str, value: str) -> None:
+LOCAL_SECRET_PREFIX = "local:"
+
+
+def _kv_configured() -> bool:
+    return bool(os.getenv("AGENTCORE_KEY_VAULT_URL", "").strip())
+
+
+def _store_secret_value(name: str, value: str) -> str:
+    """Persist a connector secret and return the reference to keep on the connector row.
+
+    With Azure Key Vault configured the value is written there and the Key Vault secret name
+    is returned. Without Key Vault (local demo / self-hosted without Azure) the value is
+    encrypted with the backend secret key and returned inline as ``local:<fernet-token>``.
+    """
     if not value:
-        return
-    store = _get_kv_store()
-    store.set_secret(name, value)
+        return name
+    if _kv_configured():
+        store = _get_kv_store()
+        store.set_secret(name, value)
+        return name
+    from agentcore.services.auth.utils import encrypt_api_key
+    from agentcore.services.deps import get_settings_service
+
+    return LOCAL_SECRET_PREFIX + encrypt_api_key(value, get_settings_service())
 
 
 def _resolve_secret_value(name: str) -> str:
     if not name:
         return ""
+    if name.startswith(LOCAL_SECRET_PREFIX):
+        from agentcore.services.auth.utils import decrypt_api_key
+        from agentcore.services.deps import get_settings_service
+
+        try:
+            return decrypt_api_key(name[len(LOCAL_SECRET_PREFIX):], get_settings_service())
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(
+                status_code=500,
+                detail="Stored connector secret could not be decrypted (has AGENTCORE_SECRET_KEY changed?)",
+            ) from exc
     store = _get_kv_store()
     secret_value = store.get_secret(name) or ""
     if not secret_value:
@@ -104,8 +134,7 @@ def _prepare_provider_config(
         if raw_value:
             if allow_secret_update or not existing.get(secret_name_key):
                 secret_name = _build_secret_name(prefix, connector_id, provider, "client-secret")
-                _store_secret_value(secret_name, raw_value)
-                prepared[secret_name_key] = secret_name
+                prepared[secret_name_key] = _store_secret_value(secret_name, raw_value)
             else:
                 prepared[secret_name_key] = existing.get(secret_name_key) or prepared.get(secret_name_key)
             prepared.pop("client_secret", None)
@@ -118,8 +147,7 @@ def _prepare_provider_config(
         if raw_value:
             if allow_secret_update or not existing.get(secret_name_key):
                 secret_name = _build_secret_name(prefix, connector_id, provider, "client-secret")
-                _store_secret_value(secret_name, raw_value)
-                prepared[secret_name_key] = secret_name
+                prepared[secret_name_key] = _store_secret_value(secret_name, raw_value)
             else:
                 prepared[secret_name_key] = existing.get(secret_name_key) or prepared.get(secret_name_key)
             prepared.pop("client_secret", None)
@@ -1196,7 +1224,7 @@ async def create_connector(
             provider,
             "password",
         )
-        _store_secret_value(password_secret_name, payload.password)
+        password_secret_name = _store_secret_value(password_secret_name, payload.password)
 
         row = ConnectorCatalogue(
             id=connector_id,
@@ -1341,8 +1369,7 @@ async def update_connector(
                 effective_provider,
                 "password",
             )
-            _store_secret_value(secret_name, payload.password)
-            row.password_secret_name = secret_name
+            row.password_secret_name = _store_secret_value(secret_name, payload.password)
         elif not row.password_secret_name:
             raise HTTPException(status_code=400, detail="password is required for database connectors")
         if payload.ssl_enabled is not None:

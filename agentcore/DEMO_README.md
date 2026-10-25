@@ -131,6 +131,34 @@ stored provider keys can no longer be decrypted. Changes made for this:
 - `app/main.py`: Key Vault is no longer mandatory at startup.
 - `app/services/redis_client.py`: plain Redis without Entra ID (rate limiter).
 
+## Outlook / SharePoint connectors without Key Vault
+
+Connector secrets (Outlook/SharePoint client secret, database passwords) were
+written to Azure Key Vault, so saving a connector failed with "Azure Key Vault
+is not configured". Without Key Vault they are now encrypted with the backend
+secret key and stored inline on the connector (`local:<token>`); keep
+`AGENTCORE_SECRET_KEY` / the generated `secret_key` file stable or stored
+secrets become unreadable. The Outlook OAuth handshake also no longer requires
+Redis (in-process state when Redis is absent).
+
+Outlook mail is read through Microsoft Graph, so an **Entra ID app
+registration is still required** (free, no Azure subscription):
+
+1. https://entra.microsoft.com → Applications → App registrations → New
+   registration. Supported account types: your organisation (or "any org +
+   personal Microsoft accounts" for outlook.com mailboxes).
+2. Redirect URI (platform **Web**): `http://localhost:7860/api/outlook/oauth/callback`
+   (the backend's own address; the UI opens Microsoft login and Microsoft
+   redirects back there).
+3. Certificates & secrets → New client secret → copy the **value**.
+4. API permissions → Microsoft Graph → Delegated: `User.Read`, `Mail.Read`,
+   `Mail.ReadWrite`, `Mail.Send`, `offline_access` → **Grant admin consent**
+   (the connector requests the `.default` scope, so consented permissions are
+   what you get).
+5. In the UI, Connectors → Outlook: enter Directory (tenant) ID, Application
+   (client) ID and the secret value, save, then **Link account** and sign in
+   with the mailbox.
+
 ## Limitations in demo mode
 
 - Only the model microservice is part of the demo stack. MCP, guardrails,
