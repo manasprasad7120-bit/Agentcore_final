@@ -7,7 +7,14 @@ from redis.exceptions import RedisError
 from redis.exceptions import TimeoutError as RedisTimeoutError
 
 from agentcore.services.settings.service import SettingsService
-from agentcore.services.cache.redis_client import get_redis_client, reset_redis_client
+from agentcore.services.cache.redis_client import (
+    get_redis_client,
+    mark_redis_down,
+    mark_redis_up,
+    redis_circuit_open,
+    redis_configured,
+    reset_redis_client,
+)
 from agentcore.services.deps import session_scope
 from agentcore.services.database.models.role import Role
 from agentcore.services.database.models.permission import Permission
@@ -372,8 +379,13 @@ PERMISSION_VERSION = "v22"  # bump when permissions change
 class PermissionCacheService:
     def __init__(self, settings_service: SettingsService):
         self.settings_service = settings_service
-        self.redis = get_redis_client(settings_service)
-        self.ttl = settings_service.settings.redis_cache_expire
+        self.ttl = settings_service.settings.redis_cache_expire or 3600
+        self.redis = None
+        if redis_configured(settings_service):
+            try:
+                self.redis = get_redis_client(settings_service)
+            except Exception as exc:  # noqa: BLE001 - Redis is optional; permissions fall back to the DB
+                logger.warning(f"RBAC cache disabled (Redis client could not be created): {exc}")
 
     async def _redis_call_with_reconnect(
         self,
@@ -382,16 +394,28 @@ class PermissionCacheService:
         key: str,
         call: Callable[[Any], Awaitable[Any]],
     ) -> Any:
+        if self.redis is None:
+            msg = "Redis is not configured"
+            raise RedisConnectionError(msg)
+        if redis_circuit_open():
+            msg = "Redis unavailable (circuit open)"
+            raise RedisConnectionError(msg)
         try:
-            return await call(self.redis)
+            result = await call(self.redis)
         except (RedisConnectionError, RedisTimeoutError, RedisError, OSError) as exc:
             logger.warning(
                 f"RBAC cache {action} failed for {key}: {exc}. "
                 "Resetting Redis client and retrying once."
             )
-            await reset_redis_client()
-            self.redis = get_redis_client(self.settings_service)
-            return await call(self.redis)
+            try:
+                await reset_redis_client()
+                self.redis = get_redis_client(self.settings_service)
+                result = await call(self.redis)
+            except (RedisConnectionError, RedisTimeoutError, RedisError, OSError):
+                mark_redis_down(str(exc))
+                raise
+        mark_redis_up()
+        return result
 
     async def get_permissions_for_role(self, role: str) -> List[str]:
         role = _normalize_role(role)
@@ -405,11 +429,16 @@ class PermissionCacheService:
 
         key = f"role:{PERMISSION_VERSION}:{role}"
 
-        cached = await self._redis_call_with_reconnect(
-            action="read",
-            key=key,
-            call=lambda client: client.get(key),
-        )
+        try:
+            cached = await self._redis_call_with_reconnect(
+                action="read",
+                key=key,
+                call=lambda client: client.get(key),
+            )
+        except (RedisConnectionError, RedisTimeoutError, RedisError, OSError) as exc:
+            # Redis down or not configured: serve permissions straight from the database.
+            logger.debug(f"RBAC cache unavailable ({exc}); reading role '{role}' from DB")
+            return _expand_permissions(await _get_permissions_for_role_db(role))
         if cached:
             if isinstance(cached, bytes):
                 cached = cached.decode("utf-8")

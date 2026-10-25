@@ -15,7 +15,12 @@ cd <repo>\agentcore
 Prerequisites on a new machine: PostgreSQL installed (any recent version; the
 script runs its own cluster on port 5433), Python 3.10–3.12 on PATH (uv
 downloads 3.12 automatically if needed), Node.js 18+ with npm. Redis is
-optional; without it the backend uses its in-memory cache. On the first run
+optional; without it the backend uses its in-memory cache. The backend and
+model-service connect to `REDIS_HOST:REDIS_PORT` from `.env` (default
+`127.0.0.1:6379`); if your Redis runs in WSL, Docker, as a Memurai service or
+on another port, set `REDIS_HOST`, `REDIS_PORT` and, if needed,
+`REDIS_PASSWORD` there. The start script tests that connection and prints the
+model-service's Redis status in its summary. On the first run
 the script installs uv, creates the backend and model-service virtualenvs from
 the lockfiles (plus any declared package the lockfiles miss) and runs
 `npm install`; expect 10–15 minutes. `.\start-demo.ps1 -SetupOnly` does only
@@ -60,8 +65,12 @@ Code (all backwards compatible; Azure paths are untouched when configured):
 
 - `services/cache/redis_client.py`, `services/cache/service.py` – Entra
   credential provider is optional; plain Redis auth is supported.
-- `services/auth/permissions.py` – permissions fall back to the database when
-  the Redis cache is unavailable, so login never depends on Redis.
+- `services/auth/permissions.py`, `services/cache/user_cache.py`,
+  `services/cache/redis_client.py` – the auth caches tolerate a missing
+  Redis: short timeouts, a 30-second circuit breaker after a failure, and
+  permissions served from the database. Without this a non-root login waited
+  about 20 seconds per request when Redis was unreachable (root skips the
+  cache, which is why the admin login still worked).
 - `services/utils.py` – `ensure_local_superuser()` bootstraps a root user from
   `AGENTCORE_SUPERUSER` / `AGENTCORE_SUPERUSER_PASSWORD`.
 - `src/frontend/src/index.tsx`, `authConfig.js`, `pages/LoginPage` – MSAL is

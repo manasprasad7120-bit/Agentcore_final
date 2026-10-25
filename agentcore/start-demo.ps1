@@ -74,12 +74,47 @@ function Find-PgBin {
 
 function Find-RedisExe {
     if ($env:AGENTCORE_REDIS_EXE -and (Test-Path $env:AGENTCORE_REDIS_EXE)) { return $env:AGENTCORE_REDIS_EXE }
-    $cmd = Get-Command redis-server.exe -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
-    $guess = Get-ChildItem (Join-Path $env:USERPROFILE "redis") -Recurse -Filter redis-server.exe -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-    if ($guess) { return $guess.FullName }
+    foreach ($name in @("redis-server.exe", "memurai.exe")) {
+        $cmd = Get-Command $name -ErrorAction SilentlyContinue
+        if ($cmd) { return $cmd.Source }
+    }
+    $known = @(
+        "$env:ProgramFiles\Redis\redis-server.exe",
+        "$env:ProgramFiles\Memurai\memurai.exe",
+        "$env:ProgramData\chocolatey\lib\redis-64\tools\redis-server.exe",
+        "C:\tools\redis\redis-server.exe",
+        "$env:LOCALAPPDATA\Programs\Redis\redis-server.exe"
+    )
+    foreach ($p in $known) { if (Test-Path $p) { return $p } }
+    foreach ($dir in @((Join-Path $env:USERPROFILE "redis"), (Join-Path $env:USERPROFILE "Downloads"), "C:\redis", "D:\redis")) {
+        if (-not (Test-Path $dir)) { continue }
+        $guess = Get-ChildItem $dir -Recurse -Depth 2 -Filter redis-server.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($guess) { return $guess.FullName }
+    }
     return $null
+}
+
+function Test-TcpOpen([string]$TargetHost, [int]$Port, [int]$TimeoutMs = 1500) {
+    # Real connection attempt: also sees Redis in WSL/Docker or a Windows service, which Get-NetTCPConnection can miss.
+    try {
+        $client = New-Object System.Net.Sockets.TcpClient
+        $async = $client.BeginConnect($TargetHost, $Port, $null, $null)
+        if ($async.AsyncWaitHandle.WaitOne($TimeoutMs)) { $client.EndConnect($async); $client.Close(); return $true }
+        $client.Close()
+        return $false
+    } catch { return $false }
+}
+
+function Get-EnvValue([string]$Key, [string]$Default) {
+    $envPath = Join-Path $Root ".env"
+    if (Test-Path $envPath) {
+        $line = Get-Content $envPath | Where-Object { $_ -match "^\s*$Key\s*=" } | Select-Object -Last 1
+        if ($line) {
+            $value = ($line -split "=", 2)[1].Trim().Trim('"').Trim("'")
+            if ($value) { return $value }
+        }
+    }
+    return $Default
 }
 
 function Resolve-SystemPython {
@@ -190,21 +225,41 @@ if ("$dbExists".Trim() -ne "1") {
 }
 
 # ---------------------------------------------------------------- 2. Redis (optional)
-if (-not (Test-PortListening $RedisPort)) {
-    $RedisExe = Find-RedisExe
-    if ($RedisExe) {
-        Write-Host "Starting Redis on 127.0.0.1:$RedisPort ..."
-        Start-Process -FilePath $RedisExe -WindowStyle Minimized -ArgumentList @(
-            "--port", "$RedisPort", "--bind", "127.0.0.1",
-            "--save", "`"`"", "--appendonly", "no",
-            "--dir", "`"$LocalDir`""
-        )
-        Wait-ForPort $RedisPort "Redis" 20 | Out-Null
-    } else {
-        Write-Warning "redis-server.exe not found; the backend will fall back to its in-memory cache (fine for the demo). Set AGENTCORE_REDIS_EXE to use a local Redis."
-    }
+# The backend/model-service connect to REDIS_HOST:REDIS_PORT from .env; this block only tries to make that reachable.
+$RedisHost = Get-EnvValue "REDIS_HOST" "127.0.0.1"
+$RedisPort = [int](Get-EnvValue "REDIS_PORT" "$RedisPort")
+$redisLocal = $RedisHost -in @("127.0.0.1", "localhost", "::1")
+if (Test-TcpOpen $RedisHost $RedisPort) {
+    Write-Host "Redis reachable at ${RedisHost}:$RedisPort"
 } else {
-    Write-Host "Redis already listening on $RedisPort"
+    $started = $false
+    $svc = Get-Service -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^(redis|memurai)' } | Select-Object -First 1
+    if ($redisLocal -and $svc -and $svc.Status -ne "Running") {
+        Write-Host "Starting Windows service '$($svc.Name)' ..."
+        try { Start-Service $svc.Name -ErrorAction Stop; $started = $true } catch { Write-Warning "Could not start service $($svc.Name): $($_.Exception.Message)" }
+    }
+    if (-not $started -and $redisLocal) {
+        $RedisExe = Find-RedisExe
+        if ($RedisExe) {
+            Write-Host "Starting Redis ($RedisExe) on 127.0.0.1:$RedisPort ..."
+            Start-Process -FilePath $RedisExe -WindowStyle Minimized -ArgumentList @(
+                "--port", "$RedisPort", "--bind", "127.0.0.1",
+                "--save", "`"`"", "--appendonly", "no",
+                "--dir", "`"$LocalDir`""
+            )
+            $started = $true
+        }
+    }
+    $deadline = (Get-Date).AddSeconds(15)
+    while ($started -and (Get-Date) -lt $deadline -and -not (Test-TcpOpen $RedisHost $RedisPort)) { Start-Sleep -Milliseconds 500 }
+    if (Test-TcpOpen $RedisHost $RedisPort) {
+        Write-Host "Redis reachable at ${RedisHost}:$RedisPort"
+    } else {
+        Write-Warning ("Redis is not reachable at ${RedisHost}:$RedisPort (REDIS_HOST/REDIS_PORT in .env). " +
+            "If your Redis runs in WSL/Docker or on another port, set REDIS_HOST/REDIS_PORT (and REDIS_PASSWORD) in .env. " +
+            "To run without Redis at all, set CACHE_TYPE=async and leave REDIS_HOST empty in .env. " +
+            "Either way the backend keeps working (in-memory cache, permissions served from the database).")
+    }
 }
 
 # ---------------------------------------------------------------- 3. Model service
@@ -253,12 +308,19 @@ $envText  = Get-Content $EnvFile
 $user     = ($envText | Where-Object { $_ -match '^AGENTCORE_SUPERUSER=' }) -replace '^AGENTCORE_SUPERUSER=', ''
 $password = ($envText | Where-Object { $_ -match '^AGENTCORE_SUPERUSER_PASSWORD=' }) -replace '^AGENTCORE_SUPERUSER_PASSWORD=', ''
 
+$redisStatus = "unknown"
+try {
+    $ms = Invoke-RestMethod -Uri "http://127.0.0.1:$ModelSvcPort/health" -TimeoutSec 5
+    if ($ms.redis) { $redisStatus = "$($ms.redis) (model-service rate limiter)" }
+} catch { }
+
 Write-Host ""
 if ($ready) {
     Write-Host "AgentCore demo stack is READY." -ForegroundColor Green
 } else {
     Write-Warning "Backend did not report ready yet. Check the 'AgentCore backend' window for errors; the UI may still come up shortly."
 }
+Write-Host "  Redis:    ${RedisHost}:$RedisPort -> $redisStatus"
 Write-Host "  UI:       http://localhost:$FrontendPort"
 Write-Host "  API:      http://127.0.0.1:$BackendPort/docs"
 Write-Host "  Models:   http://127.0.0.1:$ModelSvcPort/health   (model-service)"

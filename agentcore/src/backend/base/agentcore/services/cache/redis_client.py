@@ -1,5 +1,6 @@
 import inspect
 import os
+import time
 from typing import Optional, Any
 
 import redis.asyncio as redis
@@ -16,6 +17,34 @@ _redis_client: Optional[Any] = None
 _redis_signature: Optional[tuple] = None
 _redis_credential_provider: Optional[CredentialProvider] = None
 _redis_credential_provider_signature: Optional[tuple] = None
+
+# --- circuit breaker -------------------------------------------------------
+# When Redis is unreachable every cache call would otherwise wait for connect
+# timeouts and retries (tens of seconds per request). After a failure the
+# circuit opens for REDIS_CIRCUIT_SECONDS and callers skip Redis immediately,
+# falling back to the database / no-op.
+REDIS_CIRCUIT_SECONDS = int(os.getenv("REDIS_CIRCUIT_SECONDS", "30") or 30)
+_redis_down_until: float = 0.0
+
+
+def redis_circuit_open() -> bool:
+    """True while Redis is considered unavailable (recent connection failure)."""
+    return time.monotonic() < _redis_down_until
+
+
+def mark_redis_down(reason: str = "") -> None:
+    global _redis_down_until
+    _redis_down_until = time.monotonic() + REDIS_CIRCUIT_SECONDS
+
+
+def mark_redis_up() -> None:
+    global _redis_down_until
+    _redis_down_until = 0.0
+
+
+def redis_configured(settings_service: SettingsService) -> bool:
+    """False when REDIS_HOST is empty: Redis-backed caches are then skipped entirely."""
+    return bool(str(settings_service.settings.redis_host or "").strip().strip("'\""))
 
 
 def _redis_cluster_enabled(settings_service: SettingsService) -> bool:
@@ -191,12 +220,13 @@ def get_redis_client(settings_service: SettingsService):
             "port": redis_port,
             "ssl": redis_ssl,
             "decode_responses": True,
-            "socket_connect_timeout": 5,
-            "socket_timeout": 5,
+            # Plain/local Redis (no Entra): fail fast so an absent Redis never stalls requests.
+            "socket_connect_timeout": 5 if redis_credential_provider is not None else 2,
+            "socket_timeout": 5 if redis_credential_provider is not None else 3,
             # Auto-detect stale connections before use
             "health_check_interval": 15,
             # Retry on transient connection drops (Azure idle timeout, etc.)
-            "retry": Retry(ExponentialBackoff(cap=2, base=0.1), retries=3),
+            "retry": Retry(ExponentialBackoff(cap=2, base=0.1), retries=3 if redis_credential_provider is not None else 1),
             "retry_on_error": [ConnectionError, TimeoutError, OSError],
         }
         if redis_credential_provider is not None:
