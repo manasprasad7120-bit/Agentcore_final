@@ -24,11 +24,12 @@ import urllib.request
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
+ROOT = HERE.parents[2]
 API = os.getenv("AGENTCORE_API", "http://127.0.0.1:7860").rstrip("/")
 
 COMPONENT_FILES = [
     "underwriting_email_intake.py",
+    "underwriting_mailbox_intake.py",
     "underwriting_document_extractor.py",
     "underwriting_validation_engine.py",
     "underwriting_decision_router.py",
@@ -122,21 +123,34 @@ def make_edge(src: dict, out_name: str, tgt: dict, field: str) -> dict:
     }
 
 
-def build(token: str, *, with_llm: bool) -> dict:
-    catalogue = _request("GET", "/api/all", token)
-    builtin = {name: tmpl for cat in catalogue.values() for name, tmpl in cat.items()}
+_TEMPLATE_CACHE: dict[str, dict] = {}
 
-    custom: dict[str, dict] = {}
-    for file in COMPONENT_FILES:
-        code = (HERE / "components" / file).read_text(encoding="utf-8")
-        resp = _request("POST", "/api/custom_component", token, json.dumps({"code": code}).encode())
-        custom[resp["type"]] = resp["data"]
-        print(f"  built template for {resp['type']}")
+
+def build(token: str, *, with_llm: bool, intake: str = "chat") -> dict:
+    """intake: 'chat' (Playground text + attachments / bundled samples) or 'outlook' (live mailbox)."""
+    if not _TEMPLATE_CACHE:
+        catalogue = _request("GET", "/api/all", token)
+        _TEMPLATE_CACHE["builtin"] = {name: tmpl for cat in catalogue.values() for name, tmpl in cat.items()}
+        custom: dict[str, dict] = {}
+        for file in COMPONENT_FILES:
+            code = (HERE / "components" / file).read_text(encoding="utf-8")
+            resp = _request("POST", "/api/custom_component", token, json.dumps({"code": code}).encode())
+            custom[resp["type"]] = resp["data"]
+            print(f"  built template for {resp['type']}")
+        _TEMPLATE_CACHE["custom"] = custom
+    builtin, custom = _TEMPLATE_CACHE["builtin"], _TEMPLATE_CACHE["custom"]
 
     y, step = 200, 430
     chat_in = make_node("ChatInput", builtin["ChatInput"], 0, y, 300)
-    chat_in["data"]["node"]["template"]["input_value"]["value"] = SAMPLE_EMAIL
-    intake = make_node("UnderwritingEmailIntake", custom["UnderwritingEmailIntake"], step, y)
+    if intake == "outlook":
+        chat_in["data"]["node"]["template"]["input_value"]["value"] = "Check the underwriting inbox for new broker submissions."
+        intake_node = make_node("UnderwritingMailboxIntake", custom["UnderwritingMailboxIntake"], step, y)
+        intake_field = "trigger"
+    else:
+        chat_in["data"]["node"]["template"]["input_value"]["value"] = SAMPLE_EMAIL
+        intake_node = make_node("UnderwritingEmailIntake", custom["UnderwritingEmailIntake"], step, y)
+        intake_field = "email_message"
+    intake = intake_node  # noqa: PLW0127 - reuse name below for wiring
     extractor = make_node("UnderwritingDocumentExtractor", custom["UnderwritingDocumentExtractor"], 2 * step, y)
     validator = make_node("UnderwritingValidationEngine", custom["UnderwritingValidationEngine"], 3 * step, y)
     router = make_node("UnderwritingDecisionRouter", custom["UnderwritingDecisionRouter"], 4 * step, y)
@@ -147,7 +161,7 @@ def build(token: str, *, with_llm: bool) -> dict:
 
     nodes = [chat_in, intake, extractor, validator, router, rating, composer, chat_out]
     edges = [
-        make_edge(chat_in, "message", intake, "email_message"),
+        make_edge(chat_in, "message", intake, intake_field),
         make_edge(intake, "case", extractor, "case"),
         make_edge(extractor, "extracted", validator, "extracted"),
         make_edge(validator, "validated", router, "validated"),
@@ -160,14 +174,20 @@ def build(token: str, *, with_llm: bool) -> dict:
         nodes.append(llm)
         edges += [make_edge(llm, "model_output", extractor, "llm"), make_edge(llm, "model_output", composer, "llm")]
 
-    name = "Email-to-Quote Underwriting Agent" + ("" if with_llm else " (no LLM)")
+    suffix_name = {"chat": "", "outlook": " (Outlook live inbox)"}[intake_field == "trigger" and "outlook" or "chat"]
+    name = "Email-to-Quote Underwriting Agent" + suffix_name + ("" if with_llm else " (no LLM)")
+    source_desc = (
+        "Reads the newest unread broker email with PDF attachments from the mailbox linked via the Outlook connector"
+        if intake_field == "trigger"
+        else "broker email + PDF attachments from the Playground (or bundled sample cases)"
+    )
     return {
-        "id": "email-to-quote-underwriting-agent" + ("" if with_llm else "-no-llm"),
+        "id": "email-to-quote-underwriting-agent" + ("-outlook" if intake_field == "trigger" else "") + ("" if with_llm else "-no-llm"),
         "name": name,
         "description": (
-            "AI-powered insurance underwriting & quotation: broker email + PDF attachments → document intelligence → "
+            f"AI-powered insurance underwriting & quotation: {source_desc} → document intelligence → "
             "field-level validation → underwriting decision → configurable rating → quote PDF and broker email "
-            "(draft until approved). Group Medical Insurance demo with bundled clean/conflicting sample cases."
+            "(draft until approved; can reply through the Outlook mailbox). Group Medical Insurance demo."
         ),
         "icon": "FileText",
         "gradient": "2",
@@ -180,9 +200,13 @@ def build(token: str, *, with_llm: bool) -> dict:
 
 if __name__ == "__main__":
     tok = login()
-    for with_llm, filename in ((True, "Email_to_Quote_Underwriting_Agent.json"), (False, "Email_to_Quote_Underwriting_Agent_no_llm.json")):
+    for with_llm, intake_kind, filename in (
+        (True, "chat", "Email_to_Quote_Underwriting_Agent.json"),
+        (False, "chat", "Email_to_Quote_Underwriting_Agent_no_llm.json"),
+        (True, "outlook", "Email_to_Quote_Underwriting_Agent_outlook.json"),
+    ):
         print(f"Building {filename} ...")
-        flow = build(tok, with_llm=with_llm)
+        flow = build(tok, with_llm=with_llm, intake=intake_kind)
         (HERE / filename).write_text(json.dumps(flow, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"  wrote {HERE / filename} ({len(flow['data']['nodes'])} nodes, {len(flow['data']['edges'])} edges)")
     sys.exit(0)

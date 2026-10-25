@@ -106,10 +106,12 @@ Fill the Azure variables back in (`AGENTCORE_KEY_VAULT_URL` and the
 ## Demo agent: Email-to-Quote Underwriting
 
 `demo/underwriting/Email_to_Quote_Underwriting_Agent.json` is an importable
-agent (Group Medical Insurance): broker email + PDF attachments → document
-intelligence → field-level validation → underwriting decision → configurable
-rating → quote PDF and broker email. Sample submissions (one clean, one with
-deliberate discrepancies) are in `demo/underwriting/samples`. See
+agent (Group Medical Insurance) built only from standard components: Outlook
+Mail (linked mailbox) → Prompt Template → Large Language Model → Chat Output.
+The LLM reads the broker email and attachment text directly and returns the
+extracted data model, field-level validation, underwriting decision, rating and
+broker email draft. A file-upload variant and sample submissions (one clean, one
+with deliberate discrepancies) are in `demo/underwriting/`. See
 `demo/underwriting/README.md` for import and run steps.
 
 ## Model microservice
@@ -158,6 +160,17 @@ registration is still required** (free, no Azure subscription):
 5. In the UI, Connectors → Outlook: enter Directory (tenant) ID, Application
    (client) ID and the secret value, save, then **Link account** and sign in
    with the mailbox.
+
+If linking fails after the Microsoft sign-in, the toast now shows the reason
+(also logged in the backend window as "Outlook mailbox validation failed"):
+
+- `outlook_mail_permission_missing` (Graph 401/403): the token has no mail
+  permission. Add delegated `Mail.Read` (and `Mail.ReadWrite`/`Mail.Send`) on
+  the app registration, grant admin consent, link again.
+- `outlook_no_mailbox` (Graph 404, e.g. `MailboxNotEnabledForRESTAPI`): the
+  signed-in account has no Exchange Online mailbox. Use a Microsoft 365 user
+  with an Exchange licence, or a personal outlook.com account with an app
+  registration that allows personal accounts and tenant `common`.
 
 ## Limitations in demo mode
 

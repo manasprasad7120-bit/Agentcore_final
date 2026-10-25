@@ -433,6 +433,16 @@ class OutlookMailComponent(Node):
             value=10,
             tool_mode=True,
         ),
+        IntInput(
+            name="attachment_max_chars",
+            display_name="Max Attachment Characters",
+            info=(
+                "Maximum characters of extracted text included per attachment (PDF, DOCX, XLSX, ...). "
+                "Raise it when the LLM must read whole documents such as an employee census."
+            ),
+            value=3000,
+            advanced=True,
+        ),
         MessageTextInput(
             name="folder",
             display_name="Mail Folder",
@@ -714,8 +724,9 @@ class OutlookMailComponent(Node):
                         error = att.get("error")
                         if text:
                             # Truncate very long attachments to keep context manageable
-                            preview = text[:3000]
-                            if len(text) > 3000:
+                            limit = int(getattr(self, "attachment_max_chars", 3000) or 3000)
+                            preview = text[:limit]
+                            if len(text) > limit:
                                 preview += f"\n... (truncated, {len(text)} chars total)"
                             att_lines.append(f"  - **{fname}**:\n{preview}")
                         elif error:

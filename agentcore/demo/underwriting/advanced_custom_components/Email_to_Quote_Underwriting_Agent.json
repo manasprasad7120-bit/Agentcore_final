@@ -1,7 +1,7 @@
 {
-  "id": "email-to-quote-underwriting-agent-no-llm",
-  "name": "Email-to-Quote Underwriting Agent (no LLM)",
-  "description": "AI-powered insurance underwriting & quotation: broker email + PDF attachments → document intelligence → field-level validation → underwriting decision → configurable rating → quote PDF and broker email (draft until approved). Group Medical Insurance demo with bundled clean/conflicting sample cases.",
+  "id": "email-to-quote-underwriting-agent",
+  "name": "Email-to-Quote Underwriting Agent",
+  "description": "AI-powered insurance underwriting & quotation: broker email + PDF attachments from the Playground (or bundled sample cases) → document intelligence → field-level validation → underwriting decision → configurable rating → quote PDF and broker email (draft until approved; can reply through the Outlook mailbox). Group Medical Insurance demo.",
   "icon": "FileText",
   "gradient": "2",
   "tags": [
@@ -14,14 +14,14 @@
   "data": {
     "nodes": [
       {
-        "id": "ChatInput-GdKmD",
+        "id": "ChatInput-4a8aS",
         "type": "genericNode",
         "position": {
           "x": 0,
           "y": 200
         },
         "data": {
-          "id": "ChatInput-GdKmD",
+          "id": "ChatInput-4a8aS",
           "type": "ChatInput",
           "node": {
             "template": {
@@ -329,14 +329,14 @@
         }
       },
       {
-        "id": "UnderwritingEmailIntake-BejVk",
+        "id": "UnderwritingEmailIntake-xO7WG",
         "type": "genericNode",
         "position": {
           "x": 430,
           "y": 200
         },
         "data": {
-          "id": "UnderwritingEmailIntake-BejVk",
+          "id": "UnderwritingEmailIntake-xO7WG",
           "type": "UnderwritingEmailIntake",
           "node": {
             "template": {
@@ -503,14 +503,14 @@
         }
       },
       {
-        "id": "UnderwritingDocumentExtractor-JT8Qo",
+        "id": "UnderwritingDocumentExtractor-m6hx3",
         "type": "genericNode",
         "position": {
           "x": 860,
           "y": 200
         },
         "data": {
-          "id": "UnderwritingDocumentExtractor-JT8Qo",
+          "id": "UnderwritingDocumentExtractor-m6hx3",
           "type": "UnderwritingDocumentExtractor",
           "node": {
             "template": {
@@ -646,14 +646,14 @@
         }
       },
       {
-        "id": "UnderwritingValidationEngine-Lf48u",
+        "id": "UnderwritingValidationEngine-Hbwko",
         "type": "genericNode",
         "position": {
           "x": 1290,
           "y": 200
         },
         "data": {
-          "id": "UnderwritingValidationEngine-Lf48u",
+          "id": "UnderwritingValidationEngine-Hbwko",
           "type": "UnderwritingValidationEngine",
           "node": {
             "template": {
@@ -787,14 +787,14 @@
         }
       },
       {
-        "id": "UnderwritingDecisionRouter-1h69N",
+        "id": "UnderwritingDecisionRouter-4oVh0",
         "type": "genericNode",
         "position": {
           "x": 1720,
           "y": 200
         },
         "data": {
-          "id": "UnderwritingDecisionRouter-1h69N",
+          "id": "UnderwritingDecisionRouter-4oVh0",
           "type": "UnderwritingDecisionRouter",
           "node": {
             "template": {
@@ -966,14 +966,14 @@
         }
       },
       {
-        "id": "UnderwritingRatingEngine-ASqPR",
+        "id": "UnderwritingRatingEngine-6ROv4",
         "type": "genericNode",
         "position": {
           "x": 2150,
           "y": 200
         },
         "data": {
-          "id": "UnderwritingRatingEngine-ASqPR",
+          "id": "UnderwritingRatingEngine-6ROv4",
           "type": "UnderwritingRatingEngine",
           "node": {
             "template": {
@@ -1114,14 +1114,14 @@
         }
       },
       {
-        "id": "UnderwritingQuoteComposer-dKDap",
+        "id": "UnderwritingQuoteComposer-gnWdV",
         "type": "genericNode",
         "position": {
           "x": 2580,
           "y": 200
         },
         "data": {
-          "id": "UnderwritingQuoteComposer-dKDap",
+          "id": "UnderwritingQuoteComposer-gnWdV",
           "type": "UnderwritingQuoteComposer",
           "node": {
             "template": {
@@ -1193,7 +1193,7 @@
                 "list": false,
                 "show": true,
                 "multiline": true,
-                "value": "\"\"\"Quote generation, broker email drafting and controlled dispatch.\n\nProduces the quotation PDF (when the case is cleared), drafts the outbound\nemail for the decided action (quote / clarification / referral), optionally\npolishes the wording with the LLM (numbers are never changed), and either keeps\nthe email as a draft pending approval or sends it through SMTP.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport io\nimport os\nimport re\nimport smtplib\nfrom datetime import date, timedelta\nfrom email.message import EmailMessage\nfrom pathlib import Path\n\nfrom agentcore.custom.custom_node.node import Node\nfrom agentcore.io import BoolInput, DataInput, DropdownInput, HandleInput, Output, StrInput\nfrom agentcore.schema.data import Data\nfrom agentcore.schema.message import Message\n\nDRAFT, SEND = \"Draft only (requires approval)\", \"Send via SMTP when approved\"\n\n\ndef inr(value) -> str:\n    if value is None:\n        return \"—\"\n    try:\n        n = int(round(float(value)))\n    except (TypeError, ValueError):\n        return str(value)\n    s = str(abs(n))\n    if len(s) > 3:\n        head, tail = s[:-3], s[-3:]\n        parts = []\n        while len(head) > 2:\n            parts.insert(0, head[-2:])\n            head = head[:-2]\n        if head:\n            parts.insert(0, head)\n        s = \",\".join(parts) + \",\" + tail\n    return (\"-\" if n < 0 else \"\") + \"₹\" + s\n\n\nclass UnderwritingQuoteComposer(Node):\n    display_name = \"6. Quote, Broker Email & Dispatch\"\n    description = (\n        \"Generates the quotation PDF, drafts the broker email for the decided action, shows the full review \"\n        \"(extraction, validation, decision, rating, audit trail) and dispatches only when approved.\"\n    )\n    icon = \"file-text\"\n    name = \"UnderwritingQuoteComposer\"\n\n    inputs = [\n        DataInput(name=\"rated\", display_name=\"Rated Case\", required=True),\n        HandleInput(\n            name=\"llm\",\n            display_name=\"Language Model (optional)\",\n            info=\"Optional LLM used to polish the email wording. Figures are fixed by the rating engine.\",\n            input_types=[\"LanguageModel\"],\n            required=False,\n        ),\n        StrInput(name=\"insurer_name\", display_name=\"Insurer name\", value=\"Demo General Insurance Co. Ltd.\"),\n        StrInput(name=\"underwriter_signature\", display_name=\"Email signature\", value=\"Insurance Underwriting Team\"),\n        DropdownInput(\n            name=\"dispatch_mode\",\n            display_name=\"Dispatch mode\",\n            options=[DRAFT, SEND],\n            value=DRAFT,\n            info=\"Emails are drafts by default. Sending requires 'Approved' and SMTP_* settings in .env.\",\n        ),\n        BoolInput(\n            name=\"approved\",\n            display_name=\"Approved by authorised underwriter\",\n            value=False,\n            info=\"Human approval gate for dispatch.\",\n        ),\n        StrInput(\n            name=\"output_folder\",\n            display_name=\"Output folder for quote PDF\",\n            value=\"\",\n            info=\"Optional local folder to copy the generated quote PDF into (e.g. a mock outbox).\",\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Underwriting Response\", name=\"response\", method=\"compose\"),\n        Output(display_name=\"Case Record (JSON)\", name=\"case_record\", method=\"case_record\"),\n    ]\n\n    # ------------------------------------------------------------------ PDF\n    @staticmethod\n    def _build_quote_pdf(case: dict, insurer: str) -> bytes:\n        from reportlab.lib import colors\n        from reportlab.lib.pagesizes import A4\n        from reportlab.lib.units import mm\n        from reportlab.pdfgen import canvas\n\n        model = case[\"extraction\"][\"data_model\"]\n        rating = case[\"rating\"]\n        buf = io.BytesIO()\n        c = canvas.Canvas(buf, pagesize=A4)\n        w, h = A4\n        y = h - 25 * mm\n\n        def line(text, size=10, bold=False, dy=6 * mm, color=colors.black):\n            nonlocal y\n            c.setFillColor(color)\n            c.setFont(\"Helvetica-Bold\" if bold else \"Helvetica\", size)\n            c.drawString(20 * mm, y, text)\n            y -= dy\n\n        line(insurer, 16, True, 8 * mm, colors.HexColor(\"#b3202c\"))\n        line(\"Group Medical Insurance — Quotation (Illustrative)\", 13, True, 10 * mm)\n        line(f\"Quote reference: {case.get('case_id')}    Date: {date.today().isoformat()}    \"\n             f\"Valid until: {(date.today() + timedelta(days=int(rating.get('quote_validity_days', 30)))).isoformat()}\", 9)\n        y -= 3 * mm\n        line(\"Proposer\", 11, True)\n        line(f\"Company: {model.get('company_name') or '—'}\")\n        line(f\"Industry: {model.get('industry') or '—'}    Broker: {model.get('broker_name') or '—'}\")\n        line(f\"Policy: {model.get('policy_type')}    Coverage start: {model.get('coverage_start_date') or 'To be confirmed'}\")\n        y -= 3 * mm\n        line(\"Coverage & Premium\", 11, True)\n        rows = [\n            (\"Covered employees\", str(rating[\"covered_employees\"])),\n            (\"Dependants covered\", str(rating[\"dependants\"])),\n            (\"Sum insured per employee\", inr(rating[\"sum_insured_per_employee\"])),\n            (\"Employee base premium\", inr(rating[\"employee_base_premium\"])),\n            (f\"Dependant loading ({rating['dependant_loading_pct']}%)\", inr(rating[\"dependant_loading\"])),\n            (f\"{rating['claims_adjustment_label']} ({rating['claims_adjustment_pct']:+}%)\", inr(rating[\"claims_adjustment\"])),\n            (\"Annual premium (excl. GST)\", inr(rating[\"annual_premium\"])),\n            (f\"GST @ {rating['gst_pct']}% (calculated separately)\", inr(rating[\"gst\"])),\n            (\"Total payable\", inr(rating[\"total_payable\"])),\n        ]\n        for label, value in rows:\n            c.setFont(\"Helvetica\", 10)\n            c.drawString(20 * mm, y, label)\n            c.setFont(\"Helvetica-Bold\", 10)\n            c.drawRightString(w - 20 * mm, y, value)\n            y -= 6 * mm\n        y -= 3 * mm\n        line(\"Age-band breakdown\", 11, True)\n        for band, info in rating[\"age_band_breakdown\"].items():\n            line(f\"{band}: {info['employees']} employees × rate {inr(info['rate'])} → {inr(info['premium'])}\", 9)\n        y -= 3 * mm\n        line(\"Terms & Conditions\", 11, True)\n        for t in (\n            \"Subject to the insurer's applicable underwriting guidelines and authorised approval.\",\n            \"Premium computed from the configured rating table; placeholder rates, not actuarially validated.\",\n            \"Pre-existing disease waiting periods, room-rent limits and exclusions as per the policy wording.\",\n            f\"Loss ratio considered: {rating.get('loss_ratio')} ({case['decision'].get('risk_tier')} risk tier).\",\n        ):\n            line(f\"• {t}\", 9, dy=5 * mm)\n        c.setFont(\"Helvetica-Oblique\", 8)\n        c.setFillColor(colors.grey)\n        c.drawString(20 * mm, 15 * mm, \"Generated by the Email-to-Quote Underwriting Agent — all company names and figures are fictional demo data.\")\n        c.showPage()\n        c.save()\n        return buf.getvalue()\n\n    # ------------------------------------------------------------------ emails\n    def _draft_email(self, case: dict) -> dict:\n        model = case[\"extraction\"][\"data_model\"]\n        decision = case[\"decision\"]\n        validation = case[\"validation\"]\n        company = model.get(\"company_name\") or \"the proposer\"\n        broker = model.get(\"broker_name\") or case.get(\"email\", {}).get(\"from\") or \"Broker\"\n        to_addr = model.get(\"broker_email\") or case.get(\"email\", {}).get(\"from\") or \"\"\n        subject_in = case.get(\"email\", {}).get(\"subject\") or f\"Group Medical Insurance — {company}\"\n        action = decision[\"next_action\"]\n\n        if action == \"PROCEED_TO_QUOTE\":\n            r = case[\"rating\"]\n            subject = f\"RE: {subject_in} — Proposed Quotation\"\n            body = (\n                f\"Dear {broker},\\n\\n\"\n                f\"We have completed the preliminary review of the Group Medical Insurance submission for {company}. \"\n                \"Please find the proposed quotation attached, including the coverage details, premium breakdown, terms and conditions.\\n\\n\"\n                f\"Summary of the proposed terms:\\n\"\n                f\"  • Covered employees: {r['covered_employees']} (dependants: {r['dependants']})\\n\"\n                f\"  • Sum insured per employee: {inr(r['sum_insured_per_employee'])}\\n\"\n                f\"  • Annual premium (excl. GST): {inr(r['annual_premium'])}\\n\"\n                f\"  • GST @ {r['gst_pct']}%: {inr(r['gst'])}  |  Total payable: {inr(r['total_payable'])}\\n\"\n                f\"  • Quote valid for {r['quote_validity_days']} days from {date.today().isoformat()}\\n\\n\"\n                \"This quotation is subject to the insurer's applicable underwriting guidelines and authorised approval.\\n\\n\"\n                f\"Regards,\\n{self.underwriter_signature}\\n{self.insurer_name}\"\n            )\n        elif action == \"REQUEST_CLARIFICATION\":\n            subject = f\"RE: {subject_in} — Clarification required before quotation\"\n            items = \"\\n\".join(f\"  {i}. {m['label']}: {m['source_value']}. {m['detail']}\" for i, m in enumerate(validation[\"material_issues\"], 1))\n            body = (\n                f\"Dear {broker},\\n\\n\"\n                f\"Thank you for the Group Medical Insurance submission for {company}. During our field-level review of the \"\n                \"attached documents we found discrepancies that must be resolved before a quotation can be released:\\n\\n\"\n                f\"{items}\\n\\n\"\n                \"Kindly share the corrected documents or confirm the correct figures. The case has been placed on hold and \"\n                \"will resume automatically once the clarified information is received.\\n\\n\"\n                f\"Regards,\\n{self.underwriter_signature}\\n{self.insurer_name}\"\n            )\n        else:\n            subject = f\"RE: {subject_in} — Submission under underwriter review\"\n            reasons = \"\\n\".join(f\"  • {x}\" for x in decision[\"reasons\"])\n            body = (\n                f\"Dear {broker},\\n\\n\"\n                f\"Thank you for the Group Medical Insurance submission for {company}. The documents have been validated and the \"\n                \"case has been referred to an authorised underwriter for review because of the following risk indicators:\\n\\n\"\n                f\"{reasons}\\n\\n\"\n                \"We will revert with the underwriting decision and quotation shortly.\\n\\n\"\n                f\"Regards,\\n{self.underwriter_signature}\\n{self.insurer_name}\"\n            )\n\n        body = self._polish(body)\n        return {\"to\": to_addr, \"subject\": subject, \"body\": body, \"action\": action}\n\n    def _polish(self, body: str) -> str:\n        if self.llm is None:\n            return body\n        numbers = set(re.findall(r\"[₹\\d][\\d,.%]*\", body))\n        prompt = (\n            \"Rewrite the following insurance underwriting email so it is concise, professional and courteous. \"\n            \"Keep every number, amount, date, name and bullet exactly as given, keep the same structure and sign-off, \"\n            \"and return ONLY the email body.\\n\\n\" + body\n        )\n        try:\n            result = self.llm.invoke(prompt)\n            content = getattr(result, \"content\", result)\n            if isinstance(content, list):\n                content = \"\\n\".join(str(c.get(\"text\", c)) if isinstance(c, dict) else str(c) for c in content)\n            polished = str(content).strip()\n            # Safety: every figure in the original must survive the rewrite, otherwise keep the deterministic draft.\n            if polished and all(n in polished for n in numbers if any(ch.isdigit() for ch in n)):\n                return polished\n            self.log(\"LLM rewrite dropped a figure; keeping the deterministic draft.\")\n        except Exception as exc:  # noqa: BLE001\n            self.log(f\"LLM polish skipped: {exc}\")\n        return body\n\n    def _dispatch(self, email: dict, attachment: tuple[str, bytes] | None) -> str:\n        if self.dispatch_mode != SEND:\n            return \"DRAFT — awaiting approval (dispatch mode: draft only)\"\n        if not self.approved:\n            return \"HELD — 'Approved by authorised underwriter' is not set\"\n        host = os.getenv(\"SMTP_HOST\") or os.getenv(\"SMTP_SERVER\")\n        if not host or not email.get(\"to\"):\n            return \"NOT SENT — SMTP_HOST or recipient address not configured\"\n        try:\n            msg = EmailMessage()\n            msg[\"From\"] = os.getenv(\"SMTP_FROM_EMAIL\") or os.getenv(\"SMTP_FROM\") or os.getenv(\"SMTP_USERNAME\") or \"underwriting@example.com\"\n            msg[\"To\"] = email[\"to\"]\n            msg[\"Subject\"] = email[\"subject\"]\n            msg.set_content(email[\"body\"])\n            if attachment:\n                msg.add_attachment(attachment[1], maintype=\"application\", subtype=\"pdf\", filename=attachment[0])\n            port = int(os.getenv(\"SMTP_PORT\") or 587)\n            use_ssl = (os.getenv(\"SMTP_USE_SSL\") or \"false\").lower() in {\"1\", \"true\", \"yes\"}\n            smtp_cls = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP\n            with smtp_cls(host, port, timeout=20) as s:\n                if not use_ssl and (os.getenv(\"SMTP_USE_TLS\") or \"true\").lower() in {\"1\", \"true\", \"yes\"}:\n                    s.starttls()\n                user = os.getenv(\"SMTP_USERNAME\") or os.getenv(\"SMTP_USER\")\n                if user:\n                    s.login(user, os.getenv(\"SMTP_PASSWORD\") or \"\")\n                s.send_message(msg)\n            return f\"SENT to {email['to']} via {host}\"\n        except Exception as exc:  # noqa: BLE001\n            return f\"FAILED — {exc}\"\n\n    # ------------------------------------------------------------------ outputs\n    def _case(self) -> dict:\n        return dict(self.rated.data) if isinstance(self.rated, Data) else dict(self.rated or {})\n\n    async def compose(self) -> Message:\n        case = self._case()\n        model = case.get(\"extraction\", {}).get(\"data_model\", {})\n        validation = case.get(\"validation\", {})\n        decision = case.get(\"decision\", {})\n        rating = case.get(\"rating\", {})\n        email = self._draft_email(case)\n\n        attachment = None\n        files: list[str] = []\n        pdf_note = \"\"\n        if decision.get(\"next_action\") == \"PROCEED_TO_QUOTE\" and rating.get(\"status\") == \"RATED\":\n            pdf_bytes = self._build_quote_pdf(case, self.insurer_name)\n            filename = f\"Quote_{re.sub(r'[^A-Za-z0-9]+', '_', model.get('company_name') or 'proposer')}_{case.get('case_id')}.pdf\"\n            attachment = (filename, pdf_bytes)\n            try:\n                from agentcore.services.deps import get_storage_service\n\n                agent_id = str(self.agent_id or \"underwriting\")\n                await get_storage_service().save_file(agent_id, filename, pdf_bytes)\n                files.append(f\"{agent_id}/{filename}\")\n                pdf_note = f\"Quote PDF saved as `{agent_id}/{filename}` in the agent's file storage.\"\n            except Exception as exc:  # noqa: BLE001\n                pdf_note = f\"Quote PDF generated in memory (storage save failed: {exc}).\"\n            if (self.output_folder or \"\").strip():\n                out = Path(self.output_folder.strip())\n                out.mkdir(parents=True, exist_ok=True)\n                (out / filename).write_bytes(pdf_bytes)\n                pdf_note += f\" Copy written to `{out / filename}`.\"\n\n        dispatch_status = self._dispatch(email, attachment)\n        case[\"outbound_email\"] = {**email, \"dispatch_status\": dispatch_status, \"attachment\": attachment[0] if attachment else None}\n        case.setdefault(\"audit_trail\", []).append({\"step\": \"dispatch\", \"detail\": dispatch_status})\n\n        # ---------------- markdown review\n        action_label = {\n            \"PROCEED_TO_QUOTE\": \"✅ Proceed to quotation\",\n            \"REQUEST_CLARIFICATION\": \"⚠️ Clarification requested — case on hold\",\n            \"REFER_TO_UNDERWRITER\": \"🔍 Referred to authorised underwriter\",\n        }.get(decision.get(\"next_action\"), decision.get(\"next_action\"))\n\n        lines = [\n            f\"## Underwriting review — {model.get('company_name') or 'Unknown proposer'}\",\n            f\"**Case** `{case.get('case_id')}` · intake: {case.get('intake_source')} · \"\n            f\"documents: {', '.join(a['name'] for a in case.get('attachments', []))}\",\n            \"\",\n            f\"### Decision: {action_label}\",\n            *[f\"- {r}\" for r in decision.get(\"reasons\", [])],\n            f\"- Risk tier: **{decision.get('risk_tier')}** · loss ratio: **{decision.get('loss_ratio')}** · \"\n            f\"completeness: **{validation.get('completeness_score')}%** · validation score: **{validation.get('validation_score')}%**\",\n            \"\",\n            \"### Field-level validation\",\n            \"| Field | Source value | Result | Type | Evidence |\",\n            \"|---|---|---|---|---|\",\n        ]\n        for r in validation.get(\"report\", []):\n            icon = {\"PASS\": \"✅\", \"FAIL\": \"❌\", \"WARN\": \"⚠️\"}.get(r[\"result\"], \"\")\n            evidence = \"; \".join(f\"{e.get('doc')} p.{e.get('page')}\" + (f\" ({e.get('confidence')})\" if e.get(\"confidence\") else \"\") for e in r.get(\"evidence\", [])[:2])\n            lines.append(f\"| {r['label']} | {r['source_value']} | {icon} {r['result']} | {r.get('issue_type') or ''} | {evidence} |\")\n\n        lines += [\"\", \"### Extracted data model\", \"| Field | Value |\", \"|---|---|\"]\n        for k, v in model.items():\n            if k == \"documents_present\":\n                v = \", \".join(v)\n            elif k in {\"requested_sum_insured\", \"current_sum_insured\", \"current_annual_premium\", \"claims_total_summary\", \"claims_total_detailed\", \"claims_rows_total\"}:\n                v = inr(v)\n            lines.append(f\"| {k.replace('_', ' ')} | {v if v is not None else '—'} |\")\n\n        if rating.get(\"status\") in {\"RATED\", \"INDICATIVE\"}:\n            lines += [\n                \"\",\n                f\"### Rating & quotation ({rating['status'].lower()})\",\n                \"| Item | Amount |\",\n                \"|---|---|\",\n                f\"| Covered employees | {rating['covered_employees']} (dependants {rating['dependants']}) |\",\n                f\"| Sum insured per employee | {inr(rating['sum_insured_per_employee'])} |\",\n                f\"| Employee base premium | {inr(rating['employee_base_premium'])} |\",\n                f\"| Dependant loading ({rating['dependant_loading_pct']}%) | {inr(rating['dependant_loading'])} |\",\n                f\"| {rating['claims_adjustment_label']} ({rating['claims_adjustment_pct']:+}%) | {inr(rating['claims_adjustment'])} |\",\n                f\"| **Annual premium (excl. GST)** | **{inr(rating['annual_premium'])}** |\",\n                f\"| GST @ {rating['gst_pct']}% | {inr(rating['gst'])} |\",\n                f\"| Total payable | {inr(rating['total_payable'])} |\",\n                \"\",\n                f\"_{rating['rating_basis']}._ {pdf_note}\",\n            ]\n        elif rating:\n            lines += [\"\", f\"### Rating: {rating.get('reason')}\"]\n\n        lines += [\n            \"\",\n            f\"### Outbound email — {dispatch_status}\",\n            f\"**To:** {email['to'] or '—'}  \",\n            f\"**Subject:** {email['subject']}\",\n            \"\",\n            \"```\",\n            email[\"body\"],\n            \"```\",\n            \"\",\n            \"### Audit trail\",\n            *[f\"{i}. **{a['step']}** — {a['detail']}\" for i, a in enumerate(case.get(\"audit_trail\", []), 1)],\n        ]\n\n        self._case_record = case\n        self.status = action_label\n        return Message(text=\"\\n\".join(lines), files=files, sender=\"Machine\", sender_name=\"Underwriting Agent\")\n\n    def case_record(self) -> Data:\n        case = getattr(self, \"_case_record\", None) or self._case()\n        return Data(data=case, text_key=\"intake_source\")\n",
+                "value": "\"\"\"Quote generation, broker email drafting and controlled dispatch.\n\nProduces the quotation PDF (when the case is cleared), drafts the outbound\nemail for the decided action (quote / clarification / referral), optionally\npolishes the wording with the LLM (numbers are never changed), and either keeps\nthe email as a draft pending approval or sends it through SMTP.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport io\nimport os\nimport re\nimport smtplib\nfrom datetime import date, timedelta\nfrom email.message import EmailMessage\nfrom pathlib import Path\n\nfrom agentcore.custom.custom_node.node import Node\nfrom agentcore.io import BoolInput, DataInput, DropdownInput, HandleInput, Output, StrInput\nfrom agentcore.schema.data import Data\nfrom agentcore.schema.message import Message\n\nDRAFT = \"Draft only (requires approval)\"\nSEND = \"Send via SMTP when approved\"\nSEND_OUTLOOK = \"Send via Outlook connector when approved\"\n\n\ndef inr(value) -> str:\n    if value is None:\n        return \"—\"\n    try:\n        n = int(round(float(value)))\n    except (TypeError, ValueError):\n        return str(value)\n    s = str(abs(n))\n    if len(s) > 3:\n        head, tail = s[:-3], s[-3:]\n        parts = []\n        while len(head) > 2:\n            parts.insert(0, head[-2:])\n            head = head[:-2]\n        if head:\n            parts.insert(0, head)\n        s = \",\".join(parts) + \",\" + tail\n    return (\"-\" if n < 0 else \"\") + \"₹\" + s\n\n\nclass UnderwritingQuoteComposer(Node):\n    display_name = \"6. Quote, Broker Email & Dispatch\"\n    description = (\n        \"Generates the quotation PDF, drafts the broker email for the decided action, shows the full review \"\n        \"(extraction, validation, decision, rating, audit trail) and dispatches only when approved.\"\n    )\n    icon = \"file-text\"\n    name = \"UnderwritingQuoteComposer\"\n\n    inputs = [\n        DataInput(name=\"rated\", display_name=\"Rated Case\", required=True),\n        HandleInput(\n            name=\"llm\",\n            display_name=\"Language Model (optional)\",\n            info=\"Optional LLM used to polish the email wording. Figures are fixed by the rating engine.\",\n            input_types=[\"LanguageModel\"],\n            required=False,\n        ),\n        StrInput(name=\"insurer_name\", display_name=\"Insurer name\", value=\"Demo General Insurance Co. Ltd.\"),\n        StrInput(name=\"underwriter_signature\", display_name=\"Email signature\", value=\"Insurance Underwriting Team\"),\n        DropdownInput(\n            name=\"dispatch_mode\",\n            display_name=\"Dispatch mode\",\n            options=[DRAFT, SEND, SEND_OUTLOOK],\n            value=DRAFT,\n            info=(\n                \"Emails are drafts by default. Sending requires 'Approved'. SMTP uses the SMTP_* settings in .env; \"\n                \"the Outlook option replies from the mailbox the email was read from (needs the Outlook mailbox intake \"\n                \"and Mail.Send permission).\"\n            ),\n        ),\n        BoolInput(\n            name=\"approved\",\n            display_name=\"Approved by authorised underwriter\",\n            value=False,\n            info=\"Human approval gate for dispatch.\",\n        ),\n        StrInput(\n            name=\"output_folder\",\n            display_name=\"Output folder for quote PDF\",\n            value=\"\",\n            info=\"Optional local folder to copy the generated quote PDF into (e.g. a mock outbox).\",\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Underwriting Response\", name=\"response\", method=\"compose\"),\n        Output(display_name=\"Case Record (JSON)\", name=\"case_record\", method=\"case_record\"),\n    ]\n\n    # ------------------------------------------------------------------ PDF\n    @staticmethod\n    def _build_quote_pdf(case: dict, insurer: str) -> bytes:\n        from reportlab.lib import colors\n        from reportlab.lib.pagesizes import A4\n        from reportlab.lib.units import mm\n        from reportlab.pdfgen import canvas\n\n        model = case[\"extraction\"][\"data_model\"]\n        rating = case[\"rating\"]\n        buf = io.BytesIO()\n        c = canvas.Canvas(buf, pagesize=A4)\n        w, h = A4\n        y = h - 25 * mm\n\n        def line(text, size=10, bold=False, dy=6 * mm, color=colors.black):\n            nonlocal y\n            c.setFillColor(color)\n            c.setFont(\"Helvetica-Bold\" if bold else \"Helvetica\", size)\n            c.drawString(20 * mm, y, text)\n            y -= dy\n\n        line(insurer, 16, True, 8 * mm, colors.HexColor(\"#b3202c\"))\n        line(\"Group Medical Insurance — Quotation (Illustrative)\", 13, True, 10 * mm)\n        line(f\"Quote reference: {case.get('case_id')}    Date: {date.today().isoformat()}    \"\n             f\"Valid until: {(date.today() + timedelta(days=int(rating.get('quote_validity_days', 30)))).isoformat()}\", 9)\n        y -= 3 * mm\n        line(\"Proposer\", 11, True)\n        line(f\"Company: {model.get('company_name') or '—'}\")\n        line(f\"Industry: {model.get('industry') or '—'}    Broker: {model.get('broker_name') or '—'}\")\n        line(f\"Policy: {model.get('policy_type')}    Coverage start: {model.get('coverage_start_date') or 'To be confirmed'}\")\n        y -= 3 * mm\n        line(\"Coverage & Premium\", 11, True)\n        rows = [\n            (\"Covered employees\", str(rating[\"covered_employees\"])),\n            (\"Dependants covered\", str(rating[\"dependants\"])),\n            (\"Sum insured per employee\", inr(rating[\"sum_insured_per_employee\"])),\n            (\"Employee base premium\", inr(rating[\"employee_base_premium\"])),\n            (f\"Dependant loading ({rating['dependant_loading_pct']}%)\", inr(rating[\"dependant_loading\"])),\n            (f\"{rating['claims_adjustment_label']} ({rating['claims_adjustment_pct']:+}%)\", inr(rating[\"claims_adjustment\"])),\n            (\"Annual premium (excl. GST)\", inr(rating[\"annual_premium\"])),\n            (f\"GST @ {rating['gst_pct']}% (calculated separately)\", inr(rating[\"gst\"])),\n            (\"Total payable\", inr(rating[\"total_payable\"])),\n        ]\n        for label, value in rows:\n            c.setFont(\"Helvetica\", 10)\n            c.drawString(20 * mm, y, label)\n            c.setFont(\"Helvetica-Bold\", 10)\n            c.drawRightString(w - 20 * mm, y, value)\n            y -= 6 * mm\n        y -= 3 * mm\n        line(\"Age-band breakdown\", 11, True)\n        for band, info in rating[\"age_band_breakdown\"].items():\n            line(f\"{band}: {info['employees']} employees × rate {inr(info['rate'])} → {inr(info['premium'])}\", 9)\n        y -= 3 * mm\n        line(\"Terms & Conditions\", 11, True)\n        for t in (\n            \"Subject to the insurer's applicable underwriting guidelines and authorised approval.\",\n            \"Premium computed from the configured rating table; placeholder rates, not actuarially validated.\",\n            \"Pre-existing disease waiting periods, room-rent limits and exclusions as per the policy wording.\",\n            f\"Loss ratio considered: {rating.get('loss_ratio')} ({case['decision'].get('risk_tier')} risk tier).\",\n        ):\n            line(f\"• {t}\", 9, dy=5 * mm)\n        c.setFont(\"Helvetica-Oblique\", 8)\n        c.setFillColor(colors.grey)\n        c.drawString(20 * mm, 15 * mm, \"Generated by the Email-to-Quote Underwriting Agent — all company names and figures are fictional demo data.\")\n        c.showPage()\n        c.save()\n        return buf.getvalue()\n\n    # ------------------------------------------------------------------ emails\n    def _draft_email(self, case: dict) -> dict:\n        model = case[\"extraction\"][\"data_model\"]\n        decision = case[\"decision\"]\n        validation = case[\"validation\"]\n        company = model.get(\"company_name\") or \"the proposer\"\n        broker = model.get(\"broker_name\") or case.get(\"email\", {}).get(\"from\") or \"Broker\"\n        to_addr = model.get(\"broker_email\") or case.get(\"email\", {}).get(\"from\") or \"\"\n        subject_in = case.get(\"email\", {}).get(\"subject\") or f\"Group Medical Insurance — {company}\"\n        action = decision[\"next_action\"]\n\n        if action == \"PROCEED_TO_QUOTE\":\n            r = case[\"rating\"]\n            subject = f\"RE: {subject_in} — Proposed Quotation\"\n            body = (\n                f\"Dear {broker},\\n\\n\"\n                f\"We have completed the preliminary review of the Group Medical Insurance submission for {company}. \"\n                \"Please find the proposed quotation attached, including the coverage details, premium breakdown, terms and conditions.\\n\\n\"\n                f\"Summary of the proposed terms:\\n\"\n                f\"  • Covered employees: {r['covered_employees']} (dependants: {r['dependants']})\\n\"\n                f\"  • Sum insured per employee: {inr(r['sum_insured_per_employee'])}\\n\"\n                f\"  • Annual premium (excl. GST): {inr(r['annual_premium'])}\\n\"\n                f\"  • GST @ {r['gst_pct']}%: {inr(r['gst'])}  |  Total payable: {inr(r['total_payable'])}\\n\"\n                f\"  • Quote valid for {r['quote_validity_days']} days from {date.today().isoformat()}\\n\\n\"\n                \"This quotation is subject to the insurer's applicable underwriting guidelines and authorised approval.\\n\\n\"\n                f\"Regards,\\n{self.underwriter_signature}\\n{self.insurer_name}\"\n            )\n        elif action == \"REQUEST_CLARIFICATION\":\n            subject = f\"RE: {subject_in} — Clarification required before quotation\"\n            items = \"\\n\".join(f\"  {i}. {m['label']}: {m['source_value']}. {m['detail']}\" for i, m in enumerate(validation[\"material_issues\"], 1))\n            body = (\n                f\"Dear {broker},\\n\\n\"\n                f\"Thank you for the Group Medical Insurance submission for {company}. During our field-level review of the \"\n                \"attached documents we found discrepancies that must be resolved before a quotation can be released:\\n\\n\"\n                f\"{items}\\n\\n\"\n                \"Kindly share the corrected documents or confirm the correct figures. The case has been placed on hold and \"\n                \"will resume automatically once the clarified information is received.\\n\\n\"\n                f\"Regards,\\n{self.underwriter_signature}\\n{self.insurer_name}\"\n            )\n        else:\n            subject = f\"RE: {subject_in} — Submission under underwriter review\"\n            reasons = \"\\n\".join(f\"  • {x}\" for x in decision[\"reasons\"])\n            body = (\n                f\"Dear {broker},\\n\\n\"\n                f\"Thank you for the Group Medical Insurance submission for {company}. The documents have been validated and the \"\n                \"case has been referred to an authorised underwriter for review because of the following risk indicators:\\n\\n\"\n                f\"{reasons}\\n\\n\"\n                \"We will revert with the underwriting decision and quotation shortly.\\n\\n\"\n                f\"Regards,\\n{self.underwriter_signature}\\n{self.insurer_name}\"\n            )\n\n        body = self._polish(body)\n        return {\"to\": to_addr, \"subject\": subject, \"body\": body, \"action\": action}\n\n    def _polish(self, body: str) -> str:\n        if self.llm is None:\n            return body\n        numbers = set(re.findall(r\"[₹\\d][\\d,.%]*\", body))\n        prompt = (\n            \"Rewrite the following insurance underwriting email so it is concise, professional and courteous. \"\n            \"Keep every number, amount, date, name and bullet exactly as given, keep the same structure and sign-off, \"\n            \"and return ONLY the email body.\\n\\n\" + body\n        )\n        try:\n            result = self.llm.invoke(prompt)\n            content = getattr(result, \"content\", result)\n            if isinstance(content, list):\n                content = \"\\n\".join(str(c.get(\"text\", c)) if isinstance(c, dict) else str(c) for c in content)\n            polished = str(content).strip()\n            # Safety: every figure in the original must survive the rewrite, otherwise keep the deterministic draft.\n            if polished and all(n in polished for n in numbers if any(ch.isdigit() for ch in n)):\n                return polished\n            self.log(\"LLM rewrite dropped a figure; keeping the deterministic draft.\")\n        except Exception as exc:  # noqa: BLE001\n            self.log(f\"LLM polish skipped: {exc}\")\n        return body\n\n    def _send_via_outlook(self, email: dict, attachment: tuple[str, bytes] | None, case: dict) -> str:\n        \"\"\"Reply from the mailbox the email was read from, using the product's Outlook connector.\"\"\"\n        import base64\n\n        import httpx\n        from agentcore.components.tools.outlook_mail import (\n            GRAPH_BASE,\n            _gate_with_refresh_retry,\n            _get_outlook_config,\n            _refresh_token_sync,\n        )\n\n        source = case.get(\"source_mailbox\") or {}\n        connector_id = source.get(\"connector_id\")\n        if not connector_id:\n            return \"NOT SENT — Outlook dispatch needs the Outlook mailbox intake (no source mailbox on this case)\"\n        if not email.get(\"to\"):\n            return \"NOT SENT — no recipient address (broker email not found)\"\n        config = _get_outlook_config(connector_id)\n        if not config:\n            return \"NOT SENT — Outlook connector not found\"\n        config[\"_connector_id\"] = connector_id\n        accounts = config.get(\"linked_accounts\", [])\n        acct = next((a for a in accounts if a.get(\"email\", \"\").lower() == str(source.get(\"account_email\", \"\")).lower()), None) or (accounts[0] if accounts else None)\n        if acct is None:\n            return \"NOT SENT — no mailbox linked to the Outlook connector\"\n        try:\n            _gate_with_refresh_retry(config, acct, \"Mail.Send\")\n            token = _refresh_token_sync(config, acct)\n        except Exception as exc:  # noqa: BLE001\n            return f\"NOT SENT — {exc}\"\n\n        message: dict = {\n            \"subject\": email[\"subject\"],\n            \"body\": {\"contentType\": \"Text\", \"content\": email[\"body\"]},\n            \"toRecipients\": [{\"emailAddress\": {\"address\": email[\"to\"]}}],\n        }\n        if attachment:\n            message[\"attachments\"] = [\n                {\n                    \"@odata.type\": \"#microsoft.graph.fileAttachment\",\n                    \"name\": attachment[0],\n                    \"contentType\": \"application/pdf\",\n                    \"contentBytes\": base64.b64encode(attachment[1]).decode(\"ascii\"),\n                }\n            ]\n        try:\n            resp = httpx.post(\n                f\"{GRAPH_BASE}/me/sendMail\",\n                headers={\"Authorization\": f\"Bearer {token}\", \"Content-Type\": \"application/json\"},\n                json={\"message\": message, \"saveToSentItems\": True},\n                timeout=60,\n            )\n        except Exception as exc:  # noqa: BLE001\n            return f\"FAILED — {exc}\"\n        if resp.status_code in (200, 202):\n            return f\"SENT from {acct.get('email')} to {email['to']} via Outlook\" + (\" with quote PDF\" if attachment else \"\")\n        return f\"FAILED — Microsoft Graph {resp.status_code}: {resp.text[:200]}\"\n\n    def _dispatch(self, email: dict, attachment: tuple[str, bytes] | None, case: dict | None = None) -> str:\n        if self.dispatch_mode not in (SEND, SEND_OUTLOOK):\n            return \"DRAFT — awaiting approval (dispatch mode: draft only)\"\n        if not self.approved:\n            return \"HELD — 'Approved by authorised underwriter' is not set\"\n        if self.dispatch_mode == SEND_OUTLOOK:\n            return self._send_via_outlook(email, attachment, case or {})\n        host = os.getenv(\"SMTP_HOST\") or os.getenv(\"SMTP_SERVER\")\n        if not host or not email.get(\"to\"):\n            return \"NOT SENT — SMTP_HOST or recipient address not configured\"\n        try:\n            msg = EmailMessage()\n            msg[\"From\"] = os.getenv(\"SMTP_FROM_EMAIL\") or os.getenv(\"SMTP_FROM\") or os.getenv(\"SMTP_USERNAME\") or \"underwriting@example.com\"\n            msg[\"To\"] = email[\"to\"]\n            msg[\"Subject\"] = email[\"subject\"]\n            msg.set_content(email[\"body\"])\n            if attachment:\n                msg.add_attachment(attachment[1], maintype=\"application\", subtype=\"pdf\", filename=attachment[0])\n            port = int(os.getenv(\"SMTP_PORT\") or 587)\n            use_ssl = (os.getenv(\"SMTP_USE_SSL\") or \"false\").lower() in {\"1\", \"true\", \"yes\"}\n            smtp_cls = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP\n            with smtp_cls(host, port, timeout=20) as s:\n                if not use_ssl and (os.getenv(\"SMTP_USE_TLS\") or \"true\").lower() in {\"1\", \"true\", \"yes\"}:\n                    s.starttls()\n                user = os.getenv(\"SMTP_USERNAME\") or os.getenv(\"SMTP_USER\")\n                if user:\n                    s.login(user, os.getenv(\"SMTP_PASSWORD\") or \"\")\n                s.send_message(msg)\n            return f\"SENT to {email['to']} via {host}\"\n        except Exception as exc:  # noqa: BLE001\n            return f\"FAILED — {exc}\"\n\n    # ------------------------------------------------------------------ outputs\n    def _case(self) -> dict:\n        return dict(self.rated.data) if isinstance(self.rated, Data) else dict(self.rated or {})\n\n    async def compose(self) -> Message:\n        case = self._case()\n        model = case.get(\"extraction\", {}).get(\"data_model\", {})\n        validation = case.get(\"validation\", {})\n        decision = case.get(\"decision\", {})\n        rating = case.get(\"rating\", {})\n        email = self._draft_email(case)\n\n        attachment = None\n        files: list[str] = []\n        pdf_note = \"\"\n        if decision.get(\"next_action\") == \"PROCEED_TO_QUOTE\" and rating.get(\"status\") == \"RATED\":\n            pdf_bytes = self._build_quote_pdf(case, self.insurer_name)\n            filename = f\"Quote_{re.sub(r'[^A-Za-z0-9]+', '_', model.get('company_name') or 'proposer')}_{case.get('case_id')}.pdf\"\n            attachment = (filename, pdf_bytes)\n            try:\n                from agentcore.services.deps import get_storage_service\n\n                agent_id = str(self.agent_id or \"underwriting\")\n                await get_storage_service().save_file(agent_id, filename, pdf_bytes)\n                files.append(f\"{agent_id}/{filename}\")\n                pdf_note = f\"Quote PDF saved as `{agent_id}/{filename}` in the agent's file storage.\"\n            except Exception as exc:  # noqa: BLE001\n                pdf_note = f\"Quote PDF generated in memory (storage save failed: {exc}).\"\n            if (self.output_folder or \"\").strip():\n                out = Path(self.output_folder.strip())\n                out.mkdir(parents=True, exist_ok=True)\n                (out / filename).write_bytes(pdf_bytes)\n                pdf_note += f\" Copy written to `{out / filename}`.\"\n\n        dispatch_status = self._dispatch(email, attachment, case)\n        case[\"outbound_email\"] = {**email, \"dispatch_status\": dispatch_status, \"attachment\": attachment[0] if attachment else None}\n        case.setdefault(\"audit_trail\", []).append({\"step\": \"dispatch\", \"detail\": dispatch_status})\n\n        # ---------------- markdown review\n        action_label = {\n            \"PROCEED_TO_QUOTE\": \"✅ Proceed to quotation\",\n            \"REQUEST_CLARIFICATION\": \"⚠️ Clarification requested — case on hold\",\n            \"REFER_TO_UNDERWRITER\": \"🔍 Referred to authorised underwriter\",\n        }.get(decision.get(\"next_action\"), decision.get(\"next_action\"))\n\n        lines = [\n            f\"## Underwriting review — {model.get('company_name') or 'Unknown proposer'}\",\n            f\"**Case** `{case.get('case_id')}` · intake: {case.get('intake_source')} · \"\n            f\"documents: {', '.join(a['name'] for a in case.get('attachments', []))}\",\n            \"\",\n            f\"### Decision: {action_label}\",\n            *[f\"- {r}\" for r in decision.get(\"reasons\", [])],\n            f\"- Risk tier: **{decision.get('risk_tier')}** · loss ratio: **{decision.get('loss_ratio')}** · \"\n            f\"completeness: **{validation.get('completeness_score')}%** · validation score: **{validation.get('validation_score')}%**\",\n            \"\",\n            \"### Field-level validation\",\n            \"| Field | Source value | Result | Type | Evidence |\",\n            \"|---|---|---|---|---|\",\n        ]\n        for r in validation.get(\"report\", []):\n            icon = {\"PASS\": \"✅\", \"FAIL\": \"❌\", \"WARN\": \"⚠️\"}.get(r[\"result\"], \"\")\n            evidence = \"; \".join(f\"{e.get('doc')} p.{e.get('page')}\" + (f\" ({e.get('confidence')})\" if e.get(\"confidence\") else \"\") for e in r.get(\"evidence\", [])[:2])\n            lines.append(f\"| {r['label']} | {r['source_value']} | {icon} {r['result']} | {r.get('issue_type') or ''} | {evidence} |\")\n\n        lines += [\"\", \"### Extracted data model\", \"| Field | Value |\", \"|---|---|\"]\n        for k, v in model.items():\n            if k == \"documents_present\":\n                v = \", \".join(v)\n            elif k in {\"requested_sum_insured\", \"current_sum_insured\", \"current_annual_premium\", \"claims_total_summary\", \"claims_total_detailed\", \"claims_rows_total\"}:\n                v = inr(v)\n            lines.append(f\"| {k.replace('_', ' ')} | {v if v is not None else '—'} |\")\n\n        if rating.get(\"status\") in {\"RATED\", \"INDICATIVE\"}:\n            lines += [\n                \"\",\n                f\"### Rating & quotation ({rating['status'].lower()})\",\n                \"| Item | Amount |\",\n                \"|---|---|\",\n                f\"| Covered employees | {rating['covered_employees']} (dependants {rating['dependants']}) |\",\n                f\"| Sum insured per employee | {inr(rating['sum_insured_per_employee'])} |\",\n                f\"| Employee base premium | {inr(rating['employee_base_premium'])} |\",\n                f\"| Dependant loading ({rating['dependant_loading_pct']}%) | {inr(rating['dependant_loading'])} |\",\n                f\"| {rating['claims_adjustment_label']} ({rating['claims_adjustment_pct']:+}%) | {inr(rating['claims_adjustment'])} |\",\n                f\"| **Annual premium (excl. GST)** | **{inr(rating['annual_premium'])}** |\",\n                f\"| GST @ {rating['gst_pct']}% | {inr(rating['gst'])} |\",\n                f\"| Total payable | {inr(rating['total_payable'])} |\",\n                \"\",\n                f\"_{rating['rating_basis']}._ {pdf_note}\",\n            ]\n        elif rating:\n            lines += [\"\", f\"### Rating: {rating.get('reason')}\"]\n\n        lines += [\n            \"\",\n            f\"### Outbound email — {dispatch_status}\",\n            f\"**To:** {email['to'] or '—'}  \",\n            f\"**Subject:** {email['subject']}\",\n            \"\",\n            \"```\",\n            email[\"body\"],\n            \"```\",\n            \"\",\n            \"### Audit trail\",\n            *[f\"{i}. **{a['step']}** — {a['detail']}\" for i, a in enumerate(case.get(\"audit_trail\", []), 1)],\n        ]\n\n        self._case_record = case\n        self.status = action_label\n        return Message(text=\"\\n\".join(lines), files=files, sender=\"Machine\", sender_name=\"Underwriting Agent\")\n\n    def case_record(self) -> Data:\n        case = getattr(self, \"_case_record\", None) or self._case()\n        return Data(data=case, text_key=\"intake_source\")\n",
                 "fileTypes": [],
                 "file_path": "",
                 "password": false,
@@ -1209,7 +1209,8 @@
                 "trace_as_metadata": true,
                 "options": [
                   "Draft only (requires approval)",
-                  "Send via SMTP when approved"
+                  "Send via SMTP when approved",
+                  "Send via Outlook connector when approved"
                 ],
                 "options_metadata": [],
                 "combobox": false,
@@ -1223,7 +1224,7 @@
                 "display_name": "Dispatch mode",
                 "advanced": false,
                 "dynamic": false,
-                "info": "Emails are drafts by default. Sending requires 'Approved' and SMTP_* settings in .env.",
+                "info": "Emails are drafts by default. Sending requires 'Approved'. SMTP uses the SMTP_* settings in .env; the Outlook option replies from the mailbox the email was read from (needs the Outlook mailbox intake and Mail.Send permission).",
                 "title_case": false,
                 "type": "str",
                 "_input_type": "DropdownInput"
@@ -1360,14 +1361,14 @@
         }
       },
       {
-        "id": "ChatOutput-Rgmrz",
+        "id": "ChatOutput-Rz3xZ",
         "type": "genericNode",
         "position": {
           "x": 3010,
           "y": 200
         },
         "data": {
-          "id": "ChatOutput-Rgmrz",
+          "id": "ChatOutput-Rz3xZ",
           "type": "ChatOutput",
           "node": {
             "template": {
@@ -1668,6 +1669,270 @@
           "width": 300,
           "height": 420
         }
+      },
+      {
+        "id": "RegistryModelComponent-9N8iY",
+        "type": "genericNode",
+        "position": {
+          "x": 860,
+          "y": 820
+        },
+        "data": {
+          "id": "RegistryModelComponent-9N8iY",
+          "type": "RegistryModelComponent",
+          "node": {
+            "template": {
+              "_type": "Component",
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "\"\"\"Unified Language Model component — thin wrapper around the Model microservice.\n\nAll LLM invocations are delegated to the Model microservice via\n``MicroserviceChatModel``.  No provider SDKs are imported here.\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom loguru import logger\n\nfrom agentcore.base.models.model import LCModelNode\nfrom agentcore.field_typing import LanguageModel\nfrom agentcore.io import DropdownInput, FloatInput, IntInput\n\nfrom agentcore.components.models._rbac_helpers import (\n    check_model_access_sync,\n    fetch_model_by_id_sync,\n    filter_models_by_rbac,\n    is_public_registry_agent_run,\n    resolve_user_id,\n)\n\n# Display label → DB key mapping\nPROVIDER_LABEL_TO_KEY = {\n    \"OpenAI\": \"openai\",\n    \"Azure\": \"azure\",\n    \"Anthropic\": \"anthropic\",\n    \"Google\": \"google\",\n    \"Google Vertex AI\": \"google_vertex\",\n    \"Groq\": \"groq\",\n    \"Custom Model\": \"openai_compatible\",\n}\nPROVIDER_KEY_TO_LABEL = {v: k for k, v in PROVIDER_LABEL_TO_KEY.items()}\nPROVIDER_OPTIONS = list(PROVIDER_LABEL_TO_KEY.keys())\n\n\ndef _fetch_models_for_provider(provider: str, user_id: str | None = None) -> list[str]:\n    \"\"\"Fetch active LLM models from the microservice, filtered by provider and RBAC.\n\n    Returns a list of strings formatted as ``'display_name | model_name | uuid'``.\n    \"\"\"\n    if not provider:\n        return []\n    try:\n        from agentcore.services.model_service_client import fetch_registry_models\n\n        results = fetch_registry_models(provider=provider, model_type=\"llm\")\n        if user_id:\n            results = filter_models_by_rbac(results, user_id)\n        # Filter: only show models meant for agent canvas\n        results = [\n            r for r in results\n            if \"agent\" in (r.get(\"show_in\") or [\"orchestrator\", \"agent\"])\n        ]\n        return [\n            f\"{r['display_name']} | {r['model_name']} | {r['id']}\"\n            for r in results\n        ]\n    except Exception as e:\n        logger.warning(f\"Failed to fetch LLM models via microservice: {e}\")\n        return []\n\n\nclass RegistryModelComponent(LCModelNode):\n    \"\"\"A unified Language Model component that dynamically loads models from the Model Registry.\n\n    Users onboard models via the Model Registry page.  This component\n    lets them pick a provider, then select a registered model for that\n    provider in the agent builder.\n    \"\"\"\n\n    display_name: str = \"Large Language Model\"\n    description: str = \"Select a provider and model from the Model Registry to power your agent.\"\n    icon = \"BrainCircuit\"\n    name = \"RegistryModelComponent\"\n    priority = 0\n\n    inputs = [\n        *LCModelNode._base_inputs,\n        DropdownInput(\n            name=\"provider\",\n            display_name=\"Provider\",\n            info=\"Select the AI provider. Models onboarded for this provider will appear below.\",\n            options=PROVIDER_OPTIONS,\n            value=\"\",\n            real_time_refresh=True,\n        ),\n        DropdownInput(\n            name=\"registry_model\",\n            display_name=\"Registry Model\",\n            info=\"Select a model from the Model Registry.\",\n            options=[],\n            value=\"\",\n            refresh_button=True,\n            real_time_refresh=True,\n            combobox=True,\n        ),\n        FloatInput(\n            name=\"temperature\",\n            display_name=\"Temperature\",\n            info=\"Controls randomness (0-2). Leave empty to use model default.\",\n            advanced=True,\n        ),\n        IntInput(\n            name=\"max_tokens\",\n            display_name=\"Max Output Tokens\",\n            info=\"Maximum number of tokens to generate. Leave empty for model default.\",\n            advanced=True,\n        ),\n    ]\n\n    def update_build_config(self, build_config: dict, field_value: str, field_name: str | None = None):\n        \"\"\"Refresh dropdowns when provider changes or registry_model refresh is clicked.\"\"\"\n        current_user_id = resolve_user_id(self)\n\n        if field_name == \"provider\":\n            provider_key = PROVIDER_LABEL_TO_KEY.get(field_value, field_value)\n            try:\n                options = _fetch_models_for_provider(provider_key, user_id=current_user_id)\n                build_config[\"registry_model\"][\"options\"] = options if options else []\n                build_config[\"registry_model\"][\"value\"] = options[0] if options else \"\"\n            except Exception as e:\n                logger.warning(f\"Error fetching models for provider {provider_key}: {e}\")\n                build_config[\"registry_model\"][\"options\"] = []\n                build_config[\"registry_model\"][\"value\"] = \"\"\n\n        elif field_name == \"registry_model\":\n            provider_label = build_config.get(\"provider\", {}).get(\"value\", \"\")\n            provider_key = PROVIDER_LABEL_TO_KEY.get(provider_label, provider_label)\n            if provider_key:\n                try:\n                    options = _fetch_models_for_provider(provider_key, user_id=current_user_id)\n                    build_config[\"registry_model\"][\"options\"] = options if options else []\n                    if options and not build_config[\"registry_model\"].get(\"value\"):\n                        build_config[\"registry_model\"][\"value\"] = options[0]\n                except Exception as e:\n                    logger.warning(f\"Error refreshing registry models: {e}\")\n                    build_config[\"registry_model\"][\"options\"] = []\n\n        return build_config\n\n    def build_model(self) -> LanguageModel:  # type: ignore[type-var]\n        \"\"\"Build a MicroserviceChatModel proxy that delegates to the Model microservice.\"\"\"\n        from agentcore.services.model_service_client import MicroserviceChatModel, _get_model_service_settings\n\n        selected = self.registry_model\n        if not selected:\n            msg = \"No model selected. Please select a model from the Registry Model dropdown.\"\n            raise ValueError(msg)\n\n        parts = [p.strip() for p in selected.split(\"|\")]\n        if len(parts) < 3:\n            msg = f\"Invalid registry model format: {selected}. Please refresh the dropdown.\"\n            raise ValueError(msg)\n\n        model_name = parts[1]\n        model_id = parts[2]\n\n        # Defence-in-depth: verify per-user RBAC access before building proxy.\n        # Skip when the run originates from a PROD+PUBLIC registry agent — the\n        # deployer endorsed this model for the public agent at publish time, so\n        # any authenticated caller reaching it through the orchestrator (incl.\n        # cross-org / cross-dept consumers) is allowed to use it.\n        current_user_id = resolve_user_id(self)\n        if current_user_id and not is_public_registry_agent_run(self):\n            model_dict = fetch_model_by_id_sync(model_id)\n            if model_dict and not check_model_access_sync(model_dict, current_user_id):\n                raise ValueError(\"Access denied to selected model due to RBAC scope\")\n\n        provider_label = self.provider or \"\"\n        provider_key = PROVIDER_LABEL_TO_KEY.get(provider_label, provider_label).lower()\n\n        temperature = self.temperature if self.temperature not in (None, \"\") else None\n        if temperature is not None:\n            temperature = float(temperature)\n\n        max_tokens = self.max_tokens if self.max_tokens not in (None, \"\") else None\n        if max_tokens is not None:\n            max_tokens = int(max_tokens)\n\n        service_url, service_api_key = _get_model_service_settings()\n\n        return MicroserviceChatModel(\n            service_url=service_url,\n            service_api_key=service_api_key,\n            provider=provider_key,\n            model=model_name,\n            registry_model_id=model_id,\n            temperature=temperature,\n            max_tokens=max_tokens,\n            streaming=self.stream,\n        )\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "input_value": {
+                "trace_as_input": true,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Input",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageInput"
+              },
+              "max_tokens": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "max_tokens",
+                "value": "",
+                "display_name": "Max Output Tokens",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Maximum number of tokens to generate. Leave empty for model default.",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "provider": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "OpenAI",
+                  "Azure",
+                  "Anthropic",
+                  "Google",
+                  "Google Vertex AI",
+                  "Groq",
+                  "Custom Model"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "toggle": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "provider",
+                "value": "",
+                "display_name": "Provider",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Select the AI provider. Models onboarded for this provider will appear below.",
+                "real_time_refresh": true,
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "registry_model": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [],
+                "options_metadata": [],
+                "combobox": true,
+                "dialog_inputs": {},
+                "toggle": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "registry_model",
+                "value": "",
+                "display_name": "Registry Model",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Select a model from the Model Registry.",
+                "real_time_refresh": true,
+                "refresh_button": true,
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "stream": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "stream",
+                "value": false,
+                "display_name": "Stream",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Stream the response from the model. Streaming works only in Chat.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "system_message": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "system_message",
+                "value": "",
+                "display_name": "System Message",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "System message to pass to the model.",
+                "title_case": false,
+                "copy_field": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "temperature": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "temperature",
+                "value": "",
+                "display_name": "Temperature",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Controls randomness (0-2). Leave empty to use model default.",
+                "title_case": false,
+                "type": "float",
+                "_input_type": "FloatInput"
+              }
+            },
+            "description": "Select a provider and model from the Model Registry to power your agent.",
+            "icon": "BrainCircuit",
+            "base_classes": [
+              "LanguageModel",
+              "Message"
+            ],
+            "display_name": "Large Language Model",
+            "priority": 0,
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "text_output",
+                "display_name": "Model Response",
+                "method": "text_response",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "group_outputs": false,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "LanguageModel"
+                ],
+                "selected": "LanguageModel",
+                "name": "model_output",
+                "display_name": "Language Model",
+                "method": "build_model",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "group_outputs": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "input_value",
+              "system_message",
+              "stream",
+              "provider",
+              "registry_model",
+              "temperature",
+              "max_tokens"
+            ],
+            "beta": false,
+            "edited": false,
+            "metadata": {
+              "keywords": [
+                "model",
+                "llm",
+                "language model",
+                "large language model"
+              ],
+              "module": "agentcore.components.models.registry_model.RegistryModelComponent",
+              "code_hash": "c037f5bb48eb"
+            },
+            "tool_mode": false,
+            "hidden": false
+          },
+          "showNode": true
+        },
+        "dragging": false,
+        "selected": false,
+        "measured": {
+          "width": 340,
+          "height": 420
+        }
       }
     ],
     "edges": [
@@ -1677,7 +1942,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "ChatInput",
-            "id": "ChatInput-GdKmD",
+            "id": "ChatInput-4a8aS",
             "name": "message",
             "output_types": [
               "Message"
@@ -1685,19 +1950,19 @@
           },
           "targetHandle": {
             "fieldName": "email_message",
-            "id": "UnderwritingEmailIntake-BejVk",
+            "id": "UnderwritingEmailIntake-xO7WG",
             "inputTypes": [
               "Message"
             ],
             "type": "str"
           }
         },
-        "id": "reactFlow__edge-ChatInput-GdKmD{œdataTypeœ:œChatInputœ,œidœ:œChatInput-GdKmDœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-UnderwritingEmailIntake-BejVk{œfieldNameœ:œemail_messageœ,œidœ:œUnderwritingEmailIntake-BejVkœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "id": "reactFlow__edge-ChatInput-4a8aS{œdataTypeœ:œChatInputœ,œidœ:œChatInput-4a8aSœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-UnderwritingEmailIntake-xO7WG{œfieldNameœ:œemail_messageœ,œidœ:œUnderwritingEmailIntake-xO7WGœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
         "selected": false,
-        "source": "ChatInput-GdKmD",
-        "sourceHandle": "{œdataTypeœ:œChatInputœ,œidœ:œChatInput-GdKmDœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "UnderwritingEmailIntake-BejVk",
-        "targetHandle": "{œfieldNameœ:œemail_messageœ,œidœ:œUnderwritingEmailIntake-BejVkœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
+        "source": "ChatInput-4a8aS",
+        "sourceHandle": "{œdataTypeœ:œChatInputœ,œidœ:œChatInput-4a8aSœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "UnderwritingEmailIntake-xO7WG",
+        "targetHandle": "{œfieldNameœ:œemail_messageœ,œidœ:œUnderwritingEmailIntake-xO7WGœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}"
       },
       {
         "animated": false,
@@ -1705,7 +1970,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "UnderwritingEmailIntake",
-            "id": "UnderwritingEmailIntake-BejVk",
+            "id": "UnderwritingEmailIntake-xO7WG",
             "name": "case",
             "output_types": [
               "Data"
@@ -1713,19 +1978,19 @@
           },
           "targetHandle": {
             "fieldName": "case",
-            "id": "UnderwritingDocumentExtractor-JT8Qo",
+            "id": "UnderwritingDocumentExtractor-m6hx3",
             "inputTypes": [
               "Data"
             ],
             "type": "other"
           }
         },
-        "id": "reactFlow__edge-UnderwritingEmailIntake-BejVk{œdataTypeœ:œUnderwritingEmailIntakeœ,œidœ:œUnderwritingEmailIntake-BejVkœ,œnameœ:œcaseœ,œoutput_typesœ:[œDataœ]}-UnderwritingDocumentExtractor-JT8Qo{œfieldNameœ:œcaseœ,œidœ:œUnderwritingDocumentExtractor-JT8Qoœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
+        "id": "reactFlow__edge-UnderwritingEmailIntake-xO7WG{œdataTypeœ:œUnderwritingEmailIntakeœ,œidœ:œUnderwritingEmailIntake-xO7WGœ,œnameœ:œcaseœ,œoutput_typesœ:[œDataœ]}-UnderwritingDocumentExtractor-m6hx3{œfieldNameœ:œcaseœ,œidœ:œUnderwritingDocumentExtractor-m6hx3œ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
         "selected": false,
-        "source": "UnderwritingEmailIntake-BejVk",
-        "sourceHandle": "{œdataTypeœ:œUnderwritingEmailIntakeœ,œidœ:œUnderwritingEmailIntake-BejVkœ,œnameœ:œcaseœ,œoutput_typesœ:[œDataœ]}",
-        "target": "UnderwritingDocumentExtractor-JT8Qo",
-        "targetHandle": "{œfieldNameœ:œcaseœ,œidœ:œUnderwritingDocumentExtractor-JT8Qoœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
+        "source": "UnderwritingEmailIntake-xO7WG",
+        "sourceHandle": "{œdataTypeœ:œUnderwritingEmailIntakeœ,œidœ:œUnderwritingEmailIntake-xO7WGœ,œnameœ:œcaseœ,œoutput_typesœ:[œDataœ]}",
+        "target": "UnderwritingDocumentExtractor-m6hx3",
+        "targetHandle": "{œfieldNameœ:œcaseœ,œidœ:œUnderwritingDocumentExtractor-m6hx3œ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
       },
       {
         "animated": false,
@@ -1733,7 +1998,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "UnderwritingDocumentExtractor",
-            "id": "UnderwritingDocumentExtractor-JT8Qo",
+            "id": "UnderwritingDocumentExtractor-m6hx3",
             "name": "extracted",
             "output_types": [
               "Data"
@@ -1741,19 +2006,19 @@
           },
           "targetHandle": {
             "fieldName": "extracted",
-            "id": "UnderwritingValidationEngine-Lf48u",
+            "id": "UnderwritingValidationEngine-Hbwko",
             "inputTypes": [
               "Data"
             ],
             "type": "other"
           }
         },
-        "id": "reactFlow__edge-UnderwritingDocumentExtractor-JT8Qo{œdataTypeœ:œUnderwritingDocumentExtractorœ,œidœ:œUnderwritingDocumentExtractor-JT8Qoœ,œnameœ:œextractedœ,œoutput_typesœ:[œDataœ]}-UnderwritingValidationEngine-Lf48u{œfieldNameœ:œextractedœ,œidœ:œUnderwritingValidationEngine-Lf48uœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
+        "id": "reactFlow__edge-UnderwritingDocumentExtractor-m6hx3{œdataTypeœ:œUnderwritingDocumentExtractorœ,œidœ:œUnderwritingDocumentExtractor-m6hx3œ,œnameœ:œextractedœ,œoutput_typesœ:[œDataœ]}-UnderwritingValidationEngine-Hbwko{œfieldNameœ:œextractedœ,œidœ:œUnderwritingValidationEngine-Hbwkoœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
         "selected": false,
-        "source": "UnderwritingDocumentExtractor-JT8Qo",
-        "sourceHandle": "{œdataTypeœ:œUnderwritingDocumentExtractorœ,œidœ:œUnderwritingDocumentExtractor-JT8Qoœ,œnameœ:œextractedœ,œoutput_typesœ:[œDataœ]}",
-        "target": "UnderwritingValidationEngine-Lf48u",
-        "targetHandle": "{œfieldNameœ:œextractedœ,œidœ:œUnderwritingValidationEngine-Lf48uœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
+        "source": "UnderwritingDocumentExtractor-m6hx3",
+        "sourceHandle": "{œdataTypeœ:œUnderwritingDocumentExtractorœ,œidœ:œUnderwritingDocumentExtractor-m6hx3œ,œnameœ:œextractedœ,œoutput_typesœ:[œDataœ]}",
+        "target": "UnderwritingValidationEngine-Hbwko",
+        "targetHandle": "{œfieldNameœ:œextractedœ,œidœ:œUnderwritingValidationEngine-Hbwkoœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
       },
       {
         "animated": false,
@@ -1761,7 +2026,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "UnderwritingValidationEngine",
-            "id": "UnderwritingValidationEngine-Lf48u",
+            "id": "UnderwritingValidationEngine-Hbwko",
             "name": "validated",
             "output_types": [
               "Data"
@@ -1769,19 +2034,19 @@
           },
           "targetHandle": {
             "fieldName": "validated",
-            "id": "UnderwritingDecisionRouter-1h69N",
+            "id": "UnderwritingDecisionRouter-4oVh0",
             "inputTypes": [
               "Data"
             ],
             "type": "other"
           }
         },
-        "id": "reactFlow__edge-UnderwritingValidationEngine-Lf48u{œdataTypeœ:œUnderwritingValidationEngineœ,œidœ:œUnderwritingValidationEngine-Lf48uœ,œnameœ:œvalidatedœ,œoutput_typesœ:[œDataœ]}-UnderwritingDecisionRouter-1h69N{œfieldNameœ:œvalidatedœ,œidœ:œUnderwritingDecisionRouter-1h69Nœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
+        "id": "reactFlow__edge-UnderwritingValidationEngine-Hbwko{œdataTypeœ:œUnderwritingValidationEngineœ,œidœ:œUnderwritingValidationEngine-Hbwkoœ,œnameœ:œvalidatedœ,œoutput_typesœ:[œDataœ]}-UnderwritingDecisionRouter-4oVh0{œfieldNameœ:œvalidatedœ,œidœ:œUnderwritingDecisionRouter-4oVh0œ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
         "selected": false,
-        "source": "UnderwritingValidationEngine-Lf48u",
-        "sourceHandle": "{œdataTypeœ:œUnderwritingValidationEngineœ,œidœ:œUnderwritingValidationEngine-Lf48uœ,œnameœ:œvalidatedœ,œoutput_typesœ:[œDataœ]}",
-        "target": "UnderwritingDecisionRouter-1h69N",
-        "targetHandle": "{œfieldNameœ:œvalidatedœ,œidœ:œUnderwritingDecisionRouter-1h69Nœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
+        "source": "UnderwritingValidationEngine-Hbwko",
+        "sourceHandle": "{œdataTypeœ:œUnderwritingValidationEngineœ,œidœ:œUnderwritingValidationEngine-Hbwkoœ,œnameœ:œvalidatedœ,œoutput_typesœ:[œDataœ]}",
+        "target": "UnderwritingDecisionRouter-4oVh0",
+        "targetHandle": "{œfieldNameœ:œvalidatedœ,œidœ:œUnderwritingDecisionRouter-4oVh0œ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
       },
       {
         "animated": false,
@@ -1789,7 +2054,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "UnderwritingDecisionRouter",
-            "id": "UnderwritingDecisionRouter-1h69N",
+            "id": "UnderwritingDecisionRouter-4oVh0",
             "name": "decision",
             "output_types": [
               "Data"
@@ -1797,19 +2062,19 @@
           },
           "targetHandle": {
             "fieldName": "decision",
-            "id": "UnderwritingRatingEngine-ASqPR",
+            "id": "UnderwritingRatingEngine-6ROv4",
             "inputTypes": [
               "Data"
             ],
             "type": "other"
           }
         },
-        "id": "reactFlow__edge-UnderwritingDecisionRouter-1h69N{œdataTypeœ:œUnderwritingDecisionRouterœ,œidœ:œUnderwritingDecisionRouter-1h69Nœ,œnameœ:œdecisionœ,œoutput_typesœ:[œDataœ]}-UnderwritingRatingEngine-ASqPR{œfieldNameœ:œdecisionœ,œidœ:œUnderwritingRatingEngine-ASqPRœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
+        "id": "reactFlow__edge-UnderwritingDecisionRouter-4oVh0{œdataTypeœ:œUnderwritingDecisionRouterœ,œidœ:œUnderwritingDecisionRouter-4oVh0œ,œnameœ:œdecisionœ,œoutput_typesœ:[œDataœ]}-UnderwritingRatingEngine-6ROv4{œfieldNameœ:œdecisionœ,œidœ:œUnderwritingRatingEngine-6ROv4œ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
         "selected": false,
-        "source": "UnderwritingDecisionRouter-1h69N",
-        "sourceHandle": "{œdataTypeœ:œUnderwritingDecisionRouterœ,œidœ:œUnderwritingDecisionRouter-1h69Nœ,œnameœ:œdecisionœ,œoutput_typesœ:[œDataœ]}",
-        "target": "UnderwritingRatingEngine-ASqPR",
-        "targetHandle": "{œfieldNameœ:œdecisionœ,œidœ:œUnderwritingRatingEngine-ASqPRœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
+        "source": "UnderwritingDecisionRouter-4oVh0",
+        "sourceHandle": "{œdataTypeœ:œUnderwritingDecisionRouterœ,œidœ:œUnderwritingDecisionRouter-4oVh0œ,œnameœ:œdecisionœ,œoutput_typesœ:[œDataœ]}",
+        "target": "UnderwritingRatingEngine-6ROv4",
+        "targetHandle": "{œfieldNameœ:œdecisionœ,œidœ:œUnderwritingRatingEngine-6ROv4œ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
       },
       {
         "animated": false,
@@ -1817,7 +2082,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "UnderwritingRatingEngine",
-            "id": "UnderwritingRatingEngine-ASqPR",
+            "id": "UnderwritingRatingEngine-6ROv4",
             "name": "rated",
             "output_types": [
               "Data"
@@ -1825,19 +2090,19 @@
           },
           "targetHandle": {
             "fieldName": "rated",
-            "id": "UnderwritingQuoteComposer-dKDap",
+            "id": "UnderwritingQuoteComposer-gnWdV",
             "inputTypes": [
               "Data"
             ],
             "type": "other"
           }
         },
-        "id": "reactFlow__edge-UnderwritingRatingEngine-ASqPR{œdataTypeœ:œUnderwritingRatingEngineœ,œidœ:œUnderwritingRatingEngine-ASqPRœ,œnameœ:œratedœ,œoutput_typesœ:[œDataœ]}-UnderwritingQuoteComposer-dKDap{œfieldNameœ:œratedœ,œidœ:œUnderwritingQuoteComposer-dKDapœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
+        "id": "reactFlow__edge-UnderwritingRatingEngine-6ROv4{œdataTypeœ:œUnderwritingRatingEngineœ,œidœ:œUnderwritingRatingEngine-6ROv4œ,œnameœ:œratedœ,œoutput_typesœ:[œDataœ]}-UnderwritingQuoteComposer-gnWdV{œfieldNameœ:œratedœ,œidœ:œUnderwritingQuoteComposer-gnWdVœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}",
         "selected": false,
-        "source": "UnderwritingRatingEngine-ASqPR",
-        "sourceHandle": "{œdataTypeœ:œUnderwritingRatingEngineœ,œidœ:œUnderwritingRatingEngine-ASqPRœ,œnameœ:œratedœ,œoutput_typesœ:[œDataœ]}",
-        "target": "UnderwritingQuoteComposer-dKDap",
-        "targetHandle": "{œfieldNameœ:œratedœ,œidœ:œUnderwritingQuoteComposer-dKDapœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
+        "source": "UnderwritingRatingEngine-6ROv4",
+        "sourceHandle": "{œdataTypeœ:œUnderwritingRatingEngineœ,œidœ:œUnderwritingRatingEngine-6ROv4œ,œnameœ:œratedœ,œoutput_typesœ:[œDataœ]}",
+        "target": "UnderwritingQuoteComposer-gnWdV",
+        "targetHandle": "{œfieldNameœ:œratedœ,œidœ:œUnderwritingQuoteComposer-gnWdVœ,œinputTypesœ:[œDataœ],œtypeœ:œotherœ}"
       },
       {
         "animated": false,
@@ -1845,7 +2110,7 @@
         "data": {
           "sourceHandle": {
             "dataType": "UnderwritingQuoteComposer",
-            "id": "UnderwritingQuoteComposer-dKDap",
+            "id": "UnderwritingQuoteComposer-gnWdV",
             "name": "response",
             "output_types": [
               "Message"
@@ -1853,7 +2118,7 @@
           },
           "targetHandle": {
             "fieldName": "input_value",
-            "id": "ChatOutput-Rgmrz",
+            "id": "ChatOutput-Rz3xZ",
             "inputTypes": [
               "Data",
               "DataFrame",
@@ -1862,12 +2127,68 @@
             "type": "other"
           }
         },
-        "id": "reactFlow__edge-UnderwritingQuoteComposer-dKDap{œdataTypeœ:œUnderwritingQuoteComposerœ,œidœ:œUnderwritingQuoteComposer-dKDapœ,œnameœ:œresponseœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-Rgmrz{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-Rgmrzœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}",
+        "id": "reactFlow__edge-UnderwritingQuoteComposer-gnWdV{œdataTypeœ:œUnderwritingQuoteComposerœ,œidœ:œUnderwritingQuoteComposer-gnWdVœ,œnameœ:œresponseœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-Rz3xZ{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-Rz3xZœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}",
         "selected": false,
-        "source": "UnderwritingQuoteComposer-dKDap",
-        "sourceHandle": "{œdataTypeœ:œUnderwritingQuoteComposerœ,œidœ:œUnderwritingQuoteComposer-dKDapœ,œnameœ:œresponseœ,œoutput_typesœ:[œMessageœ]}",
-        "target": "ChatOutput-Rgmrz",
-        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-Rgmrzœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}"
+        "source": "UnderwritingQuoteComposer-gnWdV",
+        "sourceHandle": "{œdataTypeœ:œUnderwritingQuoteComposerœ,œidœ:œUnderwritingQuoteComposer-gnWdVœ,œnameœ:œresponseœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "ChatOutput-Rz3xZ",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-Rz3xZœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}"
+      },
+      {
+        "animated": false,
+        "className": "",
+        "data": {
+          "sourceHandle": {
+            "dataType": "RegistryModelComponent",
+            "id": "RegistryModelComponent-9N8iY",
+            "name": "model_output",
+            "output_types": [
+              "LanguageModel"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "llm",
+            "id": "UnderwritingDocumentExtractor-m6hx3",
+            "inputTypes": [
+              "LanguageModel"
+            ],
+            "type": "other"
+          }
+        },
+        "id": "reactFlow__edge-RegistryModelComponent-9N8iY{œdataTypeœ:œRegistryModelComponentœ,œidœ:œRegistryModelComponent-9N8iYœ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}-UnderwritingDocumentExtractor-m6hx3{œfieldNameœ:œllmœ,œidœ:œUnderwritingDocumentExtractor-m6hx3œ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}",
+        "selected": false,
+        "source": "RegistryModelComponent-9N8iY",
+        "sourceHandle": "{œdataTypeœ:œRegistryModelComponentœ,œidœ:œRegistryModelComponent-9N8iYœ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}",
+        "target": "UnderwritingDocumentExtractor-m6hx3",
+        "targetHandle": "{œfieldNameœ:œllmœ,œidœ:œUnderwritingDocumentExtractor-m6hx3œ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}"
+      },
+      {
+        "animated": false,
+        "className": "",
+        "data": {
+          "sourceHandle": {
+            "dataType": "RegistryModelComponent",
+            "id": "RegistryModelComponent-9N8iY",
+            "name": "model_output",
+            "output_types": [
+              "LanguageModel"
+            ]
+          },
+          "targetHandle": {
+            "fieldName": "llm",
+            "id": "UnderwritingQuoteComposer-gnWdV",
+            "inputTypes": [
+              "LanguageModel"
+            ],
+            "type": "other"
+          }
+        },
+        "id": "reactFlow__edge-RegistryModelComponent-9N8iY{œdataTypeœ:œRegistryModelComponentœ,œidœ:œRegistryModelComponent-9N8iYœ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}-UnderwritingQuoteComposer-gnWdV{œfieldNameœ:œllmœ,œidœ:œUnderwritingQuoteComposer-gnWdVœ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}",
+        "selected": false,
+        "source": "RegistryModelComponent-9N8iY",
+        "sourceHandle": "{œdataTypeœ:œRegistryModelComponentœ,œidœ:œRegistryModelComponent-9N8iYœ,œnameœ:œmodel_outputœ,œoutput_typesœ:[œLanguageModelœ]}",
+        "target": "UnderwritingQuoteComposer-gnWdV",
+        "targetHandle": "{œfieldNameœ:œllmœ,œidœ:œUnderwritingQuoteComposer-gnWdVœ,œinputTypesœ:[œLanguageModelœ],œtypeœ:œotherœ}"
       }
     ],
     "viewport": {

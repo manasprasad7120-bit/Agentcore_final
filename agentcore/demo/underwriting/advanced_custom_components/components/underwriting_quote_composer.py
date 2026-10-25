@@ -21,7 +21,9 @@ from agentcore.io import BoolInput, DataInput, DropdownInput, HandleInput, Outpu
 from agentcore.schema.data import Data
 from agentcore.schema.message import Message
 
-DRAFT, SEND = "Draft only (requires approval)", "Send via SMTP when approved"
+DRAFT = "Draft only (requires approval)"
+SEND = "Send via SMTP when approved"
+SEND_OUTLOOK = "Send via Outlook connector when approved"
 
 
 def inr(value) -> str:
@@ -67,9 +69,13 @@ class UnderwritingQuoteComposer(Node):
         DropdownInput(
             name="dispatch_mode",
             display_name="Dispatch mode",
-            options=[DRAFT, SEND],
+            options=[DRAFT, SEND, SEND_OUTLOOK],
             value=DRAFT,
-            info="Emails are drafts by default. Sending requires 'Approved' and SMTP_* settings in .env.",
+            info=(
+                "Emails are drafts by default. Sending requires 'Approved'. SMTP uses the SMTP_* settings in .env; "
+                "the Outlook option replies from the mailbox the email was read from (needs the Outlook mailbox intake "
+                "and Mail.Send permission)."
+            ),
         ),
         BoolInput(
             name="approved",
@@ -238,11 +244,72 @@ class UnderwritingQuoteComposer(Node):
             self.log(f"LLM polish skipped: {exc}")
         return body
 
-    def _dispatch(self, email: dict, attachment: tuple[str, bytes] | None) -> str:
-        if self.dispatch_mode != SEND:
+    def _send_via_outlook(self, email: dict, attachment: tuple[str, bytes] | None, case: dict) -> str:
+        """Reply from the mailbox the email was read from, using the product's Outlook connector."""
+        import base64
+
+        import httpx
+        from agentcore.components.tools.outlook_mail import (
+            GRAPH_BASE,
+            _gate_with_refresh_retry,
+            _get_outlook_config,
+            _refresh_token_sync,
+        )
+
+        source = case.get("source_mailbox") or {}
+        connector_id = source.get("connector_id")
+        if not connector_id:
+            return "NOT SENT — Outlook dispatch needs the Outlook mailbox intake (no source mailbox on this case)"
+        if not email.get("to"):
+            return "NOT SENT — no recipient address (broker email not found)"
+        config = _get_outlook_config(connector_id)
+        if not config:
+            return "NOT SENT — Outlook connector not found"
+        config["_connector_id"] = connector_id
+        accounts = config.get("linked_accounts", [])
+        acct = next((a for a in accounts if a.get("email", "").lower() == str(source.get("account_email", "")).lower()), None) or (accounts[0] if accounts else None)
+        if acct is None:
+            return "NOT SENT — no mailbox linked to the Outlook connector"
+        try:
+            _gate_with_refresh_retry(config, acct, "Mail.Send")
+            token = _refresh_token_sync(config, acct)
+        except Exception as exc:  # noqa: BLE001
+            return f"NOT SENT — {exc}"
+
+        message: dict = {
+            "subject": email["subject"],
+            "body": {"contentType": "Text", "content": email["body"]},
+            "toRecipients": [{"emailAddress": {"address": email["to"]}}],
+        }
+        if attachment:
+            message["attachments"] = [
+                {
+                    "@odata.type": "#microsoft.graph.fileAttachment",
+                    "name": attachment[0],
+                    "contentType": "application/pdf",
+                    "contentBytes": base64.b64encode(attachment[1]).decode("ascii"),
+                }
+            ]
+        try:
+            resp = httpx.post(
+                f"{GRAPH_BASE}/me/sendMail",
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                json={"message": message, "saveToSentItems": True},
+                timeout=60,
+            )
+        except Exception as exc:  # noqa: BLE001
+            return f"FAILED — {exc}"
+        if resp.status_code in (200, 202):
+            return f"SENT from {acct.get('email')} to {email['to']} via Outlook" + (" with quote PDF" if attachment else "")
+        return f"FAILED — Microsoft Graph {resp.status_code}: {resp.text[:200]}"
+
+    def _dispatch(self, email: dict, attachment: tuple[str, bytes] | None, case: dict | None = None) -> str:
+        if self.dispatch_mode not in (SEND, SEND_OUTLOOK):
             return "DRAFT — awaiting approval (dispatch mode: draft only)"
         if not self.approved:
             return "HELD — 'Approved by authorised underwriter' is not set"
+        if self.dispatch_mode == SEND_OUTLOOK:
+            return self._send_via_outlook(email, attachment, case or {})
         host = os.getenv("SMTP_HOST") or os.getenv("SMTP_SERVER")
         if not host or not email.get("to"):
             return "NOT SENT — SMTP_HOST or recipient address not configured"
@@ -302,7 +369,7 @@ class UnderwritingQuoteComposer(Node):
                 (out / filename).write_bytes(pdf_bytes)
                 pdf_note += f" Copy written to `{out / filename}`."
 
-        dispatch_status = self._dispatch(email, attachment)
+        dispatch_status = self._dispatch(email, attachment, case)
         case["outbound_email"] = {**email, "dispatch_status": dispatch_status, "attachment": attachment[0] if attachment else None}
         case.setdefault("audit_trail", []).append({"step": "dispatch", "detail": dispatch_status})
 

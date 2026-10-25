@@ -112,6 +112,43 @@ async def _pop_oauth_state(state: str) -> dict | None:
         return None
 
 
+def classify_mailbox_check_failure(status: int, body: str, email: str) -> tuple[str, str]:
+    """Turn a failed ``GET /me/mailFolders/inbox`` into an error code and a human-readable hint.
+
+    Microsoft Graph returns 401/403 when the token lacks mail permissions (Mail.Read not
+    granted/consented on the app registration) and 404 with codes such as
+    ``MailboxNotEnabledForRESTAPI`` / ``MailboxNotHostedInExchangeOnline`` /
+    ``ResourceNotFound`` when the signed-in account has no Exchange Online mailbox.
+    """
+    code = ""
+    message = ""
+    try:
+        err = json.loads(body or "{}").get("error", {}) or {}
+        code = str(err.get("code") or "")
+        message = str(err.get("message") or "")
+    except (ValueError, AttributeError):
+        message = (body or "")[:200]
+
+    if status in (401, 403):
+        return (
+            "outlook_mail_permission_missing",
+            f"Signed in as {email}, but Microsoft Graph refused mailbox access ({status} {code}). "
+            "On the app registration add the delegated Microsoft Graph permission Mail.Read "
+            "(and Mail.ReadWrite / Mail.Send if needed), grant admin consent, then link the mailbox again.",
+        )
+    if status == 404 or code in {"MailboxNotEnabledForRESTAPI", "MailboxNotHostedInExchangeOnline", "ResourceNotFound"}:
+        return (
+            "outlook_no_mailbox",
+            f"Signed in as {email}, but this account has no Exchange Online mailbox ({code or status}). "
+            "Use a Microsoft 365 account with an Exchange Online licence, or a personal outlook.com account "
+            "with an app registration that allows personal Microsoft accounts and tenant 'common'.",
+        )
+    return (
+        "outlook_no_mailbox",
+        f"Signed in as {email}, but the mailbox check failed: {status} {code} {message[:160]}".strip(),
+    )
+
+
 # ── Pydantic models ─────────────────────────────────────────────
 
 class OAuthStartResponse(BaseModel):
@@ -448,8 +485,9 @@ async def oauth_callback(
             f"Outlook mailbox validation failed for {email}: "
             f"{inbox_resp.status_code} — {inbox_resp.text[:200]}"
         )
+        error_code, hint = classify_mailbox_check_failure(inbox_resp.status_code, inbox_resp.text, email)
         return RedirectResponse(
-            url=f"{fe}/connectors?error=outlook_no_mailbox"
+            url=f"{fe}/connectors?error={error_code}&detail={quote(hint)}"
         )
 
     # Build linked account entry
