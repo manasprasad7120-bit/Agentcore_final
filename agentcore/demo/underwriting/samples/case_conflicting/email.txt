@@ -1,0 +1,12 @@
+From: broker@corporate-insurance-brokers.example
+To: underwriting@demo-general-insurance.example
+Subject: Group Medical Insurance — Renewal Quote Request — ABC Technologies
+
+Dear Underwriting Team,
+
+Please find attached the employee census, current policy details, claims experience report and company information for our client's group medical insurance renewal.
+
+Kindly review the information and share your proposed premium quotation and coverage terms.
+
+Regards,
+Corporate Insurance Broker

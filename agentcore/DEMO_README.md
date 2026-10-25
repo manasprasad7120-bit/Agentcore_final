@@ -16,6 +16,7 @@ cd <repo>\agentcore
 |------------|-------------------------------------------------|
 | UI         | http://localhost:3000                            |
 | API docs   | http://127.0.0.1:7860/docs                       |
+| Model service | http://127.0.0.1:8001/health (OpenAI-compatible LLM/embeddings proxy) |
 | PostgreSQL | 127.0.0.1:5433 (data in `.local\pgdata`)         |
 | Redis      | 127.0.0.1:6379 (no persistence)                  |
 
@@ -70,6 +71,12 @@ PostgreSQL; production databases are unaffected):
   system roles/permissions from `ROLE_PERMISSIONS` when the `role` table is
   empty. On a fresh database Alembic is stamped to head (the history cannot be
   replayed from scratch), so the data-seeding migrations never run.
+- `services/database/service.py` – tables are created with
+  `metadata.create_all` so foreign keys declared with `use_alter=True` are
+  emitted (per-table creation skipped them, leaving a permanent model/DB
+  diff). The Alembic "auto-fix" loop that reacted to that diff by running
+  downgrade/upgrade cycles on every start (dropping columns and their data)
+  is now opt-in via `AGENTCORE_MIGRATION_AUTOFIX=true`.
 
 ## Re-enabling Azure
 
@@ -78,11 +85,39 @@ Fill the Azure variables back in (`AGENTCORE_KEY_VAULT_URL` and the
 `AZURE_TENANT_ID`, `REDIS_ENTRA_SCOPE`, `STORAGE_TYPE=azure`, …) and remove
 `AGENTCORE_SUPERUSER*`. No code changes are needed.
 
+## Demo agent: Email-to-Quote Underwriting
+
+`demo/underwriting/Email_to_Quote_Underwriting_Agent.json` is an importable
+agent (Group Medical Insurance): broker email + PDF attachments → document
+intelligence → field-level validation → underwriting decision → configurable
+rating → quote PDF and broker email. Sample submissions (one clean, one with
+deliberate discrepancies) are in `demo/underwriting/samples`. See
+`demo/underwriting/README.md` for import and run steps.
+
+## Model microservice
+
+`start-demo.ps1` also starts `src/services/model-service` (port 8001). The
+backend proxies the Model Registry and all chat/embedding calls to it. To run
+agents against a real LLM, open the Model Registry in the UI and add a model
+with its provider API key (OpenAI, Anthropic, Google, Groq, Azure OpenAI or any
+OpenAI-compatible endpoint).
+
+Without Azure Key Vault the service stores provider API keys Fernet-encrypted in
+`src/services/model-service/.secrets/model-service-secrets.json`, using
+`MODEL_SERVICE_ENCRYPTION_KEY` from `.env`. Keep that key stable, otherwise
+stored provider keys can no longer be decrypted. Changes made for this:
+
+- `app/utils/local_secrets.py` (new): Key-Vault-compatible local store.
+- `app/services/registry_service.py`: uses the local store when
+  `MODEL_SERVICE_KEY_VAULT_URL` is empty.
+- `app/main.py`: Key Vault is no longer mandatory at startup.
+- `app/services/redis_client.py`: plain Redis without Entra ID (rate limiter).
+
 ## Limitations in demo mode
 
-- Running agents against an LLM requires the `model-service` microservice and a
-  provider API key (OpenAI, Anthropic, Google, Groq or Azure OpenAI). Set
-  `MODEL_SERVICE_URL` / `MODEL_SERVICE_API_KEY` in `.env` once it is running.
+- Only the model microservice is part of the demo stack. MCP, guardrails,
+  Pinecone and graph-RAG services are not started, so features depending on
+  them are unavailable.
 - Features that are inherently Azure/Microsoft-bound (SharePoint, Outlook,
   Teams, Azure AI Search, Document Intelligence, Key Vault-backed variables)
   are visible in the UI but will not work.
@@ -98,6 +133,12 @@ python -m pip install uv
 python -m uv sync --frozen --no-dev
 .\.venv\Scripts\python.exe -m uvicorn agentcore.main:create_app --factory --host 127.0.0.1 --port 7860 --loop asyncio:SelectorEventLoop
 # (--loop asyncio:SelectorEventLoop is required on Windows: psycopg's async driver cannot run on the default Proactor loop)
+
+# model-service (run from the repo root so it reads the shared .env)
+cd src\services\model-service
+python -m uv sync --frozen --no-dev
+cd ..\..\..
+.\src\services\model-service\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir src\services\model-service --host 127.0.0.1 --port 8001 --loop asyncio:SelectorEventLoop
 
 # frontend
 cd src\frontend

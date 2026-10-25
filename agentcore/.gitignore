@@ -16,3 +16,4 @@ src/backend/base/agentcore/alembic/alembic.log
 src/services/model-service/.venv/
 src/services/model-service/.secrets/
 src/services/*/.venv/
+demo/underwriting/outbox/
