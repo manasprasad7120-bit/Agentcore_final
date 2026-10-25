@@ -44,7 +44,18 @@ const scopes = (readEnv("MSAL_SCOPES") || "openid,profile,email")
     .map((s) => s.trim())
     .filter(Boolean);
 
-if (!clientId || !authority || !redirectUri) {
+/**
+ * True when Microsoft Entra SSO is configured (AZURE_CLIENT_ID + AZURE_TENANT_ID / MSAL_AUTHORITY).
+ * When false the app runs without MSAL and the login page shows username/password only.
+ */
+export const isSsoConfigured = Boolean(clientId && authority && redirectUri);
+
+if (!clientId && !tenantId && !authorityFromEnv) {
+    console.info(
+        "[MSAL] Microsoft SSO not configured (AZURE_CLIENT_ID / AZURE_TENANT_ID unset). " +
+            "Using local username/password login.",
+    );
+} else if (!clientId || !authority || !redirectUri) {
     // Fail fast with a clear error instead of blank MSAL popup windows.
     // Required env: AZURE_CLIENT_ID, AZURE_TENANT_ID (or MSAL_AUTHORITY), MSAL_REDIRECT_URI (or AZURE_REDIRECT_URI)
     console.error("[MSAL] Missing/invalid env configuration", {

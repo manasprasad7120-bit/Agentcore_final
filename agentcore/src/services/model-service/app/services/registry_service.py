@@ -21,6 +21,7 @@ from app.models.registry import (
     ModelRegistryUpdate,
 )
 from app.utils.key_vault import KeyVaultConfig, KeyVaultSecretStore, model_api_key_secret_name
+from app.utils.local_secrets import LocalEncryptedSecretStore
 
 logger = logging.getLogger(__name__)
 
@@ -60,20 +61,31 @@ API_KEY_REQUIRED_PROVIDERS = {
 
 
 @lru_cache(maxsize=1)
-def _build_key_vault_store() -> KeyVaultSecretStore | None:
+def _build_key_vault_store() -> KeyVaultSecretStore | LocalEncryptedSecretStore | None:
     settings = get_settings()
     config = KeyVaultConfig(
         vault_url=settings.key_vault_url,
         secret_prefix=settings.key_vault_secret_prefix,
     )
-    return KeyVaultSecretStore.from_config(config)
+    store = KeyVaultSecretStore.from_config(config)
+    if store is None:
+        # No Azure Key Vault configured: keep provider API keys in the local
+        # Fernet-encrypted store instead (local demos / deployments without Azure).
+        local_store = LocalEncryptedSecretStore(encryption_key=settings.encryption_key)
+        logger.warning(
+            "MODEL_SERVICE_KEY_VAULT_URL is not set; provider API keys are stored in the local "
+            "encrypted secret store at %s",
+            local_store.path,
+        )
+        return local_store
+    return store
 
 
 def _get_secret_name(row: ModelRegistry) -> str | None:
     return row.api_key_secret_ref
 
 
-def _require_key_vault_store() -> KeyVaultSecretStore:
+def _require_key_vault_store() -> KeyVaultSecretStore | LocalEncryptedSecretStore:
     key_vault = _build_key_vault_store()
     if key_vault is None:
         msg = (
@@ -143,7 +155,7 @@ async def create_model(
         )
         row.provider_config = {
             **provider_config,
-            "api_key_source": "azure_key_vault",
+            "api_key_source": getattr(key_vault, "source_label", "azure_key_vault"),
         }
         row.api_key_secret_ref = secret_name
 
@@ -219,7 +231,7 @@ async def update_model(
             plain_key,
             tags={"service": "model-service", "type": "provider-api-key"},
         )
-        provider_config["api_key_source"] = "azure_key_vault"
+        provider_config["api_key_source"] = getattr(key_vault, "source_label", "azure_key_vault")
         row.provider_config = provider_config
         row.api_key_secret_ref = secret_name
 

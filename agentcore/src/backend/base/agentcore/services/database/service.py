@@ -440,6 +440,11 @@ class DatabaseService(Service):
                 logger.exception(msg)
                 raise RuntimeError(msg) from exc
 
+        # SQLAlchemy 2.x connections auto-begin a transaction and roll it back on close,
+        # so the DDL above must be committed explicitly or (on PostgreSQL) every table
+        # created from the models silently disappears before Alembic runs.
+        connection.commit()
+
         # Now check if the required tables exist, if not, something went wrong.
         inspector = inspect(connection)
         table_names = inspector.get_table_names()

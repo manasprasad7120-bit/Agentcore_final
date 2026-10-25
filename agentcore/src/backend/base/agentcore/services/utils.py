@@ -119,6 +119,115 @@ async def clean_vertex_builds(settings_service: SettingsService, session: AsyncS
         # Don't re-raise since this is a cleanup task
 
 
+def _permission_category(key: str) -> str:
+    if key.startswith("view_"):
+        return "Pages"
+    if key.startswith(("manage_", "assign_", "approve_")):
+        return "Administration"
+    return "Actions"
+
+
+async def ensure_default_roles_and_permissions(session: AsyncSession) -> None:
+    """Seed the system roles and permissions from ROLE_PERMISSIONS when the role table is empty.
+
+    Fresh databases get their schema from the SQLModel metadata and Alembic is stamped to head,
+    so the data-seeding migrations never run. Without this, every role except ``root`` would have
+    no permissions. Databases that already contain roles are left untouched.
+    """
+    from agentcore.services.database.models.permission.model import Permission
+    from agentcore.services.database.models.role.model import Role
+    from agentcore.services.database.models.role_permission.model import RolePermission
+
+    try:
+        if (await session.exec(select(Role))).first() is not None:
+            return
+
+        role_map = permissions.ROLE_PERMISSIONS
+        perm_keys = sorted({key for keys in role_map.values() for key in keys})
+        perms_by_key = {perm.key: perm for perm in (await session.exec(select(Permission))).all()}
+        for key in perm_keys:
+            if key not in perms_by_key:
+                perm = Permission(
+                    key=key,
+                    name=key.replace("_", " ").title(),
+                    description=f"System permission '{key}' (seeded from defaults).",
+                    category=_permission_category(key),
+                    is_system=True,
+                )
+                session.add(perm)
+                perms_by_key[key] = perm
+        await session.flush()
+
+        for role_name, keys in role_map.items():
+            role = Role(
+                name=role_name,
+                display_name=role_name.replace("_", " ").title(),
+                description=f"System role '{role_name}' (seeded from defaults).",
+                is_system=True,
+            )
+            session.add(role)
+            await session.flush()
+            for key in dict.fromkeys(keys):
+                session.add(RolePermission(role_id=role.id, permission_id=perms_by_key[key].id))
+
+        await session.commit()
+        logger.info(
+            f"Seeded {len(role_map)} system roles and {len(perm_keys)} permissions from ROLE_PERMISSIONS defaults"
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Failed to seed default roles/permissions (continuing startup)")
+        await session.rollback()
+
+
+async def ensure_local_superuser(session: AsyncSession) -> None:
+    """Create or refresh a local root user from AGENTCORE_SUPERUSER / AGENTCORE_SUPERUSER_PASSWORD.
+
+    No-op when either variable is unset. When set, the user is guaranteed to exist, be active,
+    have the ``root`` role and the configured password, so the platform is usable without SSO.
+    """
+    username = (os.getenv("AGENTCORE_SUPERUSER") or "").strip()
+    password = os.getenv("AGENTCORE_SUPERUSER_PASSWORD") or ""
+    if not username or not password:
+        return
+
+    from agentcore.services.auth.utils import get_password_hash, verify_password
+    from agentcore.services.database.models.user.crud import get_user_by_username
+    from agentcore.services.database.models.user.model import User
+
+    normalized = username.lower() if "@" in username else username
+    try:
+        user = await get_user_by_username(session, normalized)
+        if user is None:
+            user = User(
+                username=normalized,
+                email=normalized if "@" in normalized else None,
+                display_name="Local Administrator",
+                password=get_password_hash(password),
+                role="root",
+                is_superuser=True,
+                is_active=True,
+            )
+            session.add(user)
+            await session.commit()
+            logger.info(f"Local root user '{normalized}' created from AGENTCORE_SUPERUSER")
+            return
+
+        changed = False
+        if not user.is_active or user.deleted_at is not None:
+            user.is_active, user.deleted_at, changed = True, None, True
+        if not user.is_superuser or permissions.normalize_role(user.role) != "root":
+            user.is_superuser, user.role, changed = True, "root", True
+        if not verify_password(password, user.password):
+            user.password, changed = get_password_hash(password), True
+        if changed:
+            session.add(user)
+            await session.commit()
+            logger.info(f"Local root user '{normalized}' updated from AGENTCORE_SUPERUSER settings")
+    except Exception:  # noqa: BLE001
+        logger.exception("Failed to bootstrap local superuser (continuing startup)")
+        await session.rollback()
+
+
 async def initialize_services(*, fix_migration: bool = False) -> None:
     """Initialize all the services needed."""
     settings_service = get_service(ServiceType.SETTINGS_SERVICE)
@@ -155,7 +264,11 @@ async def initialize_services(*, fix_migration: bool = False) -> None:
     db_service = get_db_service()
     await db_service.initialize_alembic_log_file()
     async with db_service.with_session() as session:
-        # SSO is enabled - users are managed via Azure AD, no superuser setup needed
+        # Users are normally provisioned via Azure Entra SSO. For environments without
+        # Azure (local demos), a root user can be bootstrapped from AGENTCORE_SUPERUSER /
+        # AGENTCORE_SUPERUSER_PASSWORD so username/password login works.
+        await ensure_default_roles_and_permissions(session)
+        await ensure_local_superuser(session)
         await clean_transactions(settings_service, session)
         await clean_vertex_builds(settings_service, session)
     try:

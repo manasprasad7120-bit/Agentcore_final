@@ -462,12 +462,18 @@ async def get_permissions_for_role(role: str) -> List[str]:
         return _expand_permissions(merged)
 
     global permission_cache
-    if permission_cache is None:
-        from agentcore.services.deps import get_settings_service
+    try:
+        if permission_cache is None:
+            from agentcore.services.deps import get_settings_service
 
-        permission_cache = PermissionCacheService(get_settings_service())
+            permission_cache = PermissionCacheService(get_settings_service())
 
-    perms = await permission_cache.get_permissions_for_role(role)
+        perms = await permission_cache.get_permissions_for_role(role)
+    except Exception as exc:  # noqa: BLE001
+        # Redis unavailable or not configured (e.g. local demo without cache):
+        # resolve permissions straight from the database instead of failing login.
+        logger.warning(f"RBAC cache unavailable ({exc}); resolving '{normalized}' permissions from DB")
+        perms = await _get_permissions_for_role_db(role)
     if perms:
         return _expand_permissions(perms)
     return []

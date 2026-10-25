@@ -238,30 +238,16 @@ class RedisCache(ExternalAsyncBaseCacheService, Generic[LockType]):
         # retry_on_timeout + Retry: when Redis restarts or a connection
         # goes stale, the client automatically drops the dead socket and
         # retries with a fresh connection — no server restart needed.
-        _retry = Retry(ExponentialBackoff(), retries=3)
-        if self._credential_provider is None:
-            msg = "RedisCache requires an Entra ID credential provider."
-            raise ValueError(msg)
-
-        common_kwargs = {
-            "host": self._host,
-            "port": self._port,
-            "ssl": self._ssl,
-            "credential_provider": self._credential_provider,
-            "socket_connect_timeout": 5,
-            "socket_timeout": 5,
-            "retry": _retry,
-            "health_check_interval": 30,
-        }
-        if self._cluster_enabled:
-            self._client = RedisCluster(**self._build_cluster_kwargs(common_kwargs))
-        else:
-            self._client = StrictRedis(
-                **common_kwargs,
-                db=self._db,
-                retry_on_timeout=True,
-            )
+        # credential_provider is optional: when None (plain/local Redis without
+        # Entra ID) we authenticate with REDIS_PASSWORD if set, else no auth.
+        self._client = self._create_client()
         self.expiration_time = expiration_time
+
+    def _auth_kwargs(self) -> dict:
+        if self._credential_provider is not None:
+            return {"credential_provider": self._credential_provider}
+        password = (os.getenv("REDIS_PASSWORD") or "").strip()
+        return {"password": password} if password else {}
 
     def _build_cluster_kwargs(self, common_kwargs: dict) -> dict:
         from redis.asyncio.cluster import RedisCluster
@@ -303,7 +289,7 @@ class RedisCache(ExternalAsyncBaseCacheService, Generic[LockType]):
             "host": self._host,
             "port": self._port,
             "ssl": self._ssl,
-            "credential_provider": self._credential_provider,
+            **self._auth_kwargs(),
             "socket_connect_timeout": 5,
             "socket_timeout": 5,
             "retry": _retry,

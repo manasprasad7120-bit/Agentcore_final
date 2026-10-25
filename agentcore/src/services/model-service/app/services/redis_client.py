@@ -50,7 +50,10 @@ def _cluster_enabled() -> bool:
         return False
     if policy in {"oss", "osscluster"}:
         return True
-    return _bool_env("REDIS_CLUSTER_ENABLED", default=True)
+    # Default: cluster protocol only for Azure Managed Redis (Entra scope configured);
+    # a plain/local Redis without Entra is a standalone server.
+    entra_configured = bool((os.getenv("REDIS_ENTRA_SCOPE") or "").strip())
+    return _bool_env("REDIS_CLUSTER_ENABLED", default=entra_configured)
 
 
 def _should_remap_cluster_addresses(host: str, ssl: bool) -> bool:
@@ -110,24 +113,27 @@ def build_redis_client():
     ssl_enabled = _bool_env("REDIS_SSL", default=True)
 
     scope = (os.getenv("REDIS_ENTRA_SCOPE") or "").strip()
-    if not scope:
-        msg = "REDIS_ENTRA_SCOPE must be set (e.g. https://redis.azure.com/.default)."
-        raise ValueError(msg)
-
-    object_id = (os.getenv("REDIS_ENTRA_OBJECT_ID") or "").strip() or None
-    refresh_margin = int(os.getenv("REDIS_ENTRA_REFRESH_MARGIN_SECONDS", "180") or 180)
-
-    credential_provider = AzureEntraRedisCredentialProvider(
-        scope=scope,
-        object_id=object_id,
-        refresh_margin_seconds=refresh_margin,
-    )
+    auth_kwargs: dict[str, Any] = {}
+    if scope:
+        object_id = (os.getenv("REDIS_ENTRA_OBJECT_ID") or "").strip() or None
+        refresh_margin = int(os.getenv("REDIS_ENTRA_REFRESH_MARGIN_SECONDS", "180") or 180)
+        auth_kwargs["credential_provider"] = AzureEntraRedisCredentialProvider(
+            scope=scope,
+            object_id=object_id,
+            refresh_margin_seconds=refresh_margin,
+        )
+    else:
+        # Plain Redis without Entra ID (local demo / self-hosted): optional static password.
+        password = (os.getenv("REDIS_PASSWORD") or "").strip()
+        if password:
+            auth_kwargs["password"] = password
+        logger.info("REDIS_ENTRA_SCOPE not set; connecting to Redis without Entra ID authentication")
 
     common_kwargs: dict[str, Any] = {
         "host": host,
         "port": port,
         "ssl": ssl_enabled,
-        "credential_provider": credential_provider,
+        **auth_kwargs,
         "decode_responses": True,
         "socket_connect_timeout": 5,
         "socket_timeout": 5,

@@ -15,7 +15,7 @@ import type {
 } from "../../types/components";
 
 import { useMsal } from "@azure/msal-react";
-import { loginRequest, msalConfig } from "@/authConfig";
+import { isSsoConfigured, loginRequest, msalConfig } from "@/authConfig";
 import { useTranslation } from "react-i18next";
 import useAuthStore from "@/stores/authStore";
 
@@ -36,34 +36,26 @@ function getBackendBaseUrl(): string {
   return (valid || window.location.origin).replace(/\/$/, "");
 }
 
-export default function LoginPage(): JSX.Element {
-  const [inputState, setInputState] =
-    useState<loginInputStateType>(CONTROL_LOGIN_STATE);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const { password, username } = inputState;
-
-  // legacy auth context (tokens / redirect)
-  const { login } = useContext(AuthContext);
-
-  const setErrorData = useAlertStore((state) => state.setErrorData);
+/* =========================
+   MICROSOFT SSO BUTTON
+   Rendered only when Entra SSO is configured; owns the MSAL hook so the
+   login page works without an MsalProvider (local username/password mode).
+   ========================= */
+function MicrosoftSsoButton({
+  setErrorData,
+  login,
+}: {
+  setErrorData: (data: { title: string; list?: string[] }) => void;
+  login: (
+    accessToken: string,
+    role: string,
+    permissions: string[],
+    refreshToken?: string,
+  ) => void;
+}): JSX.Element {
   const { instance } = useMsal();
   const { t } = useTranslation();
 
-  // 🔥 ZUSTAND (REACTIVE)
-
-  const { mutate } = useLoginUser();
-
-  function handleInput({
-    target: { name, value },
-  }: inputHandlerEventType): void {
-    setInputState((prev) => ({ ...prev, [name]: value }));
-  }
-
-  /* =========================
-     AZURE SSO LOGIN
-     ========================= */
   async function handleAzureSSO() {
     try {
       const clientId = msalConfig?.auth?.clientId;
@@ -156,6 +148,49 @@ export default function LoginPage(): JSX.Element {
         list: ["Microsoft SSO failed. Please try again or contact your admin."],
       });
     }
+  }
+
+  return (
+                  <Button
+                    type="button"
+                    onClick={handleAzureSSO}
+                    className="h-11 sm:h-12 !bg-[var(--login-sso-button-bg)] hover:!bg-[var(--login-sso-button-hover)] disabled:!bg-[var(--login-sso-button-disabled)] text-[var(--login-sso-button-foreground)] flex items-center justify-center gap-2 rounded-lg font-medium transition-all text-sm sm:text-base"
+                  >
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 23 23">
+                      <path fill="#f25022" d="M1  1h10v10H1z" />
+                      <path fill="#7fba00" d="M12 1h10v10H12z" />
+                      <path fill="#00a4ef" d="M1 12h10v10H1z" />
+                      <path fill="#ffb900" d="M12 12h10v10H12z" />
+                    </svg>
+                    <span className="whitespace-nowrap">{t("Continue with Microsoft SSO")}</span>
+                  </Button>
+  );
+}
+
+export default function LoginPage(): JSX.Element {
+  const [inputState, setInputState] =
+    useState<loginInputStateType>(CONTROL_LOGIN_STATE);
+  const [showPasswordForm, setShowPasswordForm] = useState(!isSsoConfigured);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { password, username } = inputState;
+
+  // legacy auth context (tokens / redirect)
+  const { login } = useContext(AuthContext);
+
+  const setErrorData = useAlertStore((state) => state.setErrorData);
+  const { t } = useTranslation();
+
+  // 🔥 ZUSTAND (REACTIVE)
+  const setAuthContext = useAuthStore((state) => state.setAuthContext);
+  const setIsAuthenticated = useAuthStore((state) => state.setIsAuthenticated);
+
+  const { mutate } = useLoginUser();
+
+  function handleInput({
+    target: { name, value },
+  }: inputHandlerEventType): void {
+    setInputState((prev) => ({ ...prev, [name]: value }));
   }
 
   /* =========================
@@ -261,29 +296,21 @@ export default function LoginPage(): JSX.Element {
                 }}
                 className="space-y-4"
               >
-                <div className="grid grid-cols-1 gap-3">
-                  <Button
-                    type="button"
-                    onClick={handleAzureSSO}
-                    className="h-11 sm:h-12 !bg-[var(--login-sso-button-bg)] hover:!bg-[var(--login-sso-button-hover)] disabled:!bg-[var(--login-sso-button-disabled)] text-[var(--login-sso-button-foreground)] flex items-center justify-center gap-2 rounded-lg font-medium transition-all text-sm sm:text-base"
-                  >
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 23 23">
-                      <path fill="#f25022" d="M1  1h10v10H1z" />
-                      <path fill="#7fba00" d="M12 1h10v10H12z" />
-                      <path fill="#00a4ef" d="M1 12h10v10H1z" />
-                      <path fill="#ffb900" d="M12 12h10v10H12z" />
-                    </svg>
-                    <span className="whitespace-nowrap">{t("Continue with Microsoft SSO")}</span>
-                  </Button>
-                </div>
+                {isSsoConfigured && (
+                  <div className="grid grid-cols-1 gap-3">
+                    <MicrosoftSsoButton setErrorData={setErrorData} login={login} />
+                  </div>
+                )}
 
                 {showPasswordForm && (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-gray-400">
-                      <div className="flex-1 border-t border-gray-200" />
-                      <span className="text-xs">{t("or")}</span>
-                      <div className="flex-1 border-t border-gray-200" />
-                    </div>
+                    {isSsoConfigured && (
+                      <div className="flex items-center gap-2 text-gray-400">
+                        <div className="flex-1 border-t border-gray-200" />
+                        <span className="text-xs">{t("or")}</span>
+                        <div className="flex-1 border-t border-gray-200" />
+                      </div>
+                    )}
                     <Form.Field name="username">
                       <Form.Control asChild>
                         <input
@@ -341,18 +368,20 @@ export default function LoginPage(): JSX.Element {
                       >
                         {t("Forgot / Set password?")}
                       </Link>
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswordForm(false)}
-                        className="text-xs text-gray-400 hover:text-gray-600"
-                      >
-                        {t("Back to SSO")}
-                      </button>
+                      {isSsoConfigured && (
+                        <button
+                          type="button"
+                          onClick={() => setShowPasswordForm(false)}
+                          className="text-xs text-gray-400 hover:text-gray-600"
+                        >
+                          {t("Back to SSO")}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
 
-                {!showPasswordForm && (
+                {!showPasswordForm && isSsoConfigured && (
                   <div className="text-center pt-1">
                     <button
                       type="button"

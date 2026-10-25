@@ -1,7 +1,7 @@
 """merge all alembic heads
 
 Revision ID: fdf483318169
-Revises: f1375b53908f, n8m7l6k5j4h3, z2a3b4c5d6e7
+Revises: f1375b53908f, z2a3b4c5d6e7
 Create Date: 2026-03-02 00:27:56.417333
 
 """
@@ -16,7 +16,9 @@ from agentcore.utils import migration
 
 # revision identifiers, used by Alembic.
 revision: str = 'fdf483318169'
-down_revision: Union[str, None] = ('f1375b53908f', 'n8m7l6k5j4h3', 'z2a3b4c5d6e7')
+# NOTE: 'n8m7l6k5j4h3' was removed from this merge point: no migration file with that
+# revision exists in the repository, which made Alembic fail on every fresh database.
+down_revision: Union[str, None] = ('f1375b53908f', 'z2a3b4c5d6e7')
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

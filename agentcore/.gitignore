@@ -1,0 +1,18 @@
+# local environment & runtime state
+.env
+.local/
+logs/
+*.log
+src/backend/knowledge_base_storage/
+
+# dependencies / build output
+src/backend/.venv/
+src/frontend/node_modules/
+src/frontend/build/
+**/__pycache__/
+*.pyc
+src/backend/loguru/
+src/backend/base/agentcore/alembic/alembic.log
+src/services/model-service/.venv/
+src/services/model-service/.secrets/
+src/services/*/.venv/

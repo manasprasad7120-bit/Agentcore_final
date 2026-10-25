@@ -36,7 +36,9 @@ def _redis_cluster_enabled(settings_service: SettingsService) -> bool:
     if raw_flag is not None:
         return str(raw_flag).strip().lower() in {"1", "true", "yes", "on"}
 
-    return True
+    # Default: cluster protocol only for Azure Managed Redis (Entra scope configured).
+    # A plain/local Redis (no Entra scope) is a standalone server.
+    return bool((settings_service.settings.redis_entra_scope or "").strip())
 
 
 def _get_redis_host_port(settings_service: SettingsService) -> tuple[str, int]:
@@ -46,6 +48,8 @@ def _get_redis_host_port(settings_service: SettingsService) -> tuple[str, int]:
         raise ValueError(msg)
 
     raw_port = settings_service.settings.redis_port
+    if raw_port in (None, ""):
+        raw_port = 6379
     try:
         port = int(raw_port)
     except (TypeError, ValueError) as exc:
@@ -64,17 +68,23 @@ def _get_redis_ssl(settings_service: SettingsService) -> bool:
     return str(raw_ssl or "").strip().lower() in {"1", "true", "yes", "on"}
 
 def _get_redis_entra_scope(settings_service: SettingsService) -> str:
-    redis_entra_scope = (settings_service.settings.redis_entra_scope or "").strip()
-    if not redis_entra_scope:
-        msg = "REDIS_ENTRA_SCOPE must be set."
-        raise ValueError(msg)
-    return redis_entra_scope
+    """Return the Entra scope, or "" when Redis runs without Entra ID (plain/local Redis)."""
+    return (settings_service.settings.redis_entra_scope or "").strip()
 
 
-def get_redis_credential_provider(settings_service: SettingsService) -> CredentialProvider:
+def _get_redis_password() -> str | None:
+    """Static password for plain (non-Entra) Redis, if any."""
+    return (os.getenv("REDIS_PASSWORD") or "").strip() or None
+
+
+def get_redis_credential_provider(settings_service: SettingsService) -> CredentialProvider | None:
     global _redis_credential_provider, _redis_credential_provider_signature
 
     redis_entra_scope = _get_redis_entra_scope(settings_service)
+    if not redis_entra_scope:
+        # No Entra scope configured -> plain Redis (local demo / self-hosted).
+        # Authentication, if any, uses REDIS_PASSWORD instead of Entra tokens.
+        return None
     redis_entra_object_id = (settings_service.settings.redis_entra_object_id or "").strip()
     redis_entra_refresh_margin_seconds = settings_service.settings.redis_entra_refresh_margin_seconds
     signature = (
@@ -180,7 +190,6 @@ def get_redis_client(settings_service: SettingsService):
             "host": redis_host,
             "port": redis_port,
             "ssl": redis_ssl,
-            "credential_provider": redis_credential_provider,
             "decode_responses": True,
             "socket_connect_timeout": 5,
             "socket_timeout": 5,
@@ -190,6 +199,10 @@ def get_redis_client(settings_service: SettingsService):
             "retry": Retry(ExponentialBackoff(cap=2, base=0.1), retries=3),
             "retry_on_error": [ConnectionError, TimeoutError, OSError],
         }
+        if redis_credential_provider is not None:
+            common_kwargs["credential_provider"] = redis_credential_provider
+        elif (redis_password := _get_redis_password()) is not None:
+            common_kwargs["password"] = redis_password
         if cluster_enabled:
             cluster_kwargs = _build_cluster_kwargs(common_kwargs)
             if (
