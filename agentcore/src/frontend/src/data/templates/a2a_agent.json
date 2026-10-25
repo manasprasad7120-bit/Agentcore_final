@@ -1,0 +1,1708 @@
+{
+  "id": "a2a-agent",
+  "name": "A2A Agent",
+  "description": "Agent-to-Agent (A2A) protocol-based multi-agent system where agents communicate through structured mentions, enabling autonomous peer-to-peer task coordination across local or remote agents.",
+  "icon": "Globe",
+  "gradient": "1",
+  "tags": [
+    "all-templates"
+  ],
+  "data": {
+    "nodes": [
+      {
+        "id": "ChatInput-SmRQF",
+        "type": "genericNode",
+        "position": {
+          "x": -7.755654603659146,
+          "y": 161
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "files": {
+                "trace_as_metadata": true,
+                "file_path": "",
+                "fileTypes": [
+                  "txt",
+                  "md",
+                  "mdx",
+                  "csv",
+                  "json",
+                  "yaml",
+                  "yml",
+                  "xml",
+                  "html",
+                  "htm",
+                  "pdf",
+                  "docx",
+                  "py",
+                  "sh",
+                  "sql",
+                  "js",
+                  "ts",
+                  "tsx",
+                  "jpg",
+                  "jpeg",
+                  "png",
+                  "bmp",
+                  "image"
+                ],
+                "temp_file": true,
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "files",
+                "value": "",
+                "display_name": "Files",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Files to be sent with the message.",
+                "title_case": false,
+                "type": "file",
+                "_input_type": "FileInput"
+              },
+              "background_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "background_color",
+                "value": "",
+                "display_name": "Background Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The background color of the icon.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "chat_icon": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "chat_icon",
+                "value": "",
+                "display_name": "Icon",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The icon of the message.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from agentcore.base.data.utils import IMG_FILE_TYPES, TEXT_FILE_TYPES\nfrom agentcore.base.io.chat import ChatNode\nfrom agentcore.inputs.inputs import BoolInput\nfrom agentcore.io import (\n    DropdownInput,\n    FileInput,\n    MessageTextInput,\n    MultilineInput,\n    Output,\n)\nfrom agentcore.schema.message import Message\nfrom agentcore.utils.constants import (\n    MESSAGE_SENDER_AI,\n    MESSAGE_SENDER_NAME_USER,\n    MESSAGE_SENDER_USER,\n)\n\n\nclass ChatInput(ChatNode):\n    display_name = \"Chat Input\"\n    description = \"Get chat inputs from the Playground.\"\n    icon = \"MessagesSquare\"\n    name = \"ChatInput\"\n    minimized = True\n\n    inputs = [\n        MultilineInput(\n            name=\"input_value\",\n            display_name=\"Input Text\",\n            value=\"\",\n            info=\"Message to be passed as input.\",\n            input_types=[],\n        ),\n        BoolInput(\n            name=\"should_store_message\",\n            display_name=\"Store Messages\",\n            info=\"Store the message in the history.\",\n            value=True,\n            advanced=True,\n        ),\n        DropdownInput(\n            name=\"sender\",\n            display_name=\"Sender Type\",\n            options=[MESSAGE_SENDER_AI, MESSAGE_SENDER_USER],\n            value=MESSAGE_SENDER_USER,\n            info=\"Type of sender.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"sender_name\",\n            display_name=\"Sender Name\",\n            info=\"Name of the sender.\",\n            value=MESSAGE_SENDER_NAME_USER,\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"The session ID of the chat. If empty, the current session ID parameter will be used.\",\n            advanced=True,\n        ),\n        FileInput(\n            name=\"files\",\n            display_name=\"Files\",\n            file_types=TEXT_FILE_TYPES + IMG_FILE_TYPES,\n            info=\"Files to be sent with the message.\",\n            advanced=True,\n            is_list=True,\n            temp_file=True,\n        ),\n        MessageTextInput(\n            name=\"background_color\",\n            display_name=\"Background Color\",\n            info=\"The background color of the icon.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"chat_icon\",\n            display_name=\"Icon\",\n            info=\"The icon of the message.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"text_color\",\n            display_name=\"Text Color\",\n            info=\"The text color of the name\",\n            advanced=True,\n        ),\n    ]\n    outputs = [\n        Output(display_name=\"Chat Message\", name=\"message\", method=\"message_response\"),\n    ]\n\n    async def message_response(self) -> Message:\n        from loguru import logger\n\n        background_color = self.background_color\n        text_color = self.text_color\n        icon = self.chat_icon\n\n        message = await Message.create(\n            text=self.input_value,\n            sender=self.sender,\n            sender_name=self.sender_name,\n            session_id=self.session_id,\n            files=self.files,\n            properties={\n                \"background_color\": background_color,\n                \"text_color\": text_color,\n                \"icon\": icon,\n            },\n        )\n        if self.session_id and isinstance(message, Message) and self.should_store_message:\n            stored_message = await self.send_message(\n                message,\n            )\n            self.message.value = stored_message\n            message = stored_message\n\n        # Pre-fetch image data from storage (Azure/local) so that\n        # downstream to_lc_message() can build multimodal content synchronously.\n        # Must happen AFTER store, because send_message returns a new Message\n        # object that doesn't carry the _base64_cache from the original.\n        if isinstance(message, Message):\n            await message.resolve_images()\n\n        # Add log for user message\n        if message.sender == MESSAGE_SENDER_USER:\n            logger.info(f\"[USER_MESSAGE] User: {message.text}\")\n        self.status = message\n        return message\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "input_value": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Input Text",
+                "advanced": false,
+                "input_types": [],
+                "dynamic": false,
+                "info": "Message to be passed as input.",
+                "title_case": false,
+                "copy_field": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "sender": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "Machine",
+                  "User"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "toggle": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender",
+                "value": "User",
+                "display_name": "Sender Type",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Type of sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "sender_name": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender_name",
+                "value": "User",
+                "display_name": "Sender Name",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Name of the sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "session_id": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "session_id",
+                "value": "",
+                "display_name": "Session ID",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The session ID of the chat. If empty, the current session ID parameter will be used.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "should_store_message": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "should_store_message",
+                "value": true,
+                "display_name": "Store Messages",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Store the message in the history.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "text_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "text_color",
+                "value": "",
+                "display_name": "Text Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The text color of the name",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              }
+            },
+            "description": "Get chat inputs from the Playground.",
+            "icon": "MessagesSquare",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Chat Input",
+            "minimized": true,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "message",
+                "display_name": "Chat Message",
+                "method": "message_response",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "group_outputs": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "input_value",
+              "should_store_message",
+              "sender",
+              "sender_name",
+              "session_id",
+              "files",
+              "background_color",
+              "chat_icon",
+              "text_color"
+            ],
+            "beta": false,
+            "edited": false,
+            "metadata": {
+              "module": "agentcore.components.input_output.chat.ChatInput",
+              "code_hash": "ae30bbdcc6ca"
+            },
+            "tool_mode": false,
+            "hidden": false
+          },
+          "showNode": false,
+          "type": "ChatInput",
+          "id": "ChatInput-SmRQF"
+        },
+        "selected": false,
+        "measured": {
+          "width": 174,
+          "height": 43
+        },
+        "dragging": false
+      },
+      {
+        "id": "A2AAgents-0TZ4x",
+        "type": "genericNode",
+        "position": {
+          "x": 350.86264561517567,
+          "y": 98.39792664532497
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "input_data": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "input_data",
+                "value": "",
+                "display_name": "Task Input",
+                "advanced": false,
+                "input_types": [
+                  "Message",
+                  "Data"
+                ],
+                "dynamic": false,
+                "info": "The task or question to send to the starting agent. Connect ChatInput here.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "router_llm": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "router_llm",
+                "value": "",
+                "display_name": "Router LLM",
+                "advanced": true,
+                "input_types": [
+                  "LanguageModel"
+                ],
+                "dynamic": false,
+                "info": "LLM used to pick the best agent to START the conversation. Optional.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "agents": {
+                "tool_mode": false,
+                "is_list": true,
+                "list_add_label": "Add More",
+                "table_schema": {
+                  "columns": [
+                    {
+                      "name": "name",
+                      "display_name": "Agent Name",
+                      "sortable": true,
+                      "filterable": true,
+                      "formatter": "text",
+                      "type": "str",
+                      "description": "Name shown on the output handle (e.g. Researcher, Writer)",
+                      "default": "None",
+                      "disable_edit": false,
+                      "edit_mode": "popover",
+                      "hidden": false
+                    },
+                    {
+                      "name": "description",
+                      "display_name": "Description",
+                      "sortable": true,
+                      "filterable": true,
+                      "formatter": "text",
+                      "type": "str",
+                      "description": "What this agent specialises in (visible to all agents)",
+                      "default": "None",
+                      "disable_edit": false,
+                      "edit_mode": "popover",
+                      "hidden": false
+                    }
+                  ]
+                },
+                "trigger_text": "Open table",
+                "trigger_icon": "Table",
+                "table_icon": "Table",
+                "trace_as_metadata": true,
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "agents",
+                "value": [
+                  {
+                    "name": "Agent 1",
+                    "description": ""
+                  },
+                  {
+                    "name": "Agent 2",
+                    "description": ""
+                  }
+                ],
+                "display_name": "Agents",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Define the agents in the A2A network. Each row creates an output handle — connect it to an A2AClient node on the canvas. Descriptions help agents understand each other's expertise.",
+                "real_time_refresh": true,
+                "title_case": false,
+                "type": "table",
+                "_input_type": "TableInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "# TARGET PATH: src/backend/base/agentcore/components/agents/a2a_component.py\n\"\"\"A2A (Agent-to-Agent) Network Hub Component.\n\nThis component implements Google's A2A protocol for multi-agent communication.\nIt acts as a visual hub on the canvas — users add agent names to a table, which\ncreates dynamic output handles that connect to A2AClient nodes.\n\nAgents run INDEPENDENTLY using an @mention-driven conversation loop:\n1. Hub picks the starting agent (smart routing or manual).\n2. That agent does its work and @mentions the next agent in its response.\n3. Hub reads the @mention and invokes the next agent with the full thread.\n4. Loop continues until an agent says DONE: [final answer] or max turns.\n\nCanvas wiring (no back-edges):\n1. Connect ChatInput → A2A Hub.Task\n2. Fill the Agents table (one row per agent name + description).\n3. Connect each output handle (e.g. \"Researcher\") → an A2AClient node.\n4. Connect A2A Hub.Final Response → ChatOutput.\n\nAgents decide who to call next — the Hub only facilitates.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport asyncio\nimport json\nimport time\nfrom datetime import datetime\nfrom typing import Any\n\nfrom agentcore.custom.custom_node.node import Node\nfrom agentcore.graph_langgraph.nodes import _resolve_vertex_dependencies\nfrom agentcore.io import (\n    BoolInput,\n    DropdownInput,\n    HandleInput,\n    IntInput,\n    MultilineInput,\n    Output,\n    TableInput,\n)\nfrom agentcore.logging import logger\nfrom agentcore.schema.content_block import ContentBlock\nfrom agentcore.schema.content_types import ToolContent\nfrom agentcore.schema.data import Data\nfrom agentcore.schema.dotdict import dotdict\nfrom agentcore.schema.message import Message\nfrom agentcore.utils.constants import MESSAGE_SENDER_AI\n\n\nclass A2AAgentsComponent(Node):\n    \"\"\"Visual hub for Agent-to-Agent communication using Google A2A protocol.\n\n    Add agent names in the table — each name becomes an output handle on the\n    node.  Connect each handle to an A2AClient node configured with the\n    corresponding local (or remote) agent.\n\n    Agents run independently: each agent sees the shared conversation thread,\n    does its part, and @mentions the next teammate.  The Hub just picks the\n    first agent and then facilitates the @mention-driven loop.\n    \"\"\"\n\n    display_name: str = \"A2A Agents\"\n    description: str = (\n        \"Visual A2A network hub. Agents communicate independently via @mentions — \"\n        \"each agent decides who goes next.  The Hub picks the starting agent and \"\n        \"facilitates the conversation loop.\"\n    )\n    documentation: str = \"https://docs.agentcore.org/a2a-agents\"\n    icon = \"Network\"\n    name = \"A2AAgents\"\n    beta = False\n\n    inputs = [\n        # ===== Agent Names Table =====\n        TableInput(\n            name=\"agents\",\n            display_name=\"Agents\",\n            info=(\n                \"Define the agents in the A2A network. Each row creates an output handle — \"\n                \"connect it to an A2AClient node on the canvas. \"\n                \"Descriptions help agents understand each other's expertise.\"\n            ),\n            required=True,\n            real_time_refresh=True,\n            table_schema=[\n                {\n                    \"name\": \"name\",\n                    \"display_name\": \"Agent Name\",\n                    \"type\": \"str\",\n                    \"description\": \"Name shown on the output handle (e.g. Researcher, Writer)\",\n                },\n                {\n                    \"name\": \"description\",\n                    \"display_name\": \"Description\",\n                    \"type\": \"str\",\n                    \"description\": \"What this agent specialises in (visible to all agents)\",\n                },\n            ],\n            value=[\n                {\"name\": \"Agent 1\", \"description\": \"\"},\n                {\"name\": \"Agent 2\", \"description\": \"\"},\n            ],\n        ),\n        # ===== Task Input =====\n        HandleInput(\n            name=\"input_data\",\n            display_name=\"Task Input\",\n            input_types=[\"Message\", \"Data\"],\n            required=True,\n            info=\"The task or question to send to the starting agent. Connect ChatInput here.\",\n        ),\n        # ===== Routing Configuration =====\n        HandleInput(\n            name=\"router_llm\",\n            display_name=\"Router LLM\",\n            input_types=[\"LanguageModel\"],\n            required=False,\n            info=\"LLM used to pick the best agent to START the conversation. Optional.\",\n            advanced=True,\n        ),\n        BoolInput(\n            name=\"smart_routing\",\n            display_name=\"Smart Routing\",\n            info=(\n                \"When enabled, the Router LLM picks the best agent to START the \"\n                \"conversation. After that, agents self-route via @mentions.\"\n            ),\n            value=True,\n            advanced=True,\n        ),\n        DropdownInput(\n            name=\"starting_agent\",\n            display_name=\"Starting Agent (Manual)\",\n            options=[],\n            value=\"\",\n            info=\"Manually select which agent starts. Used when Smart Routing is disabled.\",\n            advanced=True,\n        ),\n        IntInput(\n            name=\"max_turns\",\n            display_name=\"Max Turns\",\n            info=\"Maximum number of agent-to-agent turns before the conversation ends.\",\n            value=10,\n            advanced=True,\n        ),\n        MultilineInput(\n            name=\"context\",\n            display_name=\"Additional Context\",\n            info=\"Optional additional context to include with the task.\",\n            value=\"\",\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(\n            display_name=\"Final Response\",\n            name=\"Final Response\",\n            method=\"a2a_output\",\n            group_outputs=True,\n            types=[\"Message\"],\n        ),\n    ]\n\n    def __init__(self, **data):\n        super().__init__(**data)\n        self._conversation_log: list[dict] = []\n        self._detailed_log: list[dict] = []\n        self._loop_ran = False\n        self._loop_result: Message | None = None\n\n    # ------------------------------------------------------------------\n    # Dynamic output handles (driven by the agents table)\n    # ------------------------------------------------------------------\n\n    def update_outputs(self, frontend_node: dict, field_name: str, field_value: Any) -> dict:\n        \"\"\"Rebuild output handles whenever the agents table changes.\"\"\"\n        if field_name != \"agents\" or not field_value:\n            return frontend_node\n\n        outputs = []\n        for row in field_value:\n            if isinstance(row, dict):\n                name = (row.get(\"name\") or \"\").strip()\n                if name:\n                    outputs.append(\n                        Output(\n                            display_name=name,\n                            name=name,\n                            method=\"a2a_output\",\n                            group_outputs=True,\n                            types=[\"Message\"],\n                        )\n                    )\n\n        outputs.append(\n            Output(\n                display_name=\"Final Response\",\n                name=\"Final Response\",\n                method=\"a2a_output\",\n                group_outputs=True,\n                types=[\"Message\"],\n            )\n        )\n        frontend_node[\"outputs\"] = outputs\n        return frontend_node\n\n    async def update_build_config(\n        self, build_config: dotdict, field_value: Any, field_name: str | None = None\n    ) -> dotdict:\n        \"\"\"Update the starting_agent dropdown when the agents table changes.\"\"\"\n        if field_name == \"agents\":\n            agent_defs = field_value if isinstance(field_value, list) else []\n            agent_names = [\n                (row.get(\"name\") or \"\").strip()\n                for row in agent_defs\n                if isinstance(row, dict) and (row.get(\"name\") or \"\").strip()\n            ]\n\n            if \"starting_agent\" in build_config:\n                build_config[\"starting_agent\"][\"options\"] = agent_names if agent_names else []\n                current_value = build_config[\"starting_agent\"].get(\"value\", \"\")\n                if current_value not in agent_names:\n                    build_config[\"starting_agent\"][\"value\"] = agent_names[0] if agent_names else \"\"\n\n        return build_config\n\n    # ------------------------------------------------------------------\n    # Output method (Supervisor pattern)\n    # ------------------------------------------------------------------\n\n    async def a2a_output(self) -> Message:\n        \"\"\"Handle each output port.\n\n        Agent-name ports are stopped immediately (agents are invoked internally).\n        The *Final Response* port runs the A2A workflow and returns the result.\n        \"\"\"\n        current = self._current_output\n        if current != \"Final Response\":\n            self.stop(current)\n            return Message(text=\"\")\n\n        if not self._loop_ran:\n            self._loop_result = await self._run_a2a_workflow()\n            self._loop_ran = True\n        return self._loop_result  # type: ignore[return-value]\n\n    # ------------------------------------------------------------------\n    # Table helpers\n    # ------------------------------------------------------------------\n\n    def _get_agent_names(self) -> list[str]:\n        \"\"\"Get agent names from the table.\"\"\"\n        agents = getattr(self, \"agents\", [])\n        if not isinstance(agents, list):\n            return []\n        return [\n            (row.get(\"name\") or \"\").strip()\n            for row in agents\n            if isinstance(row, dict) and (row.get(\"name\") or \"\").strip()\n        ]\n\n    def _get_agent_descriptions(self) -> dict[str, str]:\n        \"\"\"Get {agent_name: description} from the agents table.\"\"\"\n        agents = getattr(self, \"agents\", [])\n        if not isinstance(agents, list):\n            return {}\n        result: dict[str, str] = {}\n        for row in agents:\n            if isinstance(row, dict):\n                name = (row.get(\"name\") or \"\").strip()\n                desc = (row.get(\"description\") or \"\").strip()\n                if name and desc:\n                    result[name] = desc\n        return result\n\n    # ------------------------------------------------------------------\n    # Worker map: resolve canvas connections (agent name → vertex ID)\n    # ------------------------------------------------------------------\n\n    def _get_worker_map(self) -> dict[str, str]:\n        \"\"\"Return {agent_display_name: target_vertex_id} from graph edges.\"\"\"\n        graph = getattr(self._vertex, \"graph\", None)\n        if graph is None:\n            logger.error(\"[A2AHub] _vertex.graph is None — cannot build worker map\")\n            return {}\n\n        my_id = self._vertex.id\n\n        result = self._extract_worker_map_from_edges(\n            getattr(graph, \"edges\", []), my_id, strategy=\"graph.edges\"\n        )\n        if result:\n            return result\n\n        raw_edges = graph.raw_graph_data.get(\"edges\", []) if hasattr(graph, \"raw_graph_data\") else []\n        if raw_edges:\n            result = self._extract_worker_map_from_edges(raw_edges, my_id, strategy=\"raw_graph_data\")\n            if result:\n                return result\n\n        result = self._build_worker_map_from_successors(graph, my_id)\n        if result:\n            logger.warning(\"[A2AHub] Using positional heuristic (sourceHandle.name missing).\")\n            return result\n\n        logger.error(\n            f\"[A2AHub] _get_worker_map() returned empty.\\n\"\n            f\"  hub vertex id: {my_id!r}\\n\"\n            f\"  agents table : {self._get_agent_names()}\"\n        )\n        return {}\n\n    @staticmethod\n    def _extract_worker_map_from_edges(\n        edges: list, my_id: str, *, strategy: str\n    ) -> dict[str, str]:\n        result: dict[str, str] = {}\n        for edge in edges:\n            if not isinstance(edge, dict) or edge.get(\"source\") != my_id:\n                continue\n            target = edge.get(\"target\", \"\")\n            if not target:\n                continue\n            sh = edge.get(\"data\", {}).get(\"sourceHandle\", {})\n            if isinstance(sh, str):\n                try:\n                    sh = json.loads(sh)\n                except Exception:\n                    sh = {}\n            name = (sh.get(\"name\") or \"\") if isinstance(sh, dict) else \"\"\n            if name and name != \"Final Response\":\n                result[name] = target\n        if result:\n            logger.debug(f\"[A2AHub] worker map via {strategy}: {list(result.keys())}\")\n        return result\n\n    def _build_worker_map_from_successors(self, graph: Any, my_id: str) -> dict[str, str]:\n        ordered_targets: list[str] = []\n        seen: set[str] = set()\n        for edge in getattr(graph, \"edges\", []):\n            if not isinstance(edge, dict) or edge.get(\"source\") != my_id:\n                continue\n            target = edge.get(\"target\", \"\")\n            if not target or target in seen:\n                continue\n            child = graph.get_vertex(target)\n            if child is None or getattr(child, \"is_interface_component\", False):\n                continue\n            ordered_targets.append(target)\n            seen.add(target)\n\n        agent_names = self._get_agent_names()\n        result: dict[str, str] = {}\n        for i, name in enumerate(agent_names):\n            if i >= len(ordered_targets):\n                break\n            result[name] = ordered_targets[i]\n        return result\n\n    # ------------------------------------------------------------------\n    # Worker invocation (invoke connected A2AClient vertex directly)\n    # ------------------------------------------------------------------\n\n    async def _invoke_worker(self, vertex_id: str, task: str, *, _retry: int = 0) -> str:\n        \"\"\"Build a connected A2AClient vertex with the given task and return result text.\n\n        Retries once on transient network errors (ReadError, ConnectError, etc.).\n        \"\"\"\n        vertex = self._vertex.graph.get_vertex(vertex_id)\n        if vertex is None:\n            return \"PASS\"\n\n        lg_state: dict = getattr(self._vertex.graph, \"_current_lg_state\", {})\n        state_results: dict = lg_state.get(\"vertices_results\", {})\n\n        resolved = _resolve_vertex_dependencies(vertex, {\"vertices_results\": state_results})\n        if resolved:\n            vertex.update_raw_params(resolved, overwrite=True)\n\n        # Forward any uploaded files (images, documents) from the original user\n        # message so workers can process them (e.g. vision models analysing images).\n        files_from_state = lg_state.get(\"files\") or []\n        if not files_from_state and isinstance(self.input_data, Message) and self.input_data.files:\n            files_from_state = self.input_data.files\n\n        # Override the task input, preserving any uploaded files.\n        task_msg = Message(text=task, files=files_from_state or [])\n        if \"input_message\" in getattr(vertex, \"template\", {}):\n            vertex.update_raw_params({\"input_message\": task_msg}, overwrite=True)\n        else:\n            vertex.update_raw_params({\"input_value\": task_msg}, overwrite=True)\n\n        # Reset built state so the vertex executes fresh\n        vertex.built = False\n        vertex.built_object = None\n        vertex.built_result = None\n\n        # CRITICAL: clear cached component instance so a fresh one is created.\n        # Without this, stale internal state (_last_send_result, etc.) causes\n        # the component to return old/empty responses.\n        # Pattern from collaborative_agent.py line 456.\n        vertex.custom_component = None\n\n        user_id = lg_state.get(\"user_id\")\n\n        # Temporarily hide this hub vertex from the worker's _resolve_params()\n        hub_vertex = self._vertex\n        hub_was_built = hub_vertex.built\n        hub_vertex.built = False\n        try:\n            # Pass event_manager=None so the worker doesn't display its own\n            # errors in the chat UI — the Hub handles errors via retry + PASS.\n            await asyncio.wait_for(\n                vertex.build(\n                    user_id=user_id,\n                    inputs={},\n                    files=files_from_state or None,\n                    event_manager=None,\n                    fallback_to_env_vars=False,\n                ),\n                timeout=180,\n            )\n            return self._extract_result(vertex.built_result)\n        except asyncio.TimeoutError:\n            logger.error(f\"[A2AHub] Worker {vertex_id} timed out after 180s\")\n            return \"PASS\"\n        except Exception as e:\n            err_name = type(e).__name__\n            # Retry once on transient network errors (ReadError, ConnectError, etc.)\n            if _retry < 2 and err_name in (\"ReadError\", \"ConnectError\", \"RemoteProtocolError\"):\n                logger.warning(f\"[A2AHub] Worker {vertex_id} got {err_name}, retrying in 2s...\")\n                await asyncio.sleep(2)\n                hub_vertex.built = hub_was_built\n                return await self._invoke_worker(vertex_id, task, _retry=_retry + 1)\n            logger.error(f\"[A2AHub] Worker {vertex_id} raised: {err_name}: {e}\")\n            return \"PASS\"\n        finally:\n            hub_vertex.built = hub_was_built\n\n    @staticmethod\n    def _extract_result(built_result: Any) -> str:\n        \"\"\"Extract plain text from a vertex's built_result.\"\"\"\n        if built_result is None:\n            return \"\"\n        if isinstance(built_result, Message):\n            return built_result.text or \"\"\n        if isinstance(built_result, Data):\n            return str(built_result.data)\n        if isinstance(built_result, dict):\n            for v in built_result.values():\n                if isinstance(v, Message) and v.text:\n                    return v.text\n            for v in built_result.values():\n                if isinstance(v, Data):\n                    return str(v.data)\n            for v in built_result.values():\n                if v:\n                    return str(v)\n        return str(built_result)\n\n    # ------------------------------------------------------------------\n    # @mention helpers\n    # ------------------------------------------------------------------\n\n    @staticmethod\n    def _extract_mentions(text: str, agent_names: list[str], sender: str) -> list[str]:\n        \"\"\"Extract @AgentName mentions from response text.\"\"\"\n        return [n for n in agent_names if n != sender and f\"@{n}\" in text]\n\n    def _format_thread_for_agent(\n        self,\n        thread: list[dict],\n        agent_name: str,\n        all_agents: list[str],\n        task: str,\n    ) -> str:\n        \"\"\"Build the prompt sent to an agent — thread context + @mention instructions.\"\"\"\n        descriptions = self._get_agent_descriptions()\n        other_agents = [n for n in all_agents if n != agent_name]\n        mentions_str = \", \".join(f\"@{n}\" for n in other_agents)\n        agent_desc = \"\\n\".join(\n            f\"- {n}: {descriptions.get(n, 'No description')}\" for n in all_agents\n        )\n\n        # Last 15 messages to keep prompt manageable\n        recent = thread[-15:] if len(thread) > 15 else thread\n        if recent:\n            thread_text = \"\\n\\n\".join(\n                f\"[Turn {msg['turn']}] {msg['sender']}: {msg['content']}\"\n                for msg in recent\n            )\n        else:\n            thread_text = \"(No conversation yet — you are the first agent to respond)\"\n\n        return (\n            f\"You are {agent_name} in a multi-agent A2A network.\\n\"\n            f\"Your expertise: {descriptions.get(agent_name, 'your role')}\\n\\n\"\n            f\"Team members:\\n{agent_desc}\\n\\n\"\n            f\"Conversation so far:\\n{thread_text}\\n\\n\"\n            f\"Original Task: {task}\\n\\n\"\n            f\"Choose ONE:\\n\"\n            f\"1. CONTRIBUTE + @mention — Do your part, then @mention the next agent \"\n            f\"whose expertise is needed to fulfil the original task. \"\n            f\"Read the task carefully — if it asks for research, writing, AND review, \"\n            f\"make sure each step is handled by the right agent. Available: {mentions_str}\\n\"\n            f\"2. DONE: [final answer] — Every step requested in the original task is \"\n            f\"complete. Write DONE: followed by the final deliverable.\\n\"\n            f\"3. PASS — Your skill isn't needed. Reply with exactly: PASS\\n\\n\"\n            f\"Use DONE only when ALL steps in the original task are finished. \"\n            f\"If the task asks for multiple steps and some are still pending, \"\n            f\"@mention the agent who should handle the next step.\"\n        )\n\n    # ------------------------------------------------------------------\n    # Smart routing — pick FIRST agent only\n    # ------------------------------------------------------------------\n\n    async def _select_first_agent(self, agent_names: list[str], task: str) -> str:\n        \"\"\"Use the router LLM to pick the best agent to START the conversation.\"\"\"\n        router_llm = getattr(self, \"router_llm\", None)\n        if not router_llm:\n            return agent_names[0]\n\n        descriptions = self._get_agent_descriptions()\n        agent_lines = \"\\n\".join(\n            f\"- {name}: {descriptions[name]}\" if name in descriptions else f\"- {name}\"\n            for name in agent_names\n        )\n\n        routing_prompt = (\n            f\"You are a task router. Pick the ONE agent best suited to START this task.\\n\"\n            f\"After the first agent, agents will @mention each other to continue.\\n\\n\"\n            f\"Available Agents:\\n{agent_lines}\\n\\n\"\n            f\"Task: {task}\\n\\n\"\n            f\"Respond with ONLY the agent name. Nothing else.\"\n        )\n\n        try:\n            if hasattr(router_llm, \"ainvoke\"):\n                response = await router_llm.ainvoke(routing_prompt)\n            else:\n                response = router_llm.invoke(routing_prompt)\n\n            selected = response.content.strip() if hasattr(response, \"content\") else str(response).strip()\n\n            for name in agent_names:\n                if name.lower() == selected.lower():\n                    logger.info(f\"[A2AHub] Smart routing selected starting agent: {name}\")\n                    return name\n\n            for name in agent_names:\n                if selected.lower() in name.lower() or name.lower() in selected.lower():\n                    logger.info(f\"[A2AHub] Smart routing partial match: {name}\")\n                    return name\n\n            logger.warning(f\"[A2AHub] Could not match '{selected}', using first agent\")\n        except Exception as e:\n            logger.warning(f\"[A2AHub] Smart routing failed: {e}, using first agent\")\n\n        return agent_names[0]\n\n    # ------------------------------------------------------------------\n    # Main workflow — @mention-driven agentic loop\n    # ------------------------------------------------------------------\n\n    @staticmethod\n    def _extract_text(value: Any) -> str:\n        \"\"\"Convert any input type to a plain string.\"\"\"\n        if isinstance(value, Message):\n            return value.text or \"\"\n        if isinstance(value, Data):\n            if isinstance(value.data, dict):\n                return json.dumps(value.data, indent=2)\n            return str(value.data)\n        if isinstance(value, dict):\n            return json.dumps(value, indent=2)\n        return str(value) if value else \"\"\n\n    async def _run_a2a_workflow(self) -> Message:\n        \"\"\"Run the @mention-driven agentic conversation loop.\n\n        1. Pick starting agent (smart routing or manual).\n        2. Invoke agent → agent responds with @mention of next agent.\n        3. Read @mentions → invoke mentioned agent with full thread.\n        4. Repeat until DONE: or max turns.\n        \"\"\"\n        agent_names = self._get_agent_names()\n        if not agent_names:\n            raise ValueError(\"No agents defined in the A2A network table\")\n\n        worker_map = self._get_worker_map()\n\n        task_text = self._extract_text(self.input_data)\n        if not task_text:\n            raise ValueError(\"No task input provided\")\n\n        context = getattr(self, \"context\", \"\") or \"\"\n        task_with_context = f\"Context: {context}\\n\\nTask: {task_text}\" if context else task_text\n\n        max_turns = getattr(self, \"max_turns\", 10) or 10\n\n        self._detailed_log = [{\n            \"event\": \"workflow_start\",\n            \"timestamp\": datetime.now().isoformat(),\n            \"agents\": agent_names,\n            \"connected_agents\": list(worker_map.keys()),\n            \"task\": task_text,\n        }]\n\n        # ── Live trace setup ──\n        trace_steps: list[ToolContent] = []\n        session_id = \"\"\n        if hasattr(self, \"_vertex\") and hasattr(self._vertex, \"graph\"):\n            _lg = getattr(self._vertex.graph, \"_current_lg_state\", {})\n            session_id = (\n                _lg.get(\"session_id\", \"\")\n                or getattr(self._vertex.graph, \"session_id\", \"\")\n                or \"\"\n            )\n\n        agent_message = Message(\n            text=\"\",\n            sender=MESSAGE_SENDER_AI,\n            sender_name=\"A2A Agents\",\n            session_id=session_id,\n            properties={\"icon\": \"Network\", \"state\": \"partial\"},\n            content_blocks=[ContentBlock(title=\"A2A Execution Trace\", contents=[])],\n        )\n        agent_message = await self.send_message(agent_message)\n\n        async def _push_trace() -> None:\n            nonlocal agent_message\n            agent_message.content_blocks = [\n                ContentBlock(title=\"A2A Execution Trace\", contents=list(trace_steps))\n            ]\n            agent_message = await self.send_message(agent_message)\n\n        try:\n            # ── Pick starting agent ──\n            smart_routing_enabled = getattr(self, \"smart_routing\", True)\n            if smart_routing_enabled:\n                routing_step = ToolContent(\n                    name=\"Smart Routing\",\n                    output=None,\n                    header={\"title\": \"Picking starting agent...\", \"icon\": \"Network\"},\n                )\n                trace_steps.append(routing_step)\n                await _push_trace()\n\n                first_agent = await self._select_first_agent(agent_names, task_with_context)\n\n                routing_step.output = f\"Starting with: **{first_agent}**\"\n                routing_step.header = {\"title\": f\"Start → **{first_agent}**\", \"icon\": \"Network\"}\n                await _push_trace()\n            else:\n                first_agent = getattr(self, \"starting_agent\", \"\") or agent_names[0]\n\n            # Verify starting agent is connected\n            if first_agent not in worker_map:\n                connected = \", \".join(worker_map.keys()) if worker_map else \"none\"\n                raise ValueError(\n                    f\"Agent '{first_agent}' is not connected on the canvas. \"\n                    f\"Connected: {connected}\"\n                )\n\n            self._detailed_log.append({\n                \"event\": \"starting_agent\",\n                \"timestamp\": datetime.now().isoformat(),\n                \"agent\": first_agent,\n            })\n\n            # ── Agentic conversation loop ──\n            thread: list[dict] = []\n            self._conversation_log = []\n            mentioned_next: set[str] = {first_agent}\n            pass_counts: dict[str, int] = {n: 0 for n in agent_names}\n            total_start = time.time()\n            final_answer = \"\"\n\n            # Hide hub vertex once for the entire loop\n            hub_vertex = self._vertex\n            hub_was_built = hub_vertex.built\n            hub_vertex.built = False\n\n            try:\n                for turn in range(1, max_turns + 1):\n                    # Only @mentioned agents run this turn\n                    active = [\n                        n for n in agent_names\n                        if n in mentioned_next\n                        and n in worker_map\n                        and pass_counts.get(n, 0) < 5\n                    ]\n                    if not active:\n                        break\n\n                    mentioned_next = set()\n\n                    for agent_name in active:\n                        # Build prompt with full thread context\n                        agent_input = self._format_thread_for_agent(\n                            thread, agent_name, agent_names, task_with_context,\n                        )\n\n                        # Trace: calling agent\n                        calling_step = ToolContent(\n                            name=agent_name,\n                            output=None,\n                            header={\"title\": f\"Calling {agent_name} via A2A...\", \"icon\": \"bot\"},\n                        )\n                        trace_steps.append(calling_step)\n                        await _push_trace()\n\n                        step_start = time.time()\n                        result = await self._invoke_worker(worker_map[agent_name], agent_input)\n                        result = result.strip()\n                        step_elapsed = time.time() - step_start\n\n                        # Add to thread\n                        thread.append({\"sender\": agent_name, \"content\": result, \"turn\": turn})\n\n                        # Log exchange\n                        self._conversation_log.append({\n                            \"sender\": agent_name,\n                            \"content\": result,\n                            \"turn\": turn,\n                            \"timestamp\": datetime.now().isoformat(),\n                        })\n\n                        # Check DONE\n                        if result.upper().startswith(\"DONE:\"):\n                            final_answer = result[5:].strip()\n\n                            calling_step.output = final_answer[:300] + \"...\" if len(final_answer) > 300 else final_answer\n                            calling_step.header = {\n                                \"title\": f\"**{agent_name}** — DONE ({step_elapsed:.1f}s)\",\n                                \"icon\": \"bot\",\n                            }\n                            await _push_trace()\n\n                            self._detailed_log.append({\n                                \"event\": \"agent_done\",\n                                \"timestamp\": datetime.now().isoformat(),\n                                \"agent\": agent_name,\n                                \"turn\": turn,\n                            })\n                            break  # exit inner loop\n\n                        # Check PASS\n                        if result.upper() == \"PASS\":\n                            pass_counts[agent_name] = pass_counts.get(agent_name, 0) + 1\n                            calling_step.output = \"PASS\"\n                            calling_step.header = {\n                                \"title\": f\"**{agent_name}** — PASS ({step_elapsed:.1f}s)\",\n                                \"icon\": \"bot\",\n                            }\n                            await _push_trace()\n                            continue\n\n                        # Agent contributed — reset pass count\n                        pass_counts[agent_name] = 0\n\n                        # Extract @mentions → drive next turn\n                        mentions = self._extract_mentions(result, agent_names, agent_name)\n\n                        # Auto-mention fallback: if agent forgot @mention, route to next in table\n                        if not mentions:\n                            idx = agent_names.index(agent_name) if agent_name in agent_names else -1\n                            if idx >= 0 and idx + 1 < len(agent_names):\n                                next_agent = agent_names[idx + 1]\n                                mentions = [next_agent]\n                                logger.info(f\"[A2AHub] Auto-mention: {agent_name} → @{next_agent}\")\n\n                        mentioned_next.update(mentions)\n\n                        # Update trace\n                        mentions_display = f\" → @{', @'.join(mentions)}\" if mentions else \"\"\n                        result_preview = result[:300] + \"...\" if len(result) > 300 else result\n                        calling_step.output = result_preview\n                        calling_step.header = {\n                            \"title\": f\"**{agent_name}**{mentions_display} ({step_elapsed:.1f}s)\",\n                            \"icon\": \"bot\",\n                        }\n                        await _push_trace()\n\n                    # If DONE was found, exit outer loop\n                    if final_answer:\n                        break\n\n            finally:\n                hub_vertex.built = hub_was_built\n\n            total_elapsed = time.time() - total_start\n\n            # If no DONE, use last non-PASS response\n            if not final_answer:\n                final_answer = next(\n                    (m[\"content\"] for m in reversed(thread)\n                     if m[\"content\"].upper() != \"PASS\"\n                     and not m[\"content\"].upper().startswith(\"DONE:\")),\n                    \"No response from agents\",\n                )\n\n            # ── Summary trace ──\n            agents_called = list(dict.fromkeys(m[\"sender\"] for m in thread))\n            summary_step = ToolContent(\n                name=\"A2A Network\",\n                output=f\"{' → '.join(agents_called)} — {total_elapsed:.1f}s\",\n                header={\n                    \"title\": f\"A2A Complete — {len(agents_called)} agents, {total_elapsed:.1f}s\",\n                    \"icon\": \"Network\",\n                },\n            )\n            trace_steps.append(summary_step)\n\n            self._detailed_log.append({\n                \"event\": \"workflow_complete\",\n                \"timestamp\": datetime.now().isoformat(),\n                \"agents_called\": agents_called,\n                \"turns\": len(set(m[\"turn\"] for m in thread)),\n                \"elapsed_seconds\": total_elapsed,\n            })\n\n            agent_message.text = final_answer\n            agent_message.properties.state = \"complete\"\n            agent_message.content_blocks = [\n                ContentBlock(title=\"A2A Execution Trace\", contents=list(trace_steps))\n            ]\n            return await self.send_message(agent_message)\n\n        except Exception as e:\n            error_step = ToolContent(\n                name=\"Error\",\n                output=str(e),\n                header={\"title\": f\"A2A Error: {type(e).__name__}\", \"icon\": \"Network\"},\n            )\n            trace_steps.append(error_step)\n            agent_message.properties.state = \"complete\"\n            agent_message.content_blocks = [\n                ContentBlock(title=\"A2A Execution Trace\", contents=list(trace_steps))\n            ]\n            await self.send_message(agent_message)\n\n            self._detailed_log.append({\n                \"event\": \"workflow_error\",\n                \"timestamp\": datetime.now().isoformat(),\n                \"error\": str(e),\n            })\n            logger.error(f\"[A2AHub] Execution error: {e}\")\n            raise\n\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "context": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "context",
+                "value": "",
+                "display_name": "Additional Context",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Optional additional context to include with the task.",
+                "title_case": false,
+                "copy_field": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "max_turns": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "max_turns",
+                "value": 10,
+                "display_name": "Max Turns",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Maximum number of agent-to-agent turns before the conversation ends.",
+                "title_case": false,
+                "type": "int",
+                "_input_type": "IntInput"
+              },
+              "smart_routing": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "smart_routing",
+                "value": true,
+                "display_name": "Smart Routing",
+                "advanced": true,
+                "dynamic": false,
+                "info": "When enabled, the Router LLM picks the best agent to START the conversation. After that, agents self-route via @mentions.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "starting_agent": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "Agent 1",
+                  "Agent 2"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "toggle": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "starting_agent",
+                "value": "Agent 1",
+                "display_name": "Starting Agent (Manual)",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Manually select which agent starts. Used when Smart Routing is disabled.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              }
+            },
+            "description": "Visual A2A network hub. Agents communicate independently via @mentions — each agent decides who goes next.  The Hub picks the starting agent and facilitates the conversation loop.",
+            "icon": "Network",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "A2A Agents",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "Agent 1",
+                "hidden": null,
+                "display_name": "Agent 1",
+                "method": "a2a_output",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": true,
+                "options": null,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "Agent 2",
+                "hidden": null,
+                "display_name": "Agent 2",
+                "method": "a2a_output",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": true,
+                "options": null,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "Final Response",
+                "display_name": "Final Response",
+                "method": "a2a_output",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": true,
+                "options": null,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "agents",
+              "input_data",
+              "router_llm",
+              "smart_routing",
+              "starting_agent",
+              "max_turns",
+              "context"
+            ],
+            "beta": false,
+            "edited": false,
+            "metadata": {
+              "module": "agentcore.components.agents.a2a_component.A2AAgentsComponent",
+              "code_hash": "3ac2bcd496bb"
+            },
+            "tool_mode": false,
+            "hidden": false,
+            "last_updated": "2026-03-24T10:41:27.563Z"
+          },
+          "showNode": true,
+          "type": "A2AAgents",
+          "id": "A2AAgents-0TZ4x"
+        },
+        "selected": false,
+        "measured": {
+          "width": 290,
+          "height": 365
+        },
+        "dragging": false
+      },
+      {
+        "id": "RunChildAgent-11vM4",
+        "type": "genericNode",
+        "position": {
+          "x": 831.4616956573522,
+          "y": 76.05085081192759
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "input_value": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Input",
+                "advanced": false,
+                "input_types": [
+                  "Message",
+                  "Data",
+                  "str"
+                ],
+                "dynamic": false,
+                "info": "Input to pass to the child agent. Can be text, JSON, or output from another component.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "child_agent_name": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "New Agent (8)",
+                  "New Agent (6)",
+                  "New Agent (15)",
+                  "New Agent (7)",
+                  "New Agent (2)",
+                  "New Agent (3)",
+                  "New Agent (4)",
+                  "New Agent (5)",
+                  "hello",
+                  "New Agent (10)",
+                  "New Agent (13)",
+                  "New Agent",
+                  "Code Review Agent (1)",
+                  "New Agent (14) (2)",
+                  "New Agent (17)",
+                  "New Agent (9)",
+                  "sch",
+                  "New Agent (1)",
+                  "New Agent (11)",
+                  "Code Review Agent (2)",
+                  "New Agent (14)",
+                  "New Agent (14) (1)",
+                  "New Agent (12)",
+                  "workernode",
+                  "Code Review Agent",
+                  "orch_demo",
+                  "mem_test",
+                  "New Agent (16)",
+                  "llm",
+                  "collaborative Multi agent",
+                  "Code Review Agent (3)",
+                  "Code Review Agent (4)",
+                  "Hierarchical Agent",
+                  "Worker Node Agent",
+                  "New Agent (18)",
+                  "Supervisor Multi Agent",
+                  "Graph RAG",
+                  "Graph RAG (1)",
+                  "Talk to data",
+                  "supervisor multi agent",
+                  "HIL"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "toggle": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "child_agent_name",
+                "display_name": "Child Agent",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Select the agent to run as a child agent.",
+                "real_time_refresh": true,
+                "refresh_button": true,
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "\n\"\"\"Run a Child Agent component.\n\nThis component enables one agent to call another agent as a \"child agent\",\nwith A2A protocol-based communication for tracking and logging.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport json\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import Any\nfrom uuid import uuid4\n\nfrom loguru import logger\n\nfrom agentcore.base.child_agent.adapter import ChildAgentAdapter, ChildAgentResult, ParentAgentContext\nfrom agentcore.base.child_agent.guards import (\n    ChildAgentCallGuard,\n    CircularAgentCallError,\n    MaxCallDepthError,\n)\nfrom agentcore.base.child_agent.registry import ChildAgentRegistry\nfrom agentcore.custom.custom_node.node import Node\nfrom agentcore.io import (\n    BoolInput,\n    DropdownInput,\n    HandleInput,\n    MessageInput,\n    Output,\n    StrInput,\n)\nfrom agentcore.schema.data import Data\nfrom agentcore.schema.dotdict import dotdict\nfrom agentcore.schema.message import Message\n\n\nclass RunChildAgentComponent(Node):\n    \"\"\"Execute another agent as a child agent.\n\n    This component allows a parent agent to call another agent as a child,\n    with A2A protocol-based communication for cross-agent communication.\n    The child agent executes and returns its output to the parent.\n\n    Features:\n    - Select any agent in the project as a child agent\n    - Pass any input (text, JSON, agent output, etc.) to the child agent\n    - Receive the child agent's output for further processing\n    - A2A protocol logging for tracking cross-agent communication\n    - Circular call detection to prevent infinite loops\n    \"\"\"\n\n    display_name = \"Run a Child Agent\"\n    description = (\n        \"Call another agent as a child agent. The child agent receives your input, \"\n        \"executes, and returns its output. Communication uses A2A protocol for tracking.\"\n    )\n    icon = \"GitBranch\"\n    name = \"RunChildAgent\"\n    beta = False\n\n    inputs = [\n        DropdownInput(\n            name=\"child_agent_name\",\n            display_name=\"Child Agent\",\n            info=\"Select the agent to run as a child agent.\",\n            options=[],\n            real_time_refresh=True,\n            refresh_button=True,\n            value=None,\n        ),\n        HandleInput(\n            name=\"input_value\",\n            display_name=\"Input\",\n            info=\"Input to pass to the child agent. Can be text, JSON, or output from another component.\",\n            input_types=[\"Message\", \"Data\", \"str\"],\n            required=True,\n        ),\n        StrInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"Optional: Share session context with child agent. Leave empty to use parent's session.\",\n            value=\"\",\n            advanced=True,\n        ),\n        BoolInput(\n            name=\"enable_a2a_logging\",\n            display_name=\"Enable A2A Logging\",\n            value=True,\n            info=\"Log A2A messages between parent and child agent for debugging.\",\n            advanced=True,\n        ),\n        StrInput(\n            name=\"log_directory\",\n            display_name=\"Log Directory\",\n            info=\"Directory to save A2A conversation logs. Each conversation gets a separate timestamped file.\",\n            value=\"a2a_logs\",\n            advanced=True,\n        ),\n        MessageInput(\n            name=\"max_call_depth\",\n            display_name=\"Max Call Depth\",\n            info=\"Maximum depth of nested child agent calls (prevents infinite recursion).\",\n            value=\"10\",\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(\n            name=\"child_output\",\n            display_name=\"Child Agent Output\",\n            method=\"run_child_agent\",\n        ),\n        Output(\n            name=\"child_output_data\",\n            display_name=\"Child Agent Data Output\",\n            method=\"run_child_agent_data\",\n            hidden=True,\n        ),\n        Output(\n            name=\"a2a_conversation_log\",\n            display_name=\"A2A Conversation Log\",\n            method=\"get_a2a_log\",\n            advanced=True,\n        ),\n    ]\n\n    # Cache for storing the result after first execution\n    _cached_result: ChildAgentResult | None = None\n\n    async def update_build_config(\n        self, build_config: dotdict, field_value: Any, field_name: str | None = None\n    ):\n        \"\"\"Update build config when child agent is selected.\"\"\"\n        if field_name == \"child_agent_name\":\n            # Get available agents for dropdown\n            build_config[\"child_agent_name\"][\"options\"] = await self._get_available_agents()\n        return build_config\n\n    async def _get_available_agents(self) -> list[str]:\n        \"\"\"Get list of available agents for the dropdown.\"\"\"\n        try:\n            # Get the current agent ID to exclude it\n            current_agent_id = None\n            if hasattr(self, \"graph\") and self.graph:\n                current_agent_id = getattr(self.graph, \"agent_id\", None) or getattr(self.graph, \"flow_id\", None)\n\n            agent_names = await ChildAgentRegistry.get_agent_names(\n                user_id=str(self.user_id),\n                exclude_agent_id=current_agent_id,\n            )\n            return agent_names\n        except Exception as e:\n            logger.warning(f\"Error getting available agents: {e}\")\n            return []\n\n    def _get_input_text(self) -> str:\n        \"\"\"Extract text from the input value.\"\"\"\n        input_val = self.input_value\n\n        if input_val is None:\n            return \"\"\n\n        if isinstance(input_val, Message):\n            return input_val.text or \"\"\n\n        if isinstance(input_val, Data):\n            # Try to get text from data\n            if hasattr(input_val, \"data\") and isinstance(input_val.data, dict):\n                return input_val.data.get(\"text\", str(input_val.data))\n            return str(input_val)\n\n        if isinstance(input_val, dict):\n            return json.dumps(input_val)\n\n        return str(input_val)\n\n    def _get_input_files(self) -> list:\n        \"\"\"Extract files (images, documents) from the input value.\"\"\"\n        input_val = self.input_value\n        if isinstance(input_val, Message) and input_val.files:\n            return input_val.files\n        return []\n\n    def _build_parent_context(self) -> ParentAgentContext:\n        \"\"\"Build the parent context for the child agent call.\"\"\"\n        parent_agent_id = \"\"\n        parent_agent_name = \"\"\n\n        if hasattr(self, \"graph\") and self.graph:\n            parent_agent_id = getattr(self.graph, \"agent_id\", \"\") or getattr(self.graph, \"flow_id\", \"\") or \"\"\n            parent_agent_name = getattr(self.graph, \"agent_name\", \"\") or getattr(self.graph, \"flow_name\", \"\") or \"\"\n\n        # Get current call depth from guard\n        guard = ChildAgentCallGuard()\n        call_depth = guard.get_call_depth()\n\n        return ParentAgentContext(\n            parent_agent_id=str(parent_agent_id),\n            parent_agent_name=parent_agent_name,\n            session_id=self.session_id if self.session_id else getattr(self.graph, \"session_id\", None),\n            call_depth=call_depth,\n            a2a_task_id=str(uuid4()),\n        )\n\n    async def _execute_child_agent(self) -> ChildAgentResult:\n        \"\"\"Execute the child agent and return the result.\"\"\"\n        # Return cached result if available\n        if self._cached_result is not None:\n            return self._cached_result\n\n        child_agent_name = self.child_agent_name\n        if not child_agent_name:\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=\"No child agent selected\",\n            )\n\n        # Get input text and files\n        input_text = self._get_input_text()\n        input_files = self._get_input_files()\n\n        # Build parent context\n        parent_context = self._build_parent_context()\n\n        # Create guard with configured max depth\n        try:\n            max_depth = int(self.max_call_depth) if self.max_call_depth else 10\n        except (ValueError, TypeError):\n            max_depth = 10\n        guard = ChildAgentCallGuard(max_depth=max_depth)\n\n        try:\n            # Create adapter for child agent\n            adapter = await ChildAgentAdapter.from_agent_name(\n                agent_name=child_agent_name,\n                user_id=str(self.user_id),\n                guard=guard,\n            )\n\n            # Execute child agent\n            result = await adapter.execute(\n                input_value=input_text,\n                parent_context=parent_context,\n                session_id=self.session_id if self.session_id else None,\n                files=input_files or None,\n            )\n\n            # Log if enabled\n            if self.enable_a2a_logging:\n                self._log_a2a_messages(result)\n\n            # Cache the result\n            self._cached_result = result\n            return result\n\n        except CircularAgentCallError as e:\n            logger.error(f\"Circular agent call detected: {e}\")\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=f\"Circular agent call detected: {e}\",\n            )\n\n        except MaxCallDepthError as e:\n            logger.error(f\"Max call depth exceeded: {e}\")\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=f\"Maximum call depth exceeded: {e}\",\n            )\n\n        except Exception as e:\n            logger.exception(f\"Error executing child agent: {e}\")\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=str(e),\n            )\n\n    def _log_a2a_messages(self, result: ChildAgentResult) -> None:\n        \"\"\"Log A2A messages for debugging and save to file.\"\"\"\n        if not result.a2a_messages:\n            return\n\n        # Log to console\n        logger.info(f\"A2A Conversation Log for child agent '{self.child_agent_name}':\")\n        for msg in result.a2a_messages:\n            logger.info(\n                f\"  [{msg.message_type.value}] {msg.sender_id} -> {msg.receiver_id}: \"\n                f\"{msg.content[:100]}{'...' if len(msg.content) > 100 else ''}\"\n            )\n\n        # Save to file\n        self._save_a2a_log_to_file(result)\n\n    def _save_a2a_log_to_file(self, result: ChildAgentResult) -> None:\n        \"\"\"Save the A2A conversation log to a timestamped JSON file.\"\"\"\n        try:\n            # Get the log directory (default: a2a_logs)\n            log_dir = Path(getattr(self, \"log_directory\", \"a2a_logs\"))\n\n            # Create the directory if it doesn't exist\n            log_dir.mkdir(parents=True, exist_ok=True)\n\n            # Generate timestamped filename\n            timestamp = datetime.now().strftime(\"%Y-%m-%d_%H-%M-%S\")\n            filename = f\"child_agent_a2a_log_{timestamp}.json\"\n            log_path = log_dir / filename\n\n            # Build log data\n            parent_context = self._build_parent_context()\n            log_data = {\n                \"type\": \"child_agent_communication\",\n                \"parent_agent\": {\n                    \"id\": parent_context.parent_agent_id,\n                    \"name\": parent_context.parent_agent_name,\n                },\n                \"child_agent\": {\n                    \"name\": self.child_agent_name,\n                },\n                \"status\": result.status,\n                \"execution_time_ms\": result.execution_time_ms,\n                \"messages\": [\n                    {\n                        \"id\": msg.id,\n                        \"task_id\": msg.task_id,\n                        \"sender\": msg.sender_id,\n                        \"receiver\": msg.receiver_id,\n                        \"type\": msg.message_type.value,\n                        \"content\": msg.content,\n                        \"timestamp\": msg.timestamp.isoformat(),\n                        \"artifacts\": msg.artifacts,\n                    }\n                    for msg in result.a2a_messages\n                ],\n                \"saved_at\": datetime.now().isoformat(),\n            }\n\n            with open(log_path, \"w\") as f:\n                json.dump(log_data, f, indent=2)\n            logger.info(f\"Child agent A2A conversation log saved to: {log_path.absolute()}\")\n        except Exception as e:\n            logger.warning(f\"Failed to save child agent A2A log: {e}\")\n\n    async def run_child_agent(self) -> Message:\n        \"\"\"Run the child agent and return output as Message.\n\n        Returns:\n            Message containing the child agent's output\n        \"\"\"\n        result = await self._execute_child_agent()\n\n        if result.status == \"error\":\n            return Message(\n                text=f\"Error: {result.error}\",\n                sender=\"RunChildAgent\",\n                sender_name=\"Run a Child Agent\",\n            )\n\n        return Message(\n            text=result.output,\n            sender=\"RunChildAgent\",\n            sender_name=f\"Child Agent: {self.child_agent_name}\",\n            content_blocks=result.content_blocks or [],\n        )\n\n    async def run_child_agent_data(self) -> Data:\n        \"\"\"Run the child agent and return output as Data.\n\n        Returns:\n            Data containing the child agent's output and metadata\n        \"\"\"\n        result = await self._execute_child_agent()\n\n        return Data(\n            data={\n                \"output\": result.output,\n                \"status\": result.status,\n                \"error\": result.error,\n                \"execution_time_ms\": result.execution_time_ms,\n                \"child_agent_name\": self.child_agent_name,\n            }\n        )\n\n    async def get_a2a_log(self) -> Data:\n        \"\"\"Get the A2A conversation log.\n\n        Returns:\n            Data containing the A2A conversation log\n        \"\"\"\n        result = await self._execute_child_agent()\n\n        # Build conversation log\n        log_data = {\n            \"parent_agent\": {\n                \"id\": self._build_parent_context().parent_agent_id,\n                \"name\": self._build_parent_context().parent_agent_name,\n            },\n            \"child_agent\": {\n                \"name\": self.child_agent_name,\n            },\n            \"status\": result.status,\n            \"execution_time_ms\": result.execution_time_ms,\n            \"messages\": [\n                {\n                    \"id\": msg.id,\n                    \"task_id\": msg.task_id,\n                    \"sender\": msg.sender_id,\n                    \"receiver\": msg.receiver_id,\n                    \"type\": msg.message_type.value,\n                    \"content\": msg.content,\n                    \"timestamp\": msg.timestamp.isoformat(),\n                }\n                for msg in result.a2a_messages\n            ],\n            \"timestamp\": datetime.now().isoformat(),\n        }\n\n        return Data(data=log_data)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "enable_a2a_logging": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "enable_a2a_logging",
+                "value": true,
+                "display_name": "Enable A2A Logging",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Log A2A messages between parent and child agent for debugging.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "log_directory": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "log_directory",
+                "value": "a2a_logs",
+                "display_name": "Log Directory",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Directory to save A2A conversation logs. Each conversation gets a separate timestamped file.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "StrInput"
+              },
+              "max_call_depth": {
+                "trace_as_input": true,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "max_call_depth",
+                "value": {
+                  "text_key": "text",
+                  "data": {
+                    "text": "10",
+                    "files": [],
+                    "sender": null,
+                    "sender_name": null,
+                    "session_id": "",
+                    "timestamp": "2026-03-24 07:17:19 UTC",
+                    "agent_id": null,
+                    "error": false,
+                    "edit": false,
+                    "properties": {
+                      "edited": false,
+                      "source": {
+                        "id": null,
+                        "display_name": null,
+                        "source": null
+                      },
+                      "allow_markdown": false,
+                      "state": "complete",
+                      "targets": []
+                    },
+                    "category": "message",
+                    "content_blocks": [],
+                    "duration": null
+                  },
+                  "default_value": ""
+                },
+                "display_name": "Max Call Depth",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Maximum depth of nested child agent calls (prevents infinite recursion).",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageInput"
+              },
+              "session_id": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "session_id",
+                "value": "",
+                "display_name": "Session ID",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Optional: Share session context with child agent. Leave empty to use parent's session.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "StrInput"
+              }
+            },
+            "description": "Call another agent as a child agent. The child agent receives your input, executes, and returns its output. Communication uses A2A protocol for tracking.",
+            "icon": "GitBranch",
+            "base_classes": [
+              "Data",
+              "Message"
+            ],
+            "display_name": "Run a Child Agent",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "child_output",
+                "display_name": "Child Agent Output",
+                "method": "run_child_agent",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": false,
+                "options": null,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "Data"
+                ],
+                "selected": "Data",
+                "name": "child_output_data",
+                "hidden": true,
+                "display_name": "Child Agent Data Output",
+                "method": "run_child_agent_data",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": false,
+                "options": null,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "Data"
+                ],
+                "selected": "Data",
+                "name": "a2a_conversation_log",
+                "display_name": "A2A Conversation Log",
+                "method": "get_a2a_log",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": false,
+                "options": null,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "child_agent_name",
+              "input_value",
+              "session_id",
+              "enable_a2a_logging",
+              "log_directory",
+              "max_call_depth"
+            ],
+            "beta": false,
+            "edited": false,
+            "metadata": {
+              "module": "agentcore.components.logic.run_child_agent.RunChildAgentComponent",
+              "code_hash": "b79d9cb738fa"
+            },
+            "tool_mode": false,
+            "hidden": false,
+            "last_updated": "2026-03-24T10:13:14.254Z"
+          },
+          "showNode": true,
+          "type": "RunChildAgent",
+          "id": "RunChildAgent-11vM4",
+          "selected_output": "child_output"
+        },
+        "selected": false,
+        "measured": {
+          "width": 290,
+          "height": 308
+        },
+        "dragging": false
+      },
+      {
+        "id": "RunChildAgent-1Rkv6",
+        "type": "genericNode",
+        "position": {
+          "x": 824.8781618798625,
+          "y": 532.4349493011146
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "input_value": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Input",
+                "advanced": false,
+                "input_types": [
+                  "Message",
+                  "Data",
+                  "str"
+                ],
+                "dynamic": false,
+                "info": "Input to pass to the child agent. Can be text, JSON, or output from another component.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "child_agent_name": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "New Agent (8)",
+                  "New Agent (6)",
+                  "New Agent (15)",
+                  "New Agent (7)",
+                  "New Agent (2)",
+                  "New Agent (3)",
+                  "New Agent (4)",
+                  "New Agent (5)",
+                  "hello",
+                  "New Agent (10)",
+                  "New Agent (13)",
+                  "New Agent",
+                  "Code Review Agent (1)",
+                  "New Agent (14) (2)",
+                  "New Agent (17)",
+                  "New Agent (9)",
+                  "sch",
+                  "New Agent (1)",
+                  "New Agent (11)",
+                  "Code Review Agent (2)",
+                  "New Agent (14)",
+                  "New Agent (14) (1)",
+                  "New Agent (12)",
+                  "workernode",
+                  "Code Review Agent",
+                  "orch_demo",
+                  "mem_test",
+                  "New Agent (16)",
+                  "llm",
+                  "collaborative Multi agent",
+                  "Code Review Agent (3)",
+                  "Code Review Agent (4)",
+                  "Hierarchical Agent",
+                  "Worker Node Agent",
+                  "New Agent (18)",
+                  "Supervisor Multi Agent",
+                  "Graph RAG",
+                  "Graph RAG (1)",
+                  "Talk to data",
+                  "supervisor multi agent",
+                  "HIL"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "toggle": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "child_agent_name",
+                "display_name": "Child Agent",
+                "advanced": false,
+                "dynamic": false,
+                "info": "Select the agent to run as a child agent.",
+                "real_time_refresh": true,
+                "refresh_button": true,
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "\n\"\"\"Run a Child Agent component.\n\nThis component enables one agent to call another agent as a \"child agent\",\nwith A2A protocol-based communication for tracking and logging.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport json\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import Any\nfrom uuid import uuid4\n\nfrom loguru import logger\n\nfrom agentcore.base.child_agent.adapter import ChildAgentAdapter, ChildAgentResult, ParentAgentContext\nfrom agentcore.base.child_agent.guards import (\n    ChildAgentCallGuard,\n    CircularAgentCallError,\n    MaxCallDepthError,\n)\nfrom agentcore.base.child_agent.registry import ChildAgentRegistry\nfrom agentcore.custom.custom_node.node import Node\nfrom agentcore.io import (\n    BoolInput,\n    DropdownInput,\n    HandleInput,\n    MessageInput,\n    Output,\n    StrInput,\n)\nfrom agentcore.schema.data import Data\nfrom agentcore.schema.dotdict import dotdict\nfrom agentcore.schema.message import Message\n\n\nclass RunChildAgentComponent(Node):\n    \"\"\"Execute another agent as a child agent.\n\n    This component allows a parent agent to call another agent as a child,\n    with A2A protocol-based communication for cross-agent communication.\n    The child agent executes and returns its output to the parent.\n\n    Features:\n    - Select any agent in the project as a child agent\n    - Pass any input (text, JSON, agent output, etc.) to the child agent\n    - Receive the child agent's output for further processing\n    - A2A protocol logging for tracking cross-agent communication\n    - Circular call detection to prevent infinite loops\n    \"\"\"\n\n    display_name = \"Run a Child Agent\"\n    description = (\n        \"Call another agent as a child agent. The child agent receives your input, \"\n        \"executes, and returns its output. Communication uses A2A protocol for tracking.\"\n    )\n    icon = \"GitBranch\"\n    name = \"RunChildAgent\"\n    beta = False\n\n    inputs = [\n        DropdownInput(\n            name=\"child_agent_name\",\n            display_name=\"Child Agent\",\n            info=\"Select the agent to run as a child agent.\",\n            options=[],\n            real_time_refresh=True,\n            refresh_button=True,\n            value=None,\n        ),\n        HandleInput(\n            name=\"input_value\",\n            display_name=\"Input\",\n            info=\"Input to pass to the child agent. Can be text, JSON, or output from another component.\",\n            input_types=[\"Message\", \"Data\", \"str\"],\n            required=True,\n        ),\n        StrInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"Optional: Share session context with child agent. Leave empty to use parent's session.\",\n            value=\"\",\n            advanced=True,\n        ),\n        BoolInput(\n            name=\"enable_a2a_logging\",\n            display_name=\"Enable A2A Logging\",\n            value=True,\n            info=\"Log A2A messages between parent and child agent for debugging.\",\n            advanced=True,\n        ),\n        StrInput(\n            name=\"log_directory\",\n            display_name=\"Log Directory\",\n            info=\"Directory to save A2A conversation logs. Each conversation gets a separate timestamped file.\",\n            value=\"a2a_logs\",\n            advanced=True,\n        ),\n        MessageInput(\n            name=\"max_call_depth\",\n            display_name=\"Max Call Depth\",\n            info=\"Maximum depth of nested child agent calls (prevents infinite recursion).\",\n            value=\"10\",\n            advanced=True,\n        ),\n    ]\n\n    outputs = [\n        Output(\n            name=\"child_output\",\n            display_name=\"Child Agent Output\",\n            method=\"run_child_agent\",\n        ),\n        Output(\n            name=\"child_output_data\",\n            display_name=\"Child Agent Data Output\",\n            method=\"run_child_agent_data\",\n            hidden=True,\n        ),\n        Output(\n            name=\"a2a_conversation_log\",\n            display_name=\"A2A Conversation Log\",\n            method=\"get_a2a_log\",\n            advanced=True,\n        ),\n    ]\n\n    # Cache for storing the result after first execution\n    _cached_result: ChildAgentResult | None = None\n\n    async def update_build_config(\n        self, build_config: dotdict, field_value: Any, field_name: str | None = None\n    ):\n        \"\"\"Update build config when child agent is selected.\"\"\"\n        if field_name == \"child_agent_name\":\n            # Get available agents for dropdown\n            build_config[\"child_agent_name\"][\"options\"] = await self._get_available_agents()\n        return build_config\n\n    async def _get_available_agents(self) -> list[str]:\n        \"\"\"Get list of available agents for the dropdown.\"\"\"\n        try:\n            # Get the current agent ID to exclude it\n            current_agent_id = None\n            if hasattr(self, \"graph\") and self.graph:\n                current_agent_id = getattr(self.graph, \"agent_id\", None) or getattr(self.graph, \"flow_id\", None)\n\n            agent_names = await ChildAgentRegistry.get_agent_names(\n                user_id=str(self.user_id),\n                exclude_agent_id=current_agent_id,\n            )\n            return agent_names\n        except Exception as e:\n            logger.warning(f\"Error getting available agents: {e}\")\n            return []\n\n    def _get_input_text(self) -> str:\n        \"\"\"Extract text from the input value.\"\"\"\n        input_val = self.input_value\n\n        if input_val is None:\n            return \"\"\n\n        if isinstance(input_val, Message):\n            return input_val.text or \"\"\n\n        if isinstance(input_val, Data):\n            # Try to get text from data\n            if hasattr(input_val, \"data\") and isinstance(input_val.data, dict):\n                return input_val.data.get(\"text\", str(input_val.data))\n            return str(input_val)\n\n        if isinstance(input_val, dict):\n            return json.dumps(input_val)\n\n        return str(input_val)\n\n    def _get_input_files(self) -> list:\n        \"\"\"Extract files (images, documents) from the input value.\"\"\"\n        input_val = self.input_value\n        if isinstance(input_val, Message) and input_val.files:\n            return input_val.files\n        return []\n\n    def _build_parent_context(self) -> ParentAgentContext:\n        \"\"\"Build the parent context for the child agent call.\"\"\"\n        parent_agent_id = \"\"\n        parent_agent_name = \"\"\n\n        if hasattr(self, \"graph\") and self.graph:\n            parent_agent_id = getattr(self.graph, \"agent_id\", \"\") or getattr(self.graph, \"flow_id\", \"\") or \"\"\n            parent_agent_name = getattr(self.graph, \"agent_name\", \"\") or getattr(self.graph, \"flow_name\", \"\") or \"\"\n\n        # Get current call depth from guard\n        guard = ChildAgentCallGuard()\n        call_depth = guard.get_call_depth()\n\n        return ParentAgentContext(\n            parent_agent_id=str(parent_agent_id),\n            parent_agent_name=parent_agent_name,\n            session_id=self.session_id if self.session_id else getattr(self.graph, \"session_id\", None),\n            call_depth=call_depth,\n            a2a_task_id=str(uuid4()),\n        )\n\n    async def _execute_child_agent(self) -> ChildAgentResult:\n        \"\"\"Execute the child agent and return the result.\"\"\"\n        # Return cached result if available\n        if self._cached_result is not None:\n            return self._cached_result\n\n        child_agent_name = self.child_agent_name\n        if not child_agent_name:\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=\"No child agent selected\",\n            )\n\n        # Get input text and files\n        input_text = self._get_input_text()\n        input_files = self._get_input_files()\n\n        # Build parent context\n        parent_context = self._build_parent_context()\n\n        # Create guard with configured max depth\n        try:\n            max_depth = int(self.max_call_depth) if self.max_call_depth else 10\n        except (ValueError, TypeError):\n            max_depth = 10\n        guard = ChildAgentCallGuard(max_depth=max_depth)\n\n        try:\n            # Create adapter for child agent\n            adapter = await ChildAgentAdapter.from_agent_name(\n                agent_name=child_agent_name,\n                user_id=str(self.user_id),\n                guard=guard,\n            )\n\n            # Execute child agent\n            result = await adapter.execute(\n                input_value=input_text,\n                parent_context=parent_context,\n                session_id=self.session_id if self.session_id else None,\n                files=input_files or None,\n            )\n\n            # Log if enabled\n            if self.enable_a2a_logging:\n                self._log_a2a_messages(result)\n\n            # Cache the result\n            self._cached_result = result\n            return result\n\n        except CircularAgentCallError as e:\n            logger.error(f\"Circular agent call detected: {e}\")\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=f\"Circular agent call detected: {e}\",\n            )\n\n        except MaxCallDepthError as e:\n            logger.error(f\"Max call depth exceeded: {e}\")\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=f\"Maximum call depth exceeded: {e}\",\n            )\n\n        except Exception as e:\n            logger.exception(f\"Error executing child agent: {e}\")\n            return ChildAgentResult(\n                output=\"\",\n                status=\"error\",\n                error=str(e),\n            )\n\n    def _log_a2a_messages(self, result: ChildAgentResult) -> None:\n        \"\"\"Log A2A messages for debugging and save to file.\"\"\"\n        if not result.a2a_messages:\n            return\n\n        # Log to console\n        logger.info(f\"A2A Conversation Log for child agent '{self.child_agent_name}':\")\n        for msg in result.a2a_messages:\n            logger.info(\n                f\"  [{msg.message_type.value}] {msg.sender_id} -> {msg.receiver_id}: \"\n                f\"{msg.content[:100]}{'...' if len(msg.content) > 100 else ''}\"\n            )\n\n        # Save to file\n        self._save_a2a_log_to_file(result)\n\n    def _save_a2a_log_to_file(self, result: ChildAgentResult) -> None:\n        \"\"\"Save the A2A conversation log to a timestamped JSON file.\"\"\"\n        try:\n            # Get the log directory (default: a2a_logs)\n            log_dir = Path(getattr(self, \"log_directory\", \"a2a_logs\"))\n\n            # Create the directory if it doesn't exist\n            log_dir.mkdir(parents=True, exist_ok=True)\n\n            # Generate timestamped filename\n            timestamp = datetime.now().strftime(\"%Y-%m-%d_%H-%M-%S\")\n            filename = f\"child_agent_a2a_log_{timestamp}.json\"\n            log_path = log_dir / filename\n\n            # Build log data\n            parent_context = self._build_parent_context()\n            log_data = {\n                \"type\": \"child_agent_communication\",\n                \"parent_agent\": {\n                    \"id\": parent_context.parent_agent_id,\n                    \"name\": parent_context.parent_agent_name,\n                },\n                \"child_agent\": {\n                    \"name\": self.child_agent_name,\n                },\n                \"status\": result.status,\n                \"execution_time_ms\": result.execution_time_ms,\n                \"messages\": [\n                    {\n                        \"id\": msg.id,\n                        \"task_id\": msg.task_id,\n                        \"sender\": msg.sender_id,\n                        \"receiver\": msg.receiver_id,\n                        \"type\": msg.message_type.value,\n                        \"content\": msg.content,\n                        \"timestamp\": msg.timestamp.isoformat(),\n                        \"artifacts\": msg.artifacts,\n                    }\n                    for msg in result.a2a_messages\n                ],\n                \"saved_at\": datetime.now().isoformat(),\n            }\n\n            with open(log_path, \"w\") as f:\n                json.dump(log_data, f, indent=2)\n            logger.info(f\"Child agent A2A conversation log saved to: {log_path.absolute()}\")\n        except Exception as e:\n            logger.warning(f\"Failed to save child agent A2A log: {e}\")\n\n    async def run_child_agent(self) -> Message:\n        \"\"\"Run the child agent and return output as Message.\n\n        Returns:\n            Message containing the child agent's output\n        \"\"\"\n        result = await self._execute_child_agent()\n\n        if result.status == \"error\":\n            return Message(\n                text=f\"Error: {result.error}\",\n                sender=\"RunChildAgent\",\n                sender_name=\"Run a Child Agent\",\n            )\n\n        return Message(\n            text=result.output,\n            sender=\"RunChildAgent\",\n            sender_name=f\"Child Agent: {self.child_agent_name}\",\n            content_blocks=result.content_blocks or [],\n        )\n\n    async def run_child_agent_data(self) -> Data:\n        \"\"\"Run the child agent and return output as Data.\n\n        Returns:\n            Data containing the child agent's output and metadata\n        \"\"\"\n        result = await self._execute_child_agent()\n\n        return Data(\n            data={\n                \"output\": result.output,\n                \"status\": result.status,\n                \"error\": result.error,\n                \"execution_time_ms\": result.execution_time_ms,\n                \"child_agent_name\": self.child_agent_name,\n            }\n        )\n\n    async def get_a2a_log(self) -> Data:\n        \"\"\"Get the A2A conversation log.\n\n        Returns:\n            Data containing the A2A conversation log\n        \"\"\"\n        result = await self._execute_child_agent()\n\n        # Build conversation log\n        log_data = {\n            \"parent_agent\": {\n                \"id\": self._build_parent_context().parent_agent_id,\n                \"name\": self._build_parent_context().parent_agent_name,\n            },\n            \"child_agent\": {\n                \"name\": self.child_agent_name,\n            },\n            \"status\": result.status,\n            \"execution_time_ms\": result.execution_time_ms,\n            \"messages\": [\n                {\n                    \"id\": msg.id,\n                    \"task_id\": msg.task_id,\n                    \"sender\": msg.sender_id,\n                    \"receiver\": msg.receiver_id,\n                    \"type\": msg.message_type.value,\n                    \"content\": msg.content,\n                    \"timestamp\": msg.timestamp.isoformat(),\n                }\n                for msg in result.a2a_messages\n            ],\n            \"timestamp\": datetime.now().isoformat(),\n        }\n\n        return Data(data=log_data)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "enable_a2a_logging": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "enable_a2a_logging",
+                "value": true,
+                "display_name": "Enable A2A Logging",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Log A2A messages between parent and child agent for debugging.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "log_directory": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "log_directory",
+                "value": "a2a_logs",
+                "display_name": "Log Directory",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Directory to save A2A conversation logs. Each conversation gets a separate timestamped file.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "StrInput"
+              },
+              "max_call_depth": {
+                "trace_as_input": true,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "max_call_depth",
+                "value": {
+                  "text_key": "text",
+                  "data": {
+                    "text": "10",
+                    "files": [],
+                    "sender": null,
+                    "sender_name": null,
+                    "session_id": "",
+                    "timestamp": "2026-03-24 07:17:19 UTC",
+                    "agent_id": null,
+                    "error": false,
+                    "edit": false,
+                    "properties": {
+                      "edited": false,
+                      "source": {
+                        "id": null,
+                        "display_name": null,
+                        "source": null
+                      },
+                      "allow_markdown": false,
+                      "state": "complete",
+                      "targets": []
+                    },
+                    "category": "message",
+                    "content_blocks": [],
+                    "duration": null
+                  },
+                  "default_value": ""
+                },
+                "display_name": "Max Call Depth",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Maximum depth of nested child agent calls (prevents infinite recursion).",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageInput"
+              },
+              "session_id": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "session_id",
+                "value": "",
+                "display_name": "Session ID",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Optional: Share session context with child agent. Leave empty to use parent's session.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "StrInput"
+              }
+            },
+            "description": "Call another agent as a child agent. The child agent receives your input, executes, and returns its output. Communication uses A2A protocol for tracking.",
+            "icon": "GitBranch",
+            "base_classes": [
+              "Data",
+              "Message"
+            ],
+            "display_name": "Run a Child Agent",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "child_output",
+                "display_name": "Child Agent Output",
+                "method": "run_child_agent",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": false,
+                "options": null,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "Data"
+                ],
+                "selected": "Data",
+                "name": "child_output_data",
+                "hidden": true,
+                "display_name": "Child Agent Data Output",
+                "method": "run_child_agent_data",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": false,
+                "options": null,
+                "tool_mode": true
+              },
+              {
+                "types": [
+                  "Data"
+                ],
+                "selected": "Data",
+                "name": "a2a_conversation_log",
+                "display_name": "A2A Conversation Log",
+                "method": "get_a2a_log",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "group_outputs": false,
+                "options": null,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "child_agent_name",
+              "input_value",
+              "session_id",
+              "enable_a2a_logging",
+              "log_directory",
+              "max_call_depth"
+            ],
+            "beta": false,
+            "edited": false,
+            "metadata": {
+              "module": "agentcore.components.logic.run_child_agent.RunChildAgentComponent",
+              "code_hash": "b79d9cb738fa"
+            },
+            "tool_mode": false,
+            "hidden": false,
+            "last_updated": "2026-03-24T10:13:14.941Z"
+          },
+          "showNode": true,
+          "type": "RunChildAgent",
+          "id": "RunChildAgent-1Rkv6",
+          "selected_output": "child_output"
+        },
+        "selected": false,
+        "measured": {
+          "width": 290,
+          "height": 308
+        },
+        "dragging": false
+      },
+      {
+        "id": "ChatOutput-rvDTz",
+        "type": "genericNode",
+        "position": {
+          "x": 1173.7229278538312,
+          "y": 420.28296705172164
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "input_value": {
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": true,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Inputs",
+                "advanced": false,
+                "input_types": [
+                  "Data",
+                  "DataFrame",
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Message to be passed as output.",
+                "title_case": false,
+                "type": "other",
+                "_input_type": "HandleInput"
+              },
+              "background_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "background_color",
+                "value": "",
+                "display_name": "Background Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The background color of the icon.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "chat_icon": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "chat_icon",
+                "value": "",
+                "display_name": "Icon",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The icon of the message.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "clean_data": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "clean_data",
+                "value": true,
+                "display_name": "Basic Clean Data",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Whether to clean the data",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "import base64\nimport re\nfrom collections.abc import Generator\nfrom datetime import datetime, timezone\nfrom typing import Any\n\nimport orjson\nfrom fastapi.encoders import jsonable_encoder\nfrom loguru import logger\n\nfrom agentcore.base.io.chat import ChatNode\nfrom agentcore.helpers.data import safe_convert\nfrom agentcore.inputs.inputs import BoolInput, DropdownInput, HandleInput, MessageTextInput\nfrom agentcore.schema.content_types import MediaContent, ToolContent\nfrom agentcore.schema.data import Data\nfrom agentcore.schema.dataframe import DataFrame\nfrom agentcore.schema.image import IMAGE_ENDPOINT\nfrom agentcore.schema.message import Message\nfrom agentcore.schema.properties import Source\nfrom agentcore.template.field.base import Output\nfrom agentcore.utils.constants import (\n    MESSAGE_SENDER_AI,\n    MESSAGE_SENDER_NAME_AI,\n    MESSAGE_SENDER_USER,\n)\n\n# Regex to find base64 image data URLs in markdown and raw strings\n_BASE64_IMG_MD_RE = re.compile(r\"!\\[([^\\]]*)\\]\\((data:image/([^;]+);base64,([A-Za-z0-9+/=\\s]+))\\)\")\n_BASE64_DATA_URL_RE = re.compile(r\"data:image/([^;]+);base64,([A-Za-z0-9+/=\\s]+)\")\n\n\nclass ChatOutput(ChatNode):\n    display_name = \"Chat Output\"\n    description = \"Display a chat message in the Playground.\"\n    icon = \"MessagesSquare\"\n    name = \"ChatOutput\"\n    minimized = True\n\n    inputs = [\n        HandleInput(\n            name=\"input_value\",\n            display_name=\"Inputs\",\n            info=\"Message to be passed as output.\",\n            input_types=[\"Data\", \"DataFrame\", \"Message\"],\n            required=True,\n        ),\n        BoolInput(\n            name=\"should_store_message\",\n            display_name=\"Store Messages\",\n            info=\"Store the message in the history.\",\n            value=True,\n            advanced=True,\n        ),\n        DropdownInput(\n            name=\"sender\",\n            display_name=\"Sender Type\",\n            options=[MESSAGE_SENDER_AI, MESSAGE_SENDER_USER],\n            value=MESSAGE_SENDER_AI,\n            advanced=True,\n            info=\"Type of sender.\",\n        ),\n        MessageTextInput(\n            name=\"sender_name\",\n            display_name=\"Sender Name\",\n            info=\"Name of the sender.\",\n            value=MESSAGE_SENDER_NAME_AI,\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"The session ID of the chat. If empty, the current session ID parameter will be used.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"data_template\",\n            display_name=\"Data Template\",\n            value=\"{text}\",\n            advanced=True,\n            info=\"Template to convert Data to Text. If left empty, it will be dynamically set to the Data's text key.\",\n        ),\n        MessageTextInput(\n            name=\"background_color\",\n            display_name=\"Background Color\",\n            info=\"The background color of the icon.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"chat_icon\",\n            display_name=\"Icon\",\n            info=\"The icon of the message.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"text_color\",\n            display_name=\"Text Color\",\n            info=\"The text color of the name\",\n            advanced=True,\n        ),\n        BoolInput(\n            name=\"clean_data\",\n            display_name=\"Basic Clean Data\",\n            value=True,\n            info=\"Whether to clean the data\",\n            advanced=True,\n        ),\n    ]\n    outputs = [\n        Output(\n            display_name=\"Output Message\",\n            name=\"message\",\n            method=\"message_response\",\n        ),\n    ]\n\n    def _build_source(self, id_: str | None, display_name: str | None, source: str | None) -> Source:\n        source_dict = {}\n        if id_:\n            source_dict[\"id\"] = id_\n        if display_name:\n            source_dict[\"display_name\"] = display_name\n        if source:\n            # Handle case where source is a ChatOpenAI object\n            if hasattr(source, \"model_name\"):\n                source_dict[\"source\"] = source.model_name\n            elif hasattr(source, \"model\"):\n                source_dict[\"source\"] = str(source.model)\n            else:\n                source_dict[\"source\"] = str(source)\n        return Source(**source_dict)\n\n    async def message_response(self) -> Message:\n        # Check if input is already a stored Message (has an ID)\n        # This happens when input comes from Agent component which already stores its response\n        input_already_stored = (\n            isinstance(self.input_value, Message) \n            and hasattr(self.input_value, \"id\") \n            and self.input_value.id is not None\n        )\n        \n        # First convert the input to string if needed\n        text = self.convert_to_string()\n\n        # Get source properties\n        source, icon, display_name, source_id = self.get_properties_from_source_component()\n        background_color = self.background_color\n        text_color = self.text_color\n        if self.chat_icon:\n            icon = self.chat_icon\n\n        # If input is already a stored Message, just return it with updated properties\n        # Don't create a new message to avoid duplicate storage\n        if input_already_stored:\n            message = self.input_value\n            # Update properties if user has customized them\n            if background_color:\n                message.properties.background_color = background_color\n            if text_color:\n                message.properties.text_color = text_color\n            if self.chat_icon:\n                message.properties.icon = icon\n            # Persist any base64 images to blob storage\n            await self._persist_ai_images(message)\n            self.status = message\n            # Update STM cache even for pre-stored messages (e.g. Agent component responses)\n            await self._update_stm_cache(message)\n            if message.sender == MESSAGE_SENDER_AI:\n                preview = (message.text or \"\")[:150]\n                logger.info(f\"[AI_MESSAGE] AI: {preview}\")\n            return message\n\n        # IMPORTANT: Create a NEW Message object for non-stored inputs\n        # If we reuse the input message (which may have an ID from a previous store),\n        # astore_message will UPDATE that existing record instead of creating a new one.\n        message = Message(text=text)\n        # Preserve content_blocks from the input message (e.g. SupervisorAgent trace steps)\n        if isinstance(self.input_value, Message) and self.input_value.content_blocks:\n            message.content_blocks = self.input_value.content_blocks\n\n        # Set message properties\n        message.sender = self.sender\n        message.sender_name = self.sender_name\n        message.session_id = self.session_id\n        message.agent_id = self.graph.agent_id if hasattr(self, \"graph\") else None\n        message.properties.source = self._build_source(source_id, display_name, source)\n        message.properties.icon = icon\n        message.properties.background_color = background_color\n        message.properties.text_color = text_color\n\n        # Persist any base64 images in the AI response to blob storage\n        # (replaces data URLs with file-serving URLs before DB store)\n        await self._persist_ai_images(message)\n\n        # Store message if needed\n        if self.session_id and self.should_store_message:\n            stored_message = await self.send_message(message)\n            self.message.value = stored_message\n            message = stored_message\n\n            await self._update_stm_cache(message)\n\n        self.status = message\n        if message.sender == MESSAGE_SENDER_AI:\n            preview = (message.text or \"\")[:150]\n            logger.info(f\"[AI_MESSAGE] AI: {preview}\")\n        return message\n\n    async def _persist_ai_images(self, message: Message) -> None:\n        \"\"\"Extract base64 images from the AI response, save them to storage,\n        and replace the inline data URLs with proper file-serving URLs.\n\n        Handles images in:\n        1. Markdown in message.text  — ``![alt](data:image/png;base64,...)``\n        2. content_blocks → MediaContent.urls  — raw ``data:image/...`` URLs\n        3. content_blocks → ToolContent.output  — markdown with data URLs\n        \"\"\"\n        try:\n            from agentcore.services.deps import get_storage_service\n\n            storage_service = get_storage_service()\n        except Exception:\n            logger.debug(\"[ChatOutput] Storage service unavailable, skipping image persistence\")\n            return\n\n        agent_id = str(self.graph.agent_id) if hasattr(self, \"graph\") and self.graph.agent_id else None\n        if not agent_id:\n            return\n\n        saved_paths: list[str] = []\n        counter = 0\n\n        async def _save_and_get_url(img_format: str, b64_data: str) -> str | None:\n            \"\"\"Decode base64, save to storage, return the serving URL.\"\"\"\n            nonlocal counter\n            try:\n                raw = base64.b64decode(b64_data.replace(\"\\n\", \"\").replace(\" \", \"\"))\n            except Exception:\n                return None\n            ext = img_format.split(\"+\")[0]  # e.g. \"svg+xml\" → \"svg\"\n            ts = datetime.now(tz=timezone.utc).strftime(\"%Y-%m-%d_%H-%M-%S\")\n            file_name = f\"{ts}_ai_generated_{counter}.{ext}\"\n            counter += 1\n            await storage_service.save_file(agent_id=agent_id, file_name=file_name, data=raw)\n            file_path = f\"{agent_id}/{file_name}\"\n            saved_paths.append(file_path)\n            return f\"{IMAGE_ENDPOINT}{file_path}\"\n\n        # --- 1. Process markdown images in message.text ---\n        if isinstance(message.text, str):\n            new_text = message.text\n            for match in list(_BASE64_IMG_MD_RE.finditer(new_text)):\n                alt = match.group(1)\n                img_format = match.group(3)\n                b64_data = match.group(4)\n                url = await _save_and_get_url(img_format, b64_data)\n                if url:\n                    new_text = new_text.replace(match.group(0), f\"![{alt}]({url})\")\n            message.text = new_text\n\n        # --- 2. Process content_blocks ---\n        for block in message.content_blocks or []:\n            for content in block.contents:\n                # MediaContent — urls list may contain data URLs\n                if isinstance(content, MediaContent):\n                    new_urls = []\n                    for url in content.urls:\n                        m = _BASE64_DATA_URL_RE.match(url)\n                        if m:\n                            stored_url = await _save_and_get_url(m.group(1), m.group(2))\n                            new_urls.append(stored_url or url)\n                        else:\n                            new_urls.append(url)\n                    content.urls = new_urls\n\n                # ToolContent — output may contain markdown with data URLs\n                if isinstance(content, ToolContent) and content.output:\n                    output_str = str(content.output)\n                    for match in list(_BASE64_IMG_MD_RE.finditer(output_str)):\n                        alt = match.group(1)\n                        img_format = match.group(3)\n                        b64_data = match.group(4)\n                        url = await _save_and_get_url(img_format, b64_data)\n                        if url:\n                            output_str = output_str.replace(match.group(0), f\"![{alt}]({url})\")\n                    content.output = output_str\n\n        # --- 3. Add saved images to message.files for DB storage ---\n        if saved_paths:\n            if not message.files:\n                message.files = []\n            message.files.extend(saved_paths)\n            logger.info(f\"[ChatOutput] Persisted {len(saved_paths)} AI-generated images to storage for agent={agent_id}\")\n\n    @staticmethod\n    def _message_to_cache_entry(message: Message) -> dict:\n        \"\"\"Serialize a Message to a dict suitable for STM Redis cache.\"\"\"\n        entry = {\n            \"text\": message.text or \"\",\n            \"sender\": message.sender or \"\",\n            \"sender_name\": message.sender_name or \"\",\n            \"files\": [str(f.path) if hasattr(f, \"path\") else str(f) for f in (message.files or [])],\n        }\n        # Persist content_blocks (e.g. media/images returned by the LLM)\n        if message.content_blocks:\n            entry[\"content_blocks\"] = [\n                cb.model_dump() if hasattr(cb, \"model_dump\") else cb\n                for cb in message.content_blocks\n            ]\n        return entry\n\n    async def _update_stm_cache(self, message: Message) -> None:\n        \"\"\"Append the message to all STM cache entries for this session.\"\"\"\n        session_id = self.session_id\n        if not session_id:\n            return\n        try:\n            import json\n\n            from agentcore.services.cache.redis_client import get_redis_client\n            from agentcore.services.deps import get_settings_service\n\n            settings_service = get_settings_service()\n            if settings_service.settings.cache_type != \"redis\":\n                return\n            redis_client = get_redis_client(settings_service)\n            ttl = getattr(settings_service.settings, \"stm_cache_ttl\", 300)\n            stm_prefix = \"stm:history:\"\n            pattern = f\"{stm_prefix}{session_id}:*\"\n            ai_entry = self._message_to_cache_entry(message)\n            async for key in redis_client.scan_iter(match=pattern, count=100):\n                existing = await redis_client.get(key)\n                if existing:\n                    cached_msgs = json.loads(existing)\n                    cached_msgs.append(ai_entry)\n                    # Trim to the n_messages limit (extract from key: stm:history:{sid}:{n})\n                    try:\n                        n_limit = int(str(key).rsplit(\":\", 1)[-1])\n                        if n_limit and len(cached_msgs) > n_limit:\n                            cached_msgs = cached_msgs[-n_limit:]\n                    except (ValueError, IndexError):\n                        pass\n                    await redis_client.setex(key, ttl, json.dumps(cached_msgs))\n                    logger.info(\n                        f\"[ChatOutput] Updated STM cache for session={session_id}, \"\n                        f\"total={len(cached_msgs)} msgs\"\n                    )\n        except Exception as e:\n            logger.debug(f\"[ChatOutput] STM cache update skipped: {e}\")\n\n    def _serialize_data(self, data: Data) -> str:\n        \"\"\"Serialize Data object to JSON string.\"\"\"\n        # Convert data.data to JSON-serializable format\n        serializable_data = jsonable_encoder(data.data)\n        # Serialize with orjson, enabling pretty printing with indentation\n        json_bytes = orjson.dumps(serializable_data, option=orjson.OPT_INDENT_2)\n        # Convert bytes to string and wrap in Markdown code blocks\n        return \"```json\\n\" + json_bytes.decode(\"utf-8\") + \"\\n```\"\n\n    def _validate_input(self) -> None:\n        \"\"\"Validate the input data and raise ValueError if invalid.\"\"\"\n        if self.input_value is None:\n            msg = \"Input data cannot be None\"\n            raise ValueError(msg)\n        if isinstance(self.input_value, list) and not all(\n            isinstance(item, Message | Data | DataFrame | str) for item in self.input_value\n        ):\n            invalid_types = [\n                type(item).__name__\n                for item in self.input_value\n                if not isinstance(item, Message | Data | DataFrame | str)\n            ]\n            msg = f\"Expected Data or DataFrame or Message or str, got {invalid_types}\"\n            raise TypeError(msg)\n        if not isinstance(\n            self.input_value,\n            Message | Data | DataFrame | str | list | Generator | type(None),\n        ):\n            type_name = type(self.input_value).__name__\n            msg = f\"Expected Data or DataFrame or Message or str, Generator or None, got {type_name}\"\n            raise TypeError(msg)\n\n    def convert_to_string(self) -> str | Generator[Any, None, None]:\n        \"\"\"Convert input data to string with proper error handling.\"\"\"\n        self._validate_input()\n        if isinstance(self.input_value, list):\n            return \"\\n\".join([safe_convert(item, clean_data=self.clean_data) for item in self.input_value])\n        if isinstance(self.input_value, Generator):\n            return self.input_value\n        return safe_convert(self.input_value)\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "data_template": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "data_template",
+                "value": "{text}",
+                "display_name": "Data Template",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Template to convert Data to Text. If left empty, it will be dynamically set to the Data's text key.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "sender": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "Machine",
+                  "User"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "toggle": false,
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender",
+                "value": "Machine",
+                "display_name": "Sender Type",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Type of sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "sender_name": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender_name",
+                "value": "AI",
+                "display_name": "Sender Name",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Name of the sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "session_id": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "session_id",
+                "value": "",
+                "display_name": "Session ID",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The session ID of the chat. If empty, the current session ID parameter will be used.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "should_store_message": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "should_store_message",
+                "value": true,
+                "display_name": "Store Messages",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Store the message in the history.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "text_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "text_color",
+                "value": "",
+                "display_name": "Text Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The text color of the name",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              }
+            },
+            "description": "Display a chat message in the Playground.",
+            "icon": "MessagesSquare",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Chat Output",
+            "minimized": true,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "message",
+                "display_name": "Output Message",
+                "method": "message_response",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "group_outputs": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "input_value",
+              "should_store_message",
+              "sender",
+              "sender_name",
+              "session_id",
+              "data_template",
+              "background_color",
+              "chat_icon",
+              "text_color",
+              "clean_data"
+            ],
+            "beta": false,
+            "edited": false,
+            "metadata": {
+              "module": "agentcore.components.input_output.chat_output.ChatOutput",
+              "code_hash": "805ede18424d"
+            },
+            "tool_mode": false,
+            "hidden": false
+          },
+          "showNode": false,
+          "type": "ChatOutput",
+          "id": "ChatOutput-rvDTz"
+        },
+        "selected": false,
+        "measured": {
+          "width": 174,
+          "height": 43
+        },
+        "dragging": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "ChatInput-SmRQF",
+        "sourceHandle": "{œdataTypeœ:œChatInputœ,œidœ:œChatInput-SmRQFœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "A2AAgents-0TZ4x",
+        "targetHandle": "{œfieldNameœ:œinput_dataœ,œidœ:œA2AAgents-0TZ4xœ,œinputTypesœ:[œMessageœ,œDataœ],œtypeœ:œotherœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "input_data",
+            "id": "A2AAgents-0TZ4x",
+            "inputTypes": [
+              "Message",
+              "Data"
+            ],
+            "type": "other"
+          },
+          "sourceHandle": {
+            "dataType": "ChatInput",
+            "id": "ChatInput-SmRQF",
+            "name": "message",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "xy-edge__ChatInput-SmRQF{œdataTypeœ:œChatInputœ,œidœ:œChatInput-SmRQFœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-A2AAgents-0TZ4x{œfieldNameœ:œinput_dataœ,œidœ:œA2AAgents-0TZ4xœ,œinputTypesœ:[œMessageœ,œDataœ],œtypeœ:œotherœ}",
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "source": "A2AAgents-0TZ4x",
+        "sourceHandle": "{œdataTypeœ:œA2AAgentsœ,œidœ:œA2AAgents-0TZ4xœ,œnameœ:œAgent 1œ,œoutput_typesœ:[œMessageœ]}",
+        "target": "RunChildAgent-11vM4",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œRunChildAgent-11vM4œ,œinputTypesœ:[œMessageœ,œDataœ,œstrœ],œtypeœ:œotherœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "RunChildAgent-11vM4",
+            "inputTypes": [
+              "Message",
+              "Data",
+              "str"
+            ],
+            "type": "other"
+          },
+          "sourceHandle": {
+            "dataType": "A2AAgents",
+            "id": "A2AAgents-0TZ4x",
+            "name": "Agent 1",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "xy-edge__A2AAgents-0TZ4x{œdataTypeœ:œA2AAgentsœ,œidœ:œA2AAgents-0TZ4xœ,œnameœ:œAgent 1œ,œoutput_typesœ:[œMessageœ]}-RunChildAgent-11vM4{œfieldNameœ:œinput_valueœ,œidœ:œRunChildAgent-11vM4œ,œinputTypesœ:[œMessageœ,œDataœ,œstrœ],œtypeœ:œotherœ}",
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "source": "A2AAgents-0TZ4x",
+        "sourceHandle": "{œdataTypeœ:œA2AAgentsœ,œidœ:œA2AAgents-0TZ4xœ,œnameœ:œAgent 2œ,œoutput_typesœ:[œMessageœ]}",
+        "target": "RunChildAgent-1Rkv6",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œRunChildAgent-1Rkv6œ,œinputTypesœ:[œMessageœ,œDataœ,œstrœ],œtypeœ:œotherœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "RunChildAgent-1Rkv6",
+            "inputTypes": [
+              "Message",
+              "Data",
+              "str"
+            ],
+            "type": "other"
+          },
+          "sourceHandle": {
+            "dataType": "A2AAgents",
+            "id": "A2AAgents-0TZ4x",
+            "name": "Agent 2",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "xy-edge__A2AAgents-0TZ4x{œdataTypeœ:œA2AAgentsœ,œidœ:œA2AAgents-0TZ4xœ,œnameœ:œAgent 2œ,œoutput_typesœ:[œMessageœ]}-RunChildAgent-1Rkv6{œfieldNameœ:œinput_valueœ,œidœ:œRunChildAgent-1Rkv6œ,œinputTypesœ:[œMessageœ,œDataœ,œstrœ],œtypeœ:œotherœ}",
+        "selected": false,
+        "animated": false,
+        "className": ""
+      },
+      {
+        "source": "A2AAgents-0TZ4x",
+        "sourceHandle": "{œdataTypeœ:œA2AAgentsœ,œidœ:œA2AAgents-0TZ4xœ,œnameœ:œFinal Responseœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "ChatOutput-rvDTz",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-rvDTzœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "ChatOutput-rvDTz",
+            "inputTypes": [
+              "Data",
+              "DataFrame",
+              "Message"
+            ],
+            "type": "other"
+          },
+          "sourceHandle": {
+            "dataType": "A2AAgents",
+            "id": "A2AAgents-0TZ4x",
+            "name": "Final Response",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "xy-edge__A2AAgents-0TZ4x{œdataTypeœ:œA2AAgentsœ,œidœ:œA2AAgents-0TZ4xœ,œnameœ:œFinal Responseœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-rvDTz{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-rvDTzœ,œinputTypesœ:[œDataœ,œDataFrameœ,œMessageœ],œtypeœ:œotherœ}",
+        "className": "",
+        "selected": false,
+        "animated": false
+      }
+    ],
+    "viewport": {
+      "x": 121.37896566858137,
+      "y": 32.40996394071453,
+      "zoom": 0.7092955711517761
+    }
+  }
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "code": "IN",
+    "name": "India",
+    "api_url": "http://localhost:7860",
+    "is_hub": true,
+    "api_key": "agentcore-backend-svc-key-001"
+  },
+  {
+    "code": "SA",
+    "name": "Saudi Arabia",
+    "api_url": "https://agentcore-sa.azurewebsites.net",
+    "is_hub": false,
+    "api_key": "agentcore-backend-svc-key-001"
+  },
+  {
+    "code": "EG",
+    "name": "Egypt",
+    "api_url": "https://agentcore-eg.azurewebsites.net",
+    "is_hub": false,
+    "api_key": "agentcore-backend-svc-key-001"
+  }
+]

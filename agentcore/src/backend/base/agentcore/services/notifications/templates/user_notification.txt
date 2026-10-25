@@ -1,0 +1,16 @@
+Hello {recipient_name},
+
+{headline}
+
+{intro_text}
+
+{summary_text}
+
+Updated details:
+{changed_fields_text}
+
+Updated by: {actor_name}
+Organization: {organization_name}
+Department: {department_name}
+
+This is an automated notification from MiCore. Please do not reply to this email.

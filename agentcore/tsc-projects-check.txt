@@ -1,0 +1,438 @@
+src/components/agents/copy-agent-dialog.tsx(275,37): error TS2339: Property 'isLoading' does not exist on type 'UseMutationResult<CloneRegistryResponse, any, CloneRegistryRequest>'.
+  Property 'isLoading' does not exist on type 'Override<MutationObserverIdleResult<CloneRegistryResponse, any, CloneRegistryRequest, unknown>, { mutate: UseMutateFunction<...>; }> & { ...; }'.
+src/components/agents/copy-agent-dialog.tsx(275,70): error TS2339: Property 'isLoading' does not exist on type 'UseMutationResult<any, any, IPostAddAgent>'.
+  Property 'isLoading' does not exist on type 'Override<MutationObserverIdleResult<any, any, IPostAddAgent, unknown>, { mutate: UseMutateFunction<any, any, IPostAddAgent, unknown>; }> & { ...; }'.
+src/components/agents/copy-agent-dialog.tsx(278,36): error TS2339: Property 'isLoading' does not exist on type 'UseMutationResult<CloneRegistryResponse, any, CloneRegistryRequest>'.
+  Property 'isLoading' does not exist on type 'Override<MutationObserverIdleResult<CloneRegistryResponse, any, CloneRegistryRequest, unknown>, { mutate: UseMutateFunction<...>; }> & { ...; }'.
+src/components/agents/copy-agent-dialog.tsx(278,69): error TS2339: Property 'isLoading' does not exist on type 'UseMutationResult<any, any, IPostAddAgent>'.
+  Property 'isLoading' does not exist on type 'Override<MutationObserverIdleResult<any, any, IPostAddAgent, unknown>, { mutate: UseMutateFunction<any, any, IPostAddAgent, unknown>; }> & { ...; }'.
+src/components/authorization/authLoginGuard/index.tsx(5,51): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/components/authorization/authSettingsGuard/index.tsx(7,51): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/components/common/storeCardComponent/hooks/use-handle-install.ts(25,20): error TS2561: Object literal may only specify known properties, but 'agentt' does not exist in type '{ agent?: AgentType | undefined; override?: boolean | undefined; new_blank?: boolean | undefined; projectId?: string | undefined; }'. Did you mean to write 'agent'?
+src/components/core/agentToolbarComponent/components/deploy-dropdown.tsx(49,50): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/components/core/agentToolbarComponent/components/teams/teams-publish-modal.tsx(51,27): error TS2554: Expected 1-2 arguments, but got 0.
+src/components/core/agentToolbarComponent/components/teams/teams-publish-modal.tsx(52,29): error TS2554: Expected 1-2 arguments, but got 0.
+src/components/core/agentToolbarComponent/components/teams/teams-publish-modal.tsx(53,26): error TS2554: Expected 1-2 arguments, but got 0.
+src/components/core/agentToolbarComponent/components/teams/teams-publish-modal.tsx(54,24): error TS2554: Expected 1-2 arguments, but got 0.
+src/components/core/agentToolbarComponent/components/teams/teams-publish-modal.tsx(55,31): error TS2554: Expected 1-2 arguments, but got 0.
+src/components/core/appHeaderComponent/components/agentcore-counts.tsx(3,10): error TS2305: Module '"@/constants/constants"' has no exported member 'DISCORD_URL'.
+src/components/core/appHeaderComponent/components/AgentMenu/index.tsx(44,22): error TS18046: 'state' is of type 'unknown'.
+src/components/core/appHeaderComponent/components/AgentMenu/index.tsx(45,25): error TS18046: 'state' is of type 'unknown'.
+src/components/core/appHeaderComponent/components/AgentMenu/index.tsx(46,23): error TS18046: 'state' is of type 'unknown'.
+src/components/core/appHeaderComponent/components/AgentMenu/index.tsx(47,29): error TS18046: 'state' is of type 'unknown'.
+src/components/core/appHeaderComponent/components/AgentMenu/index.tsx(48,25): error TS18046: 'state' is of type 'unknown'.
+src/components/core/appHeaderComponent/components/AgentMenu/index.tsx(49,29): error TS18046: 'state' is of type 'unknown'.
+src/components/core/appHeaderComponent/components/AgentMenu/index.tsx(54,19): error TS18046: 'state' is of type 'unknown'.
+src/components/core/canvasControlsComponent/CanvasControls.tsx(11,27): error TS18046: 'state' is of type 'unknown'.
+src/components/core/canvasControlsComponent/index.tsx(4,8): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowState'. Did you mean 'ReactFlowState'?
+src/components/core/canvasControlsComponent/index.tsx(78,27): error TS18046: 'state' is of type 'unknown'.
+src/components/core/canvasControlsComponent/utils/canvasUtils.ts(1,10): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowState'. Did you mean 'ReactFlowState'?
+src/components/core/chatComponents/ContentBlockDisplay.tsx(6,27): error TS2307: Cannot find module 'rehype-mathjax' or its corresponding type declarations.
+  There are types at 'd:/final_code/aimldevteam/agentcore/src/frontend/node_modules/rehype-mathjax/svg.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+src/components/core/chatComponents/ContentDisplay.tsx(3,27): error TS2307: Cannot find module 'rehype-mathjax' or its corresponding type declarations.
+  There are types at 'd:/final_code/aimldevteam/agentcore/src/frontend/node_modules/rehype-mathjax/svg.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+src/components/core/folderSidebarComponent/components/sideBarFolderButtons/components/get-started-progress.tsx(5,10): error TS2305: Module '"@/constants/constants"' has no exported member 'DISCORD_URL'.
+src/components/core/folderSidebarComponent/components/sideBarFolderButtons/components/get-started-progress.tsx(5,23): error TS2305: Module '"@/constants/constants"' has no exported member 'GITHUB_URL'.
+src/controllers/API/index.ts(1,27): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/controllers/API/queries/_builds/use-get-builds-polling-mutation.ts(6,36): error TS2307: Cannot find module '@/types/zustand/agent' or its corresponding type declarations.
+src/controllers/API/queries/_builds/use-get-builds.ts(5,36): error TS2307: Cannot find module '@/types/zustand/agent' or its corresponding type declarations.
+src/controllers/API/queries/agents/use-patch-update-agent.ts(2,15): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/controllers/API/queries/agents/use-post-add-agent.ts(2,15): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/controllers/API/queries/agents/use-post-unified-publish-agent.ts(64,16): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/API/queries/agents/use-post-unified-publish-agent.ts(70,16): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/approvals/use-approve-agent.ts(50,16): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/API/queries/approvals/use-approve-agent.ts(55,16): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/approvals/use-reject-agent.ts(52,16): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/API/queries/approvals/use-reject-agent.ts(57,16): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/auth/use-delete-role.ts(22,43): error TS2345: Argument of type 'RoleDeletePayload | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'RoleDeletePayload' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/auth/use-get-departments.ts(30,5): error TS2345: Argument of type 'DepartmentListItem[] | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'DepartmentListItem[]' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/auth/use-get-organizations.ts(29,5): error TS2345: Argument of type 'OrganizationListItem[] | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'OrganizationListItem[]' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/auth/use-post-role.ts(24,41): error TS2345: Argument of type 'RoleCreatePayload | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'RoleCreatePayload' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/auth/use-put-role-permissions.ts(26,59): error TS2345: Argument of type 'RolePermissionsPayload | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'RolePermissionsPayload' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/cost-limits/use-get-cost-limits.ts(23,49): error TS2345: Argument of type 'CostLimitResponse[] | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'CostLimitResponse[]' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/file-management/use-delete-file.ts(33,18): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/file-management/use-delete-files.ts(36,18): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/file-management/use-duplicate-file.ts(56,18): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/file-management/use-put-rename-file.ts(38,20): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/knowledge-bases/use-delete-knowledge-base.ts(32,18): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/knowledge-bases/use-delete-knowledge-bases.ts(32,18): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/knowledge-bases/use-update-kb-visibility.ts(42,18): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/messages/use-delete-messages.ts(35,16): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/messages/use-delete-sessions.ts(36,16): error TS2554: Expected 5 arguments, but got 4.
+src/controllers/API/queries/registry/use-post-registry-clone.ts(45,16): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/API/queries/registry/use-post-registry-rate.ts(46,55): error TS2339: Property 'registry_id' does not exist on type 'void'.
+src/controllers/API/queries/registry/use-post-registry-rate.ts(48,16): error TS2554: Expected 4 arguments, but got 3.
+src/controllers/API/queries/teams/use-get-teams-oauth-status.ts(25,60): error TS2345: Argument of type 'TeamsOAuthStatusResponse | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'TeamsOAuthStatusResponse' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/teams/use-get-teams-status.ts(31,50): error TS2345: Argument of type 'TeamsAppStatusResponse | undefined' is not assignable to parameter of type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn"> | undefined'.
+  Type 'TeamsAppStatusResponse' has no properties in common with type 'Omit<UseMutationOptions<any, any, void, unknown>, "mutationKey" | "mutationFn">'.
+src/controllers/API/queries/vertex/use-post-retrieve-vertex-order.tsx(1,27): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/controllers/API/services/request-processor.ts(45,38): error TS2554: Expected 5 arguments, but got 4.
+src/customization/components/custom-profile-picture-chooser.tsx(3,8): error TS2307: Cannot find module '@/pages/SettingsPage/pages/GeneralPage/components/ProfilePictureForm/components/profilePictureChooserComponent' or its corresponding type declarations.
+src/CustomNodes/A2ANode/index.tsx(339,21): error TS2322: Type '{ name: string; className: string; style: { color: string; }; }' is not assignable to type 'IntrinsicAttributes & Omit<IconComponentProps & RefAttributes<unknown>, "ref"> & { ref?: ((instance: unknown) => void) | RefObject<...> | null | undefined; }'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & Omit<IconComponentProps & RefAttributes<unknown>, "ref"> & { ref?: ((instance: unknown) => void) | RefObject<...> | null | undefined; }'.
+src/CustomNodes/GenericNode/components/handleRenderComponent/index.tsx(184,27): error TS18046: 'state' is of type 'unknown'.
+src/CustomNodes/GenericNode/components/NodeInputField/index.tsx(53,23): error TS18046: 'state' is of type 'unknown'.
+src/CustomNodes/GenericNode/components/NodeInputField/index.tsx(54,25): error TS18046: 'state' is of type 'unknown'.
+src/CustomNodes/GenericNode/index.tsx(12,37): error TS2307: Cannot find module '@/types/zustand/agent' or its corresponding type declarations.
+src/CustomNodes/GenericNode/index.tsx(591,21): error TS2322: Type '{ outputs: OutputFieldType[]; keyPrefix: string; data: NodeDataType; types: { [char: string]: string; }; selected: boolean; showNode: false; isToolMode: boolean; showHiddenOutputs: boolean; selectedOutput: OutputFieldType | null; handleSelectOutput: (output: any) => void; }' is not assignable to type 'IntrinsicAttributes & { outputs: any; keyPrefix: string; data: NodeDataType; types: any; selected: boolean; showNode: boolean; isToolMode: boolean; selectedOutput: any; handleSelectOutput: any; }'.
+  Property 'showHiddenOutputs' does not exist on type 'IntrinsicAttributes & { outputs: any; keyPrefix: string; data: NodeDataType; types: any; selected: boolean; showNode: boolean; isToolMode: boolean; selectedOutput: any; handleSelectOutput: any; }'.
+src/CustomNodes/GenericNode/index.tsx(656,17): error TS2322: Type '{ outputs: OutputFieldType[]; keyPrefix: string; data: NodeDataType; types: { [char: string]: string; }; selected: boolean; showNode: true; isToolMode: boolean; showHiddenOutputs: boolean; selectedOutput: OutputFieldType | null; handleSelectOutput: (output: any) => void; hasExistingHiddenOutputs: boolean; }' is not assignable to type 'IntrinsicAttributes & { outputs: any; keyPrefix: string; data: NodeDataType; types: any; selected: boolean; showNode: boolean; isToolMode: boolean; selectedOutput: any; handleSelectOutput: any; }'.
+  Property 'showHiddenOutputs' does not exist on type 'IntrinsicAttributes & { outputs: any; keyPrefix: string; data: NodeDataType; types: any; selected: boolean; showNode: boolean; isToolMode: boolean; selectedOutput: any; handleSelectOutput: any; }'.
+src/CustomNodes/GenericNode/index.tsx(671,17): error TS2322: Type '{ outputs: OutputFieldType[]; keyPrefix: string; data: NodeDataType; types: { [char: string]: string; }; selected: boolean; showNode: true; isToolMode: boolean; showHiddenOutputs: boolean; selectedOutput: OutputFieldType | null; handleSelectOutput: (output: any) => void; }' is not assignable to type 'IntrinsicAttributes & { outputs: any; keyPrefix: string; data: NodeDataType; types: any; selected: boolean; showNode: boolean; isToolMode: boolean; selectedOutput: any; handleSelectOutput: any; }'.
+  Property 'showHiddenOutputs' does not exist on type 'IntrinsicAttributes & { outputs: any; keyPrefix: string; data: NodeDataType; types: any; selected: boolean; showNode: boolean; isToolMode: boolean; selectedOutput: any; handleSelectOutput: any; }'.
+src/CustomNodes/hooks/use-update-validation-status.ts(3,36): error TS2307: Cannot find module '../../types/zustand/agent' or its corresponding type declarations.
+src/CustomNodes/NoteNode/components/color-picker-buttons.tsx(4,15): error TS2724: '"@/types/agent"' has no exported member named 'noteDataType'. Did you mean 'NoteDataType'?
+src/hooks/agents/use-save-agent.ts(1,15): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/hooks/use-is-auto-login.ts(1,10): error TS2305: Module '"@/constants/constants"' has no exported member 'IS_AUTO_LOGIN'.
+src/hooks/use-is-auto-login.ts(5,51): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/icons/AIML/index.tsx(7,13): error TS2741: Property 'className' is missing in type '{ children?: ReactNode; ref: ForwardedRef<SVGSVGElement>; }' but required in type '{ [x: string]: any; className: any; }'.
+src/modals/apiModal/codeTabs/code-tabs.tsx(40,27): error TS18046: 'state' is of type 'unknown'.
+src/modals/apiModal/index.tsx(37,52): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/modals/apiModal/index.tsx(48,27): error TS18046: 'state' is of type 'unknown'.
+src/modals/apiModal/index.tsx(52,27): error TS18046: 'state' is of type 'unknown'.
+src/modals/fileManagerModal/components/importButtonComponent/index.tsx(1,30): error TS2307: Cannot find module '@/components/ui/morphing-menu' or its corresponding type declarations.
+src/modals/IOModal/components/chatView/chatInput/components/voice-assistant/hooks/use-bar-controls.ts(100,42): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'Uint8Array<ArrayBuffer>'.
+  Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+    Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength
+src/modals/IOModal/components/chatView/chatInput/components/voice-assistant/hooks/use-handle-websocket-message.ts(58,37): error TS2345: Argument of type 'Float32Array<ArrayBufferLike>' is not assignable to parameter of type 'Float32Array<ArrayBuffer>'.
+  Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+    Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength
+src/modals/IOModal/components/chatView/chatInput/components/voice-assistant/hooks/use-handle-websocket-message.ts(59,37): error TS2345: Argument of type 'Float32Array<ArrayBufferLike>' is not assignable to parameter of type 'Float32Array<ArrayBuffer>'.
+  Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+    Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength
+src/modals/IOModal/components/chatView/chatMessage/chat-message.tsx(167,51): error TS2339: Property 'hitl' does not exist on type 'PropertiesType'.
+src/modals/IOModal/components/chatView/chatMessage/chat-message.tsx(168,60): error TS2339: Property 'actions' does not exist on type 'PropertiesType'.
+src/modals/IOModal/components/chatView/chatMessage/chat-message.tsx(169,59): error TS2339: Property 'thread_id' does not exist on type 'PropertiesType'.
+src/modals/IOModal/components/chatView/chatMessage/components/edit-message.tsx(2,27): error TS2307: Cannot find module 'rehype-mathjax' or its corresponding type declarations.
+  There are types at 'd:/final_code/aimldevteam/agentcore/src/frontend/node_modules/rehype-mathjax/svg.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+src/modals/IOModal/playground-modal.tsx(56,18): error TS18046: 'state' is of type 'unknown'.
+src/modals/IOModal/playground-modal.tsx(57,16): error TS18046: 'state' is of type 'unknown'.
+src/modals/IOModal/playground-modal.tsx(58,22): error TS18046: 'state' is of type 'unknown'.
+src/modals/IOModal/playground-modal.tsx(59,18): error TS18046: 'state' is of type 'unknown'.
+src/modals/mcpServerModal/index.tsx(217,55): error TS2345: Argument of type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; } | { mode: string; url: string; env_vars: Record<string, string>; headers: Record<...>; command?: undefined; args?: undefined; }' is not assignable to parameter of type 'McpTestConnectionRequest'.
+  Type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; }' is not assignable to type 'McpTestConnectionRequest'.
+    Types of property 'mode' are incompatible.
+      Type 'string' is not assignable to type '"sse" | "stdio"'.
+src/modals/mcpServerModal/index.tsx(223,55): error TS2345: Argument of type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; } | { mode: string; url: string; env_vars: Record<string, string>; headers: Record<...>; command?: undefined; args?: undefined; }' is not assignable to parameter of type 'McpTestConnectionRequest'.
+  Type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; }' is not assignable to type 'McpTestConnectionRequest'.
+    Types of property 'mode' are incompatible.
+      Type 'string' is not assignable to type '"sse" | "stdio"'.
+src/modals/mcpServerModal/index.tsx(257,53): error TS2345: Argument of type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; } | { mode: string; url: string; env_vars: Record<string, string>; headers: Record<...>; command?: undefined; args?: undefined; }' is not assignable to parameter of type 'McpTestConnectionRequest'.
+  Type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; }' is not assignable to type 'McpTestConnectionRequest'.
+    Types of property 'mode' are incompatible.
+      Type 'string' is not assignable to type '"sse" | "stdio"'.
+src/modals/mcpServerModal/index.tsx(276,11): error TS2322: Type 'string' is not assignable to type '"uat" | "prod" | "dev" | "UAT" | "PROD" | "DEV" | undefined'.
+src/modals/mcpServerModal/index.tsx(296,11): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/modals/mcpServerModal/index.tsx(321,53): error TS2345: Argument of type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; } | { mode: string; url: string; env_vars: Record<string, string>; headers: Record<...>; command?: undefined; args?: undefined; }' is not assignable to parameter of type 'McpTestConnectionRequest'.
+  Type '{ mode: string; command: string; args: string[]; env_vars: Record<string, string>; url?: undefined; headers?: undefined; }' is not assignable to type 'McpTestConnectionRequest'.
+    Types of property 'mode' are incompatible.
+      Type 'string' is not assignable to type '"sse" | "stdio"'.
+src/modals/mcpServerModal/index.tsx(340,11): error TS2322: Type 'string' is not assignable to type '"uat" | "prod" | "dev" | "UAT" | "PROD" | "DEV" | undefined'.
+src/modals/mcpServerModal/index.tsx(360,11): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/modals/mcpServerModal/index.tsx(411,13): error TS2322: Type 'string' is not assignable to type '"uat" | "prod" | "dev" | "UAT" | "PROD" | "DEV" | undefined'.
+src/modals/mcpServerModal/index.tsx(432,11): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/modals/publishModal/index.tsx(116,27): error TS2554: Expected 1-2 arguments, but got 0.
+src/modals/updateComponentModal/index.tsx(9,45): error TS2307: Cannot find module '@/types/zustand/agent' or its corresponding type declarations.
+src/pages/AccessControlPage/index.tsx(241,33): error TS2345: Argument of type 'string' is not assignable to parameter of type '"business_user" | "department_admin" | "developer" | "super_admin" | "leader_executive" | "consumer"'.
+src/pages/AccessControlPage/index.tsx(242,33): error TS2345: Argument of type 'string' is not assignable to parameter of type '"business_user" | "department_admin" | "developer" | "super_admin" | "leader_executive" | "consumer"'.
+src/pages/AccessControlPage/index.tsx(263,72): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/AccessControlPage/index.tsx(264,63): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/AccessControlPage/index.tsx(265,63): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/AccessControlPage/index.tsx(397,21): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/pages/AccessControlPage/index.tsx(403,21): error TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+src/pages/AccessControlPage/index.tsx(612,7): error TS2322: Type 'number' is not assignable to type 'To | undefined'.
+src/pages/AccessDeniedPage/index.tsx(16,7): error TS2322: Type 'number' is not assignable to type 'To | undefined'.
+src/pages/AdminPage/index.tsx(84,44): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/AdminPage/index.tsx(85,46): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/AgentBuilderPage/components/agentBuildingComponent/index.tsx(41,29): error TS18046: 's' is of type 'unknown'.
+src/pages/AgentBuilderPage/components/agentBuildingComponent/index.tsx(44,11): error TS2698: Spread types may only be created from object types.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/components/categoryGroup.tsx(47,52): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/components/categoryGroup/index.tsx(31,52): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/components/sidebarHeader.tsx(51,14): error TS2741: Property 'children' is missing in type '{}' but required in type '{ children: ReactNode; className?: string | undefined; }'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(160,22): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(161,22): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(162,19): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(163,27): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(164,27): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(177,26): error TS2353: Object literal may only specify known properties, and 'enabled' does not exist in type '{ active_only?: boolean | undefined; }'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(232,33): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(233,47): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(235,31): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(341,35): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(422,34): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(424,31): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(516,25): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentBuilderPage/components/agentSidebarComponent/index.tsx(516,62): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentBuilderPage/components/PageComponent/index.tsx(112,22): error TS2322: Type 'ZoomInOut' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Types of parameters 'options' and 'event' are incompatible.
+    Type 'MouseEvent<HTMLButtonElement, MouseEvent>' has no properties in common with type 'ViewportHelperFunctionOptions'.
+src/pages/AgentBuilderPage/components/PageComponent/index.tsx(115,22): error TS2322: Type 'ZoomInOut' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Types of parameters 'options' and 'event' are incompatible.
+    Type 'MouseEvent<HTMLButtonElement, MouseEvent>' has no properties in common with type 'ViewportHelperFunctionOptions'.
+src/pages/AgentBuilderPage/components/PageComponent/index.tsx(118,22): error TS2322: Type 'FitView<Node>' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Types of parameters 'fitViewOptions' and 'event' are incompatible.
+    Type 'MouseEvent<HTMLButtonElement, MouseEvent>' has no properties in common with type 'FitViewOptions<Node>'.
+src/pages/AgentBuilderPage/components/PageComponent/index.tsx(195,27): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentBuilderPage/components/PageComponent/MemoizedComponents.tsx(35,29): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentCatalogue/index.tsx(74,7): error TS2353: Object literal may only specify known properties, and 'keepPreviousData' does not exist in type 'Omit<UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, "queryFn" | "queryKey">'.
+src/pages/AgentCatalogue/index.tsx(807,65): error TS2339: Property 'isLoading' does not exist on type 'UseMutationResult<RateRegistryResponse, any, RateRegistryRequest>'.
+  Property 'isLoading' does not exist on type 'Override<MutationObserverIdleResult<RateRegistryResponse, any, RateRegistryRequest, unknown>, { mutate: UseMutateFunction<RateRegistryResponse, any, RateRegistryRequest, unknown>; }> & { ...; }'.
+src/pages/AgentCatalogue/index.tsx(808,29): error TS2339: Property 'isLoading' does not exist on type 'UseMutationResult<RateRegistryResponse, any, RateRegistryRequest>'.
+  Property 'isLoading' does not exist on type 'Override<MutationObserverIdleResult<RateRegistryResponse, any, RateRegistryRequest, unknown>, { mutate: UseMutateFunction<RateRegistryResponse, any, RateRegistryRequest, unknown>; }> & { ...; }'.
+src/pages/AgentPage_old/components/agentBuildingComponent/index.tsx(41,29): error TS18046: 's' is of type 'unknown'.
+src/pages/AgentPage_old/components/agentBuildingComponent/index.tsx(44,11): error TS2698: Spread types may only be created from object types.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/categoryGroup.tsx(46,52): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/categoryGroup/index.tsx(30,52): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/McpSidebarPanel.tsx(68,9): error TS2353: Object literal may only specify known properties, and 'name' does not exist in type '{ id: string; }'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/McpSidebarPanel.tsx(72,42): error TS2339: Property 'message' does not exist on type 'void'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarHeader/index.tsx(31,3): error TS2339: Property 'filterType' does not exist on type 'SidebarHeaderComponentProps'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarHeader/index.tsx(32,3): error TS2339: Property 'setFilterEdge' does not exist on type 'SidebarHeaderComponentProps'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarHeader/index.tsx(33,3): error TS2339: Property 'setFilterData' does not exist on type 'SidebarHeaderComponentProps'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarHeader/index.tsx(34,3): error TS2339: Property 'data' does not exist on type 'SidebarHeaderComponentProps'.
+src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarHeader/index.tsx(72,11): error TS2322: Type '{ isInput: boolean; type: any; color: any; resetFilters: () => void; }' is not assignable to type 'IntrinsicAttributes & { name: string; description: string; resetFilters: () => void; }'.
+  Property 'isInput' does not exist on type 'IntrinsicAttributes & { name: string; description: string; resetFilters: () => void; }'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(162,22): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(163,22): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(164,19): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(165,27): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(166,27): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(178,26): error TS2353: Object literal may only specify known properties, and 'enabled' does not exist in type '{ active_only?: boolean | undefined; }'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(233,33): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(234,47): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(236,31): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(342,35): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(423,34): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(425,31): error TS2339: Property 'name' does not exist on type 'McpRegistryType'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(518,25): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentPage_old/components/agentSidebarComponent/index.tsx(518,62): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/AgentPage_old/components/PageComponent/index.tsx(140,27): error TS18046: 'state' is of type 'unknown'.
+src/pages/AgentPage_old/components/PageComponent/MemoizedComponents.tsx(35,29): error TS18046: 'state' is of type 'unknown'.
+src/pages/ConnectorsCatalogue/index.tsx(703,14): error TS18047: 'result' is possibly 'null'.
+src/pages/ConnectorsCatalogue/index.tsx(704,61): error TS18047: 'result' is possibly 'null'.
+src/pages/ConnectorsCatalogue/index.tsx(708,35): error TS18047: 'result' is possibly 'null'.
+src/pages/CostLimitsPage/index.tsx(61,39): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/CostLimitsPage/index.tsx(65,46): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/CostLimitsPage/index.tsx(66,44): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/DashboardPage/index.tsx(440,49): error TS2322: Type '((value: number) => string) | undefined' is not assignable to type '(((label: ReactNode, payload: readonly Payload<ValueType, NameType>[]) => ReactNode) & ((label: any, payload: Payload<ValueType, NameType>[]) => ReactNode)) | undefined'.
+  Type '(value: number) => string' is not assignable to type '((label: ReactNode, payload: readonly Payload<ValueType, NameType>[]) => ReactNode) & ((label: any, payload: Payload<ValueType, NameType>[]) => ReactNode)'.
+    Type '(value: number) => string' is not assignable to type '(label: ReactNode, payload: readonly Payload<ValueType, NameType>[]) => ReactNode'.
+      Types of parameters 'value' and 'label' are incompatible.
+        Type 'ReactNode' is not assignable to type 'number'.
+          Type 'undefined' is not assignable to type 'number'.
+src/pages/DashboardPage/index.tsx(458,49): error TS2322: Type '((value: number) => string) | undefined' is not assignable to type '(((label: ReactNode, payload: readonly Payload<ValueType, NameType>[]) => ReactNode) & ((label: any, payload: Payload<ValueType, NameType>[]) => ReactNode)) | undefined'.
+  Type '(value: number) => string' is not assignable to type '((label: ReactNode, payload: readonly Payload<ValueType, NameType>[]) => ReactNode) & ((label: any, payload: Payload<ValueType, NameType>[]) => ReactNode)'.
+    Type '(value: number) => string' is not assignable to type '(label: ReactNode, payload: readonly Payload<ValueType, NameType>[]) => ReactNode'.
+      Types of parameters 'value' and 'label' are incompatible.
+        Type 'ReactNode' is not assignable to type 'number'.
+          Type 'undefined' is not assignable to type 'number'.
+src/pages/EvaluationPage/index.tsx(386,21): error TS2339: Property 'app_user_id' does not exist on type '{}'.
+src/pages/EvaluationPage/index.tsx(387,21): error TS2339: Property 'created_by_user_id' does not exist on type '{}'.
+src/pages/EvaluationPage/index.tsx(678,59): error TS2339: Property 'org_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(685,27): error TS2339: Property 'dept_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(686,26): error TS2339: Property 'org_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(707,21): error TS2339: Property 'visibility' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(707,53): error TS2339: Property 'public_scope' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(707,92): error TS2339: Property 'dept_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(708,29): error TS2339: Property 'visibility' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(708,61): error TS2339: Property 'public_scope' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(708,115): error TS2339: Property 'public_dept_ids' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(956,31): error TS2339: Property 'visibility' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(958,21): error TS2339: Property 'visibility' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(958,58): error TS2339: Property 'public_scope' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(959,42): error TS2339: Property 'public_scope' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(961,21): error TS2339: Property 'org_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(961,56): error TS2339: Property 'org_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(962,21): error TS2339: Property 'dept_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(962,58): error TS2339: Property 'dept_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(963,21): error TS2339: Property 'public_dept_ids' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(964,45): error TS2339: Property 'public_dept_ids' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1035,31): error TS2339: Property 'visibility' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1037,21): error TS2339: Property 'visibility' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1037,58): error TS2339: Property 'public_scope' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1038,42): error TS2339: Property 'public_scope' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1040,21): error TS2339: Property 'org_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1040,56): error TS2339: Property 'org_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1041,21): error TS2339: Property 'dept_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1041,58): error TS2339: Property 'dept_id' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1042,21): error TS2339: Property 'public_dept_ids' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1043,45): error TS2339: Property 'public_dept_ids' does not exist on type '{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }'.
+src/pages/EvaluationPage/index.tsx(1091,7): error TS2353: Object literal may only specify known properties, and 'visibility' does not exist in type 'SetStateAction<{ trace_id: string; criteria: string; model: string; name: string; preset_id: string; saved_evaluator_id: string; model_registry_id: string; }>'.
+src/pages/EvaluationPage/index.tsx(1340,11): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; link?: string | undefined; }'.
+src/pages/EvaluationPage/index.tsx(1657,21): error TS2322: Type '(datasetToDelete?: EvaluationDataset | null) => Promise<void>' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Types of parameters 'datasetToDelete' and 'event' are incompatible.
+    Type 'MouseEvent<HTMLButtonElement, MouseEvent>' is missing the following properties from type 'EvaluationDataset': id, name
+src/pages/LoginPage/index.tsx(181,9): error TS2552: Cannot find name 'setAuthContext'. Did you mean 'AuthContext'?
+src/pages/LoginPage/index.tsx(185,9): error TS2304: Cannot find name 'setIsAuthenticated'.
+src/pages/MainPage/components/AgentTransferModal.tsx(186,47): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/components/list/index.tsx(81,25): error TS2339: Property 'is_enabled' does not exist on type 'IPublishRecord'.
+src/pages/MainPage/components/list/index.tsx(81,60): error TS2339: Property 'is_enabled' does not exist on type 'IPublishRecord'.
+src/pages/MainPage/components/list/index.tsx(105,30): error TS2339: Property 'is_enabled' does not exist on type 'IPublishRecord'.
+src/pages/MainPage/components/list/index.tsx(106,29): error TS2339: Property 'is_enabled' does not exist on type 'IPublishRecord'.
+src/pages/MainPage/pages/empty-page.tsx(9,10): error TS2305: Module '"@/constants/constants"' has no exported member 'DISCORD_URL'.
+src/pages/MainPage/pages/enchanced-beam-effect.tsx(3,28): error TS2307: Cannot find module '../../../components/ui/border-beams' or its corresponding type declarations.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(180,35): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(215,36): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(216,36): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(633,48): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(646,48): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'SetStateAction<string | null>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<string | null>'.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(698,79): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(898,52): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/folderCollections/folder-cards-view.tsx(906,83): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/main-page.tsx(71,9): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/main-page.tsx(89,9): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/pages/MainPage/pages/main-page.tsx(94,11): error TS2322: Type 'AgentType[]' is not assignable to type 'string[]'.
+  Type 'AgentType' is not assignable to type 'string'.
+src/pages/MainPage/pages/main-page.tsx(103,27): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'FolderType | null'.
+src/pages/MainPage/pages/main-page.tsx(202,9): error TS2322: Type 'FolderType | null' is not assignable to type 'FolderType | undefined'.
+  Type 'null' is not assignable to type 'FolderType | undefined'.
+src/pages/MainPage/pages/main-page.tsx(209,9): error TS2322: Type 'FolderType | null' is not assignable to type 'FolderType | undefined'.
+  Type 'null' is not assignable to type 'FolderType | undefined'.
+src/pages/McpServersPage/index.tsx(145,9): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/pages/McpServersPage/index.tsx(175,9): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/pages/McpServersPage/index.tsx(212,11): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/pages/ModelCatalogue/components/edit-model-modal.tsx(457,11): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/pages/ModelCatalogue/components/edit-model-modal.tsx(500,11): error TS2322: Type 'string' is not assignable to type 'ModelEnvironment | undefined'.
+src/pages/ModelCatalogue/components/edit-model-modal.tsx(501,11): error TS2322: Type 'string[]' is not assignable to type 'ModelEnvironment[]'.
+  Type 'string' is not assignable to type 'ModelEnvironment'.
+src/pages/ModelCatalogue/components/edit-model-modal.tsx(519,11): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/pages/ModelCatalogue/components/request-model-modal.tsx(319,9): error TS2322: Type 'string' is not assignable to type 'ModelEnvironment | undefined'.
+src/pages/ModelCatalogue/components/request-model-modal.tsx(320,9): error TS2322: Type 'string[]' is not assignable to type 'ModelEnvironment[]'.
+  Type 'string' is not assignable to type 'ModelEnvironment'.
+src/pages/ModelCatalogue/components/request-model-modal.tsx(345,9): error TS2353: Object literal may only specify known properties, and 'list' does not exist in type '{ title: string; }'.
+src/pages/Playground/index.tsx(86,9): error TS2820: Type '"Strict"' is not assignable to type '"none" | "strict" | "lax" | undefined'. Did you mean '"strict"'?
+src/pages/SettingsPage/pages/GeneralPage/index.tsx(43,51): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/pages/SettingsPage/pages/GlobalVariablesPage/index.tsx(41,8): error TS2739: Type '{ children: Element; options: any; value: any; onSelect: any; }' is missing the following properties from type 'BaseInputProps': id, editNode, handleOnNewValue, disabled
+src/pages/SettingsPage/pages/HelpSupportPage/index.tsx(348,15): error TS2322: Type '""' is not assignable to type '"link" | "menu" | "default" | "warning" | "destructive" | "outline" | "outlineAmber" | "primary" | "secondary" | "ghost" | "ghostActive" | "menu-active" | null | undefined'.
+src/pages/SettingsPage/pages/PackagesPage/components/my-package-requests-modal.tsx(30,81): error TS2554: Expected 0-1 arguments, but got 2.
+src/reportWebVitals.ts(1,15): error TS2305: Module '"web-vitals"' has no exported member 'ReportHandler'.
+src/reportWebVitals.ts(5,34): error TS2339: Property 'getCLS' does not exist on type 'typeof import("d:/final_code/aimldevteam/agentcore/src/frontend/node_modules/web-vitals/dist/modules/index")'.
+src/reportWebVitals.ts(5,42): error TS2339: Property 'getFID' does not exist on type 'typeof import("d:/final_code/aimldevteam/agentcore/src/frontend/node_modules/web-vitals/dist/modules/index")'.
+src/reportWebVitals.ts(5,50): error TS2339: Property 'getFCP' does not exist on type 'typeof import("d:/final_code/aimldevteam/agentcore/src/frontend/node_modules/web-vitals/dist/modules/index")'.
+src/reportWebVitals.ts(5,58): error TS2339: Property 'getLCP' does not exist on type 'typeof import("d:/final_code/aimldevteam/agentcore/src/frontend/node_modules/web-vitals/dist/modules/index")'.
+src/reportWebVitals.ts(5,66): error TS2339: Property 'getTTFB' does not exist on type 'typeof import("d:/final_code/aimldevteam/agentcore/src/frontend/node_modules/web-vitals/dist/modules/index")'.
+src/routes.tsx(62,29): error TS2307: Cannot find module './pages/AutomationsPage' or its corresponding type declarations.
+src/stores/__tests__/authStore.test.ts(44,24): error TS2339: Property 'setIsAdmin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(47,29): error TS2339: Property 'isAdmin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(50,24): error TS2339: Property 'setIsAdmin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(53,29): error TS2339: Property 'isAdmin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(117,24): error TS2339: Property 'setAutoLogin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(120,29): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(123,24): error TS2339: Property 'setAutoLogin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(126,29): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(169,24): error TS2339: Property 'setIsAdmin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(181,24): error TS2339: Property 'setAutoLogin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(186,29): error TS2339: Property 'isAdmin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(190,29): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(199,29): error TS2339: Property 'isAdmin' does not exist on type 'AuthStoreType'.
+src/stores/__tests__/authStore.test.ts(203,29): error TS2339: Property 'autoLogin' does not exist on type 'AuthStoreType'.
+src/stores/agentsManagerStore.ts(8,8): error TS2307: Cannot find module '../types/zustand/agentsManager' or its corresponding type declarations.
+src/stores/agentStore.ts(36,8): error TS2307: Cannot find module '../types/zustand/agent' or its corresponding type declarations.
+src/stores/agentStore.ts(365,44): error TS2347: Untyped function calls may not accept type arguments.
+src/stores/alertStore.ts(5,33): error TS1261: Already included file name 'd:/final_code/aimldevteam/agentcore/src/frontend/src/utils/reactFlowUtils.ts' differs from file name 'd:/final_code/aimldevteam/agentcore/src/frontend/src/utils/reactflowUtils.ts' only in casing.
+  The file is in the program because:
+    Imported via "../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/stores/alertStore.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/utils/get-handle-id.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/parameterRenderComponent/components/inputComponent/index.tsx'
+    Imported via "../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/stores/agentStore.ts'
+    Imported via "./reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/utils/storeUtils.ts'
+    Imported via "../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/apiModal/utils/get-changes-types.ts'
+    Imported via "../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/stores/typesStore.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/controllers/API/queries/agents/use-get-agent.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/hooks/agents/use-save-agent.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/controllers/API/queries/agents/use-get-refresh-agents-query.ts'
+    Imported via "../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/hooks/use-unsaved-changes.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/hooks/agents/use-add-agent.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/hooks/agents/use-delete-agent.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/controllers/API/queries/registry/use-get-registry-preview.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/hooks/use-add-component.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/agentSidebarComponent/components/sidebarItemsList.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/agentSidebarComponent/components/sidebarDraggableComponent.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomEdges/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/GenericNode/components/NodeDescription/index.tsx'
+    Imported via "../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/exportModal/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/templatesModal/components/TemplateContentComponent/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/parameterRenderComponent/components/tableComponent/components/tableAdvancedToggleCellRender/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/codeAreaModal/index.tsx'
+    Imported via "../../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/parameterRenderComponent/components/floatComponent/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/parameterRenderComponent/components/inputListComponent/components/cursor-input.tsx'
+    Imported via "../../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/parameterRenderComponent/components/intComponent/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/parameterRenderComponent/components/keypairListComponent/index.tsx'
+    Imported via "../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/promptModal/index.tsx'
+    Imported via "../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/queryModal/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/customization/components/custom-parameter.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/dropdownComponent/index.tsx'
+    Imported via "../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/textAreaModal/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/parameterRenderComponent/components/tableComponent/components/tableNodeCellRender/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/codeTabsComponent/components/tweakComponent/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/apiModal/codeTabs/code-tabs.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/IOModal/components/IOFieldView/io-field-view.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/hooks/agents/use-upload-agent.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/GenericNode/components/NodeStatus/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/MainPage/hooks/use-handle-duplicate.ts'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/nodeToolbarComponent/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/editNodeModal/index.tsx'
+    Imported via "../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/modals/shareModal/index.tsx'
+    Imported via "../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/GenericNode/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/GenericNode/components/NodeOutputfield/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/GenericNode/components/handleRenderComponent/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/GenericNode/components/NodeOutputParameter/nodeOutputUtils.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/CustomNodes/GenericNode/components/RenderInputParameters/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/PageComponent/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/SelectionMenuComponent/index.tsx'
+    Imported via "../../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/PageComponent/utils/get-random-name.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/controllers/API/queries/folders/use-get-folder.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/controllers/API/queries/agents/use-get-download-agents.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/MainPage/components/list/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/MainPage/components/AgentTransferModal.tsx'
+    Imported via "../../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/folderSidebarComponent/components/sideBarFolderButtons/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/components/core/folderSidebarComponent/hooks/use-on-file-drop.ts'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/ViewPage/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/ApprovalPreviewPage/index.tsx'
+    Imported via "../../../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/agentSidebarComponent/components/sidebarDraggableComponent/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentBuilderPage/components/agentSidebarComponent/components/sidebarItemsList/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarItemsList.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarDraggableComponent.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/PageComponent/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/SelectionMenuComponent/index.tsx'
+    Imported via "../../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/PageComponent/utils/get-random-name.tsx'
+    Imported via "../../../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarDraggableComponent/index.tsx'
+    Imported via "@/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/agentSidebarComponent/components/sidebarItemsList/index.tsx'
+    Imported via "../../../../utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/pages/AgentPage_old/components/nodeToolbarComponent/index.tsx'
+    Matched by include pattern 'src' in 'tsconfig.json'
+src/stores/locationStore.ts(2,40): error TS2307: Cannot find module '../types/zustand/location' or its corresponding type declarations.
+src/types/agent/index.ts(1,27): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/types/components/index.ts(1,15): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/types/zustand/auth/index.ts(12,13): error TS2304: Cannot find name 'Users'.
+src/types/zustand/auth/index.ts(25,27): error TS2304: Cannot find name 'Users'.
+src/types/zustand/flow/index.ts(6,3): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowInstance'. Did you mean 'ReactFlowInstance'?
+src/types/zustand/flowsManager/index.ts(1,15): error TS2300: Duplicate identifier 'AgentType'.
+src/types/zustand/flowsManager/index.ts(2,15): error TS2300: Duplicate identifier 'AgentType'.
+src/utils/buildUtils.ts(22,45): error TS2307: Cannot find module '../types/zustand/agent' or its corresponding type declarations.
+src/utils/reactFlowUtils.ts(20,8): error TS2724: '"@xyflow/react"' has no exported member named 'reactFlowJsonObject'. Did you mean 'ReactFlowJsonObject'?
+src/utils/reactFlowUtils.ts(62,8): error TS1261: Already included file name 'd:/final_code/aimldevteam/agentcore/src/frontend/src/types/utils/reactFlowUtils.ts' differs from file name 'd:/final_code/aimldevteam/agentcore/src/frontend/src/types/utils/reactflowUtils.ts' only in casing.
+  The file is in the program because:
+    Imported via "../types/utils/reactFlowUtils" from file 'd:/final_code/aimldevteam/agentcore/src/frontend/src/utils/reactFlowUtils.ts'
+    Matched by include pattern 'src' in 'tsconfig.json'
+src/utils/styleUtils.ts(575,7): error TS1361: 'dynamicIconImports' cannot be used as a value because it was imported using 'import type'.
+src/utils/styleUtils.ts(577,34): error TS1361: 'dynamicIconImports' cannot be used as a value because it was imported using 'import type'.
+src/utils/styleUtils.ts(601,5): error TS1361: 'dynamicIconImports' cannot be used as a value because it was imported using 'import type'.
