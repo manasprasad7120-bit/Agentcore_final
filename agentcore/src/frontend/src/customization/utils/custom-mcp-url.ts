@@ -10,7 +10,7 @@ export const customGetMCPUrl = (
     return composerUrl;
   }
 
-  // Fallback to direct AgentCore SSE endpoint
+  // Fallback to direct Irah SSE endpoint
   const apiHost = api.defaults.baseURL || window.location.origin;
   const apiUrl = `${apiHost}/api/mcp/project/${projectId}/sse`;
   return apiUrl;

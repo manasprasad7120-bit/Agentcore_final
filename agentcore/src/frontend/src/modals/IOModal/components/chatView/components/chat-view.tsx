@@ -255,7 +255,7 @@ export default function ChatView({
               <div className="flex w-full flex-grow flex-col items-center justify-center">
                 <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-8">
                   <MothersonLogo
-                    title="Motherson Logo"
+                    title="Irah Logo"
                     className="h-9 w-9"
                   />
                   <div className="flex flex-col items-center justify-center">

@@ -211,7 +211,7 @@ export default function ShareModal({
         <BaseModal.Header
           description={`Publish ${
             is_component ? "your component" : "workflow"
-          } to the AgentCore Store.`}
+          } to the Irah Store.`}
         >
           <span className="pr-2">Share</span>
           <IconComponent

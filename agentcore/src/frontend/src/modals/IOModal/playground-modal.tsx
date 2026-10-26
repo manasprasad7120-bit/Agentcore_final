@@ -10,7 +10,7 @@ import { customOpenNewTab } from "@/customization/utils/custom-open-new-tab";
 import { AgentCoreButtonRedirectTarget } from "@/customization/utils/urls";
 import { useUtilityStore } from "@/stores/utilityStore";
 import { swatchColors } from "@/utils/styleUtils";
-import AgentCoreLogoColor from "../../assets/motherson_name.svg";
+import AgentCoreLogoColor from "../../assets/micore.svg";
 import IconComponent from "../../components/common/genericIconComponent";
 import { Button } from "../../components/ui/button";
 import useAlertStore from "../../stores/alertStore";
@@ -413,7 +413,7 @@ export default function IOModal({
             className="w-full !rounded-lg"
           >
             <AgentCoreLogoColor />
-            <span className="ml-1 text-sm">Built with AgentCore</span>
+            <span className="ml-1 text-sm">Built with Irah</span>
           </Button>
         </div>
       )}

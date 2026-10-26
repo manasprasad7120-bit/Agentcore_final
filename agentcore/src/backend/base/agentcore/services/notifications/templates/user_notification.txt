@@ -13,4 +13,4 @@ Updated by: {actor_name}
 Organization: {organization_name}
 Department: {department_name}
 
-This is an automated notification from MiCore. Please do not reply to this email.
+This is an automated notification from Irah. Please do not reply to this email.

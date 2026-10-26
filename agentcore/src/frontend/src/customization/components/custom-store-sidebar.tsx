@@ -8,7 +8,7 @@ export const CustomStoreSidebar = (
 
   if (hasStore) {
     items.push({
-      title: "AgentCore Store",
+      title: "Irah Store",
       href: "/store",
       icon: (
         <ForwardedIconComponent

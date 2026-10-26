@@ -260,7 +260,7 @@ def create_app():
     configure()
     lifespan = get_lifespan(version=__version__)
     app = FastAPI(
-        title="AgentCore",
+        title="Irah",
         version=__version__,
         lifespan=lifespan,
     )

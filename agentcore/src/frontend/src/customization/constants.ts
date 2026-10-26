@@ -1,4 +1,4 @@
-//AgentCore Desktop Base URL
+//Irah Desktop Base URL
 export const baseURL = "";
 
 export const customCodeTabsClass = {

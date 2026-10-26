@@ -459,7 +459,7 @@ function resolveModelIcon(model: { model_id?: string; model_name?: string; displ
   if (/hugging[\s_-]?face/.test(hay)) return huggingfaceLogo;
   if (/gpt|openai|o[13][\s_-]|o[13]$|o4/.test(hay)) return openaiLogo;
 
-  // 2. MiBuddy / MiCore — only if no known model family matched above
+  // 2. MiBuddy / Irah — only if no known model family matched above
   if (/mibuddy|mi[\s_-]?core|micore/.test(hay)) return micoreLogo;
 
   // 3. Provider-based fallbacks (e.g. azure with a custom deployment name)

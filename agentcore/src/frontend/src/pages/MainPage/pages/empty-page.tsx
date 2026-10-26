@@ -14,7 +14,7 @@ import { useFolderStore } from "@/stores/foldersStore";
 import { formatNumber } from "@/utils/utils";
 import useFileDrop from "../hooks/use-on-file-drop";
 
-const EMPTY_PAGE_TITLE = "Welcome to MiCore";
+const EMPTY_PAGE_TITLE = "Welcome to Irah";
 const EMPTY_PAGE_DESCRIPTION = "Your new favorite way to ship Agents";
 const EMPTY_PAGE_GITHUB_DESCRIPTION =
   "Follow development, star the repo, and shape the future.";
@@ -67,7 +67,7 @@ export const EmptyPageCommunity = ({
             <div className="z-50 flex flex-col items-center gap-2">
               <div className="z-50">
                 <MothersonLogo
-                  title="MiCore Logo"
+                  title="Irah Logo"
                   data-testid="empty_page_logo"
                   className="relative top-2 h-14 w-auto"
                 />

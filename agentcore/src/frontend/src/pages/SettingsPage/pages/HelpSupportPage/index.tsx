@@ -302,12 +302,12 @@ export default function HelpSupportPage() {
       {/* ── Footer ───────────────────────────────────────────────── */}
       <div className="flex-shrink-0 border-t bg-muted/20 px-4 py-2 sm:px-6 md:px-8">
         <p className="mx-auto max-w-5xl text-center text-xs leading-relaxed text-muted-foreground">
-          {t("For support or assistance with MiCore, contact")}{" "}
+          {t("For support or assistance with Irah, contact")}{" "}
           <a
-            href="mailto:MiCore.support@motherson.com"
+            href="mailto:Irah.support@motherson.com"
             className="font-semibold text-foreground underline-offset-2 hover:underline"
           >
-            MiCore.support@motherson.com
+            Irah.support@motherson.com
           </a>
           {"; "}
           {t("for escalations, reach out to")}{" "}

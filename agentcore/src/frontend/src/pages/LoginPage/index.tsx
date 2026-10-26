@@ -248,7 +248,7 @@ export default function LoginPage(): JSX.Element {
           <div className="mb-6 sm:mb-8">
             <img 
               src={MothersonLogo} 
-              alt={t("MiCore Logo")} 
+              alt={t("Irah Logo")} 
               className="h-12 sm:h-16 md:h-20 w-auto"
             />
           </div>
@@ -259,7 +259,7 @@ export default function LoginPage(): JSX.Element {
             </h1>
             <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8">
               {t(
-                "Connect your ideas to reality with MiCore powerful platform.",
+                "Connect your ideas to reality with Irah powerful platform.",
               )}
             </p>
           </div>

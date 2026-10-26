@@ -163,12 +163,12 @@ export default function PublishModal({
     }
 
     if (!apiKey.trim()) {
-      setError("Please enter your AgentCore API key");
+      setError("Please enter your Irah API key");
       return;
     }
 
     if (!agentcoreUrl.trim()) {
-      setError("Please enter your AgentCore URL");
+      setError("Please enter your Irah URL");
       return;
     }
 
@@ -200,8 +200,8 @@ export default function PublishModal({
 
   return (
     <BaseModal open={open} setOpen={setOpen} size="medium">
-      <BaseModal.Header description="Deploy your agent to AgentCore as a selectable model">
-        <span className="pr-2">Publish to AgentCore</span>
+      <BaseModal.Header description="Deploy your agent to Irah as a selectable model">
+        <span className="pr-2">Publish to Irah</span>
         <IconComponent
           name="Globe"
           className="h-6 w-6 pl-1 text-foreground"
@@ -220,7 +220,7 @@ export default function PublishModal({
           {/* Saved Connections Selector */}
           {savedConnections.length > 0 && (
             <div className="flex flex-col gap-2">
-              <Label htmlFor="connection-select">AgentCore Connection</Label>
+              <Label htmlFor="connection-select">Irah Connection</Label>
               <Select
                 value={selectedConnection}
                 onValueChange={handleConnectionChange}
@@ -250,7 +250,7 @@ export default function PublishModal({
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Select a previously used AgentCore instance or add a new one
+                Select a previously used Irah instance or add a new one
               </p>
             </div>
           )}
@@ -258,7 +258,7 @@ export default function PublishModal({
           {/* Model Name */}
           <div className="flex flex-col gap-2">
             <Label htmlFor="model-name">
-              Model Name in AgentCore
+              Model Name in Irah
               <span className="ml-1 text-destructive">*</span>
             </Label>
             <Input
@@ -270,14 +270,14 @@ export default function PublishModal({
               disabled={publishMutation.isPending}
             />
             <p className="text-xs text-muted-foreground">
-              The name that will appear in AgentCore's model selector
+              The name that will appear in Irah's model selector
             </p>
           </div>
 
-          {/* AgentCore URL */}
+          {/* Irah URL */}
           <div className="flex flex-col gap-2">
             <Label htmlFor="agentcore-url">
-              AgentCore URL
+              Irah URL
               <span className="ml-1 text-destructive">*</span>
             </Label>
             <Input
@@ -289,14 +289,14 @@ export default function PublishModal({
               disabled={publishMutation.isPending}
             />
             <p className="text-xs text-muted-foreground">
-              The base URL of your AgentCore instance
+              The base URL of your Irah instance
             </p>
           </div>
 
           {/* API Key */}
           <div className="flex flex-col gap-2">
             <Label htmlFor="api-key">
-              AgentCore API Key
+              Irah API Key
               <span className="ml-1 text-destructive">*</span>
             </Label>
             <div className="relative">
@@ -323,7 +323,7 @@ export default function PublishModal({
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Get your API key from AgentCore Settings → Account → API Keys
+              Get your API key from Irah Settings → Account → API Keys
             </p>
           </div>
 

@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <img src={MothersonLogo} alt="MiCore" className="h-16 w-auto" />
+          <img src={MothersonLogo} alt="Irah" className="h-16 w-auto" />
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
